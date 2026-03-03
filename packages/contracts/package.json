@@ -1,0 +1,19 @@
+{
+  "name": "@cf-rendercv/contracts",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api/index.ts",
+    "./entities": "./src/entities/index.ts"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^0.3.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "eslint-plugin-import": "^2.32.0",
+    "typescript": "^5.3.3"
+  }
+}

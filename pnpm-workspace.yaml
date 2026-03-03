@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@playwright/browser-chromium'
+  - bufferutil
+  - core-js-pure
+  - electron
+  - esbuild
+  - sharp
+  - utf-8-validate
+  - workerd

@@ -1,0 +1,63 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rendercv-http",
+  "main": "src/index.ts",
+  "dev": {
+    "port": 8787
+  },
+  "compatibility_date": "2025-11-17",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  },
+  "containers": [
+    {
+      "class_name": "DockerRendercvApp",
+      "image": "../rendercv-app/Dockerfile",
+      "name": "rendercv-app",
+      "image_build_context": "../..",
+      "max_instances": 10
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "DockerRendercvApp",
+        "name": "DOCKER_RENDERCV_APP"
+      },
+      {
+        "class_name": "RendercvDo",
+        "name": "MCP_OBJECT"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "new_sqlite_classes": [
+        "DockerRendercvApp"
+      ],
+      "tag": "v1"
+    },
+    {
+      "new_sqlite_classes": [
+        "RendercvDo"
+      ],
+      "tag": "v2"
+    }
+  ],
+  "kv_namespaces": [
+  ]
+}
