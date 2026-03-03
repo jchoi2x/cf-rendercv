@@ -21,9 +21,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "playwright-core": [
-        "./node_modules/rebrowser-playwright-core"
-      ],
       "@/*": [
         "./src/*"
       ]

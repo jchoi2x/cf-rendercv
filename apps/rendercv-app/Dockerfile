@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM --platform=linux/amd64 ghcr.io/rendercv/rendercv:latest
+FROM ghcr.io/rendercv/rendercv:latest
 
 
 USER root

@@ -1,8 +1,15 @@
 import type { ResponseConfig, RouteConfig, ZodContentObject, ZodRequestBody } from '@asteasolutions/zod-to-openapi';
 import { type OpenAPIHono } from '@hono/zod-openapi';
 import type { Env, Handler, TypedResponse } from 'hono';
-import type { AnyZodObject, ZodSchema } from 'zod';
-import { type z } from 'zod';
+import type {
+  ZodObject,
+  ZodRawShape,
+  ZodSchema,
+  infer as zInfer,
+  input as zInput,
+} from 'zod';
+
+type AnyZodObject = ZodObject<ZodRawShape>;
 
 
 export type SunoApiEnv = {
@@ -32,10 +39,10 @@ type InputTypeBase<R extends RouteConfig, Part extends string, Type extends stri
   ? RequestPart<R, Part> extends AnyZodObject
   ? {
     in: {
-      [K in Type]: z.input<RequestPart<R, Part>>;
+      [K in Type]: zInput<RequestPart<R, Part>>;
     };
     out: {
-      [K in Type]: z.input<RequestPart<R, Part>>;
+      [K in Type]: zInput<RequestPart<R, Part>>;
     };
   }
   : {}
@@ -49,10 +56,10 @@ type InputTypeJson<R extends RouteConfig> = R['request'] extends RequestTypes
   : R['request']['body']['content'][keyof R['request']['body']['content']]['schema'] extends ZodSchema<any>
   ? {
     in: {
-      json: z.input<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
+      json: zInput<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
     };
     out: {
-      json: z.input<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
+      json: zInput<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
     };
   }
   : {}
@@ -68,10 +75,10 @@ type InputTypeForm<R extends RouteConfig> = R['request'] extends RequestTypes
   : R['request']['body']['content'][keyof R['request']['body']['content']]['schema'] extends ZodSchema<any>
   ? {
     in: {
-      form: z.input<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
+      form: zInput<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
     };
   out: {
-    form: z.input<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
+    form: zInput<R['request']['body']['content'][keyof R['request']['body']['content']]['schema']>;
   };
   }
   : {}
@@ -85,7 +92,7 @@ type OutputType<R extends RouteConfig> = R['responses'] extends Record<infer _, 
   ? IsJson<keyof C['content']> extends never
   ? {}
   : C['content'][keyof C['content']]['schema'] extends ZodSchema
-  ? z.infer<C['content'][keyof C['content']]['schema']>
+  ? zInfer<C['content'][keyof C['content']]['schema']>
   : {}
   : {}
   : {}

@@ -1,1 +1,1 @@
-export * from './cv';
+export * from './rendercv';

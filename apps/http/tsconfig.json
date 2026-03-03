@@ -17,6 +17,11 @@
     "strict": true,
     "skipLibCheck": true
   },
+  "references": [
+    {
+      "path": "../../packages/contracts"
+    }
+  ],
   "exclude": ["test"],
   "include": [
     "worker-configuration.d.ts",

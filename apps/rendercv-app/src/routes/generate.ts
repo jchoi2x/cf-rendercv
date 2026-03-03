@@ -1,14 +1,12 @@
 import { createRoute } from '@hono/zod-openapi';
 
 import type { HandlerFromRoute } from '@/routes/types';
-import type { RenderCVYaml} from '@cf-rendercv/contracts';
-import { ErrorResponseSchema, GenerateSuccessSchema, RenderCVYamlSchema } from '@cf-rendercv/contracts';
+import { ErrorResponseSchema, GenerateSuccessSchema, TRenderCvDocument } from '@cf-rendercv/contracts';
 import yaml from 'js-yaml';
 import { writeFileSync } from 'node:fs';
 import { createReadStream } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { rimrafSync } from 'rimraf';
-import path from 'node:path';
 
 
 const route = createRoute({
@@ -22,7 +20,7 @@ const route = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: RenderCVYamlSchema,
+          schema: TRenderCvDocument,
         },
       },
     },
@@ -47,32 +45,47 @@ const route = createRoute({
   },
 });
 
-const outputDir = `rendercv_output`;
+const outputDir = `/tmp/rendercv_output`;
 
 const handler: HandlerFromRoute<typeof route> = async (c) => {
-    const _body = c.req.valid('json') as RenderCVYaml;
+    const _body = c.req.valid('json') as TRenderCvDocument;
     // convert to yaml text use js-yaml
     const yamlText = yaml.dump(_body);
     // rimraf delete the output directory
     rimrafSync(outputDir);
 
     // write the yaml text to a file
-    writeFileSync('resume.yaml', yamlText);
+    writeFileSync('/tmp/resume.yaml', yamlText);
 
-    // execute rendercv and stream the output to stdout
-    const result = execSync('rendercv render --pdf-path ./output.pdf ./resume.yaml', { encoding: 'utf-8' });
+    try {
+      // execute rendercv and stream the output to stdout
+      const result = execSync('rendercv render -nomd -nohtml -nopng -typ /tmp/output.typ -pdf /tmp/output.pdf /tmp/resume.yaml', { encoding: 'utf-8' });
 
-    if (result) {
-      const output = result.toString();
-      console.debug('', output)
+      if (result) {
+        const output = result.toString();
+        console.debug('output:::\n', output)
+      }
+
+      // stream output of pdf to the response
+      const pdfPath = `/tmp/output.pdf`;
+      const pdf = createReadStream(pdfPath);
+      const jsonSchema = TRenderCvDocument.toJSONSchema();
+
+      writeFileSync('/tmp/json-schema.json', JSON.stringify(jsonSchema, null, 2));
+
+      
+
+      c.header('Content-Type', 'application/pdf');
+      return c.body(pdf as unknown as ReadableStream);
+    } catch(err) {
+      const stdout = (err as any).stdout?.toString();
+      console.error('stdout:::', (err as any).stdout?.toString());
+      console.error('stderr:::', (err as any).stderr?.toString());
+
+      const statusCode = (stdout.includes('errors in the input file!') ? 400 : 500);
+      return c.json({ error: (err as any).message, info: stdout }, statusCode);
+
     }
-
-    // stream output of pdf to the response
-    const pdfPath = path.resolve(`./output.pdf`);
-    const pdf = createReadStream(pdfPath);
-
-    c.header('Content-Type', 'application/pdf');
-    return c.body(pdf as unknown as ReadableStream);
 };
 
 export const generateRoute = {

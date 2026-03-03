@@ -42,16 +42,6 @@ export class RendercvDo extends DurableObject<Env> {
     try {
       const request = new Request(`http://container${path}`, options);
       const response = await container.fetch(request);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Container service error (${response.status}): ${errorText}`);
-      }
-
-      const contentType = response.headers.get("content-type");
-      if (contentType?.includes("application/json")) {
-        return await response.json();
-      }
       return response;
     } catch (error: any) {
       throw new Error(`Failed to call container service: ${error.message}`);
