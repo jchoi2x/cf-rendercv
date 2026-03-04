@@ -47,6 +47,12 @@ importers:
 
   apps/http:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1002.0
+        version: 3.1002.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1002.0
+        version: 3.1002.0
       '@cf-rendercv/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -81,12 +87,6 @@ importers:
 
   apps/rendercv-app:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1002.0
-        version: 3.1002.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: ^3.1002.0
-        version: 3.1002.0
       '@cf-rendercv/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

@@ -3,6 +3,10 @@ import { getContainer } from "@cloudflare/containers";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Hono } from "hono";
 import { RenderCvDocument } from "@cf-rendercv/contracts";
+import {
+PutObjectCommand,
+S3Client
+} from "@aws-sdk/client-s3";
 
 export class RendercvDo extends McpAgent<Env, Record<string, string>, {}> {
   app = new Hono<{ Bindings: Env }>();
@@ -11,6 +15,9 @@ export class RendercvDo extends McpAgent<Env, Record<string, string>, {}> {
     name: "RenderCV API",
     version: "1.0.0",
   });
+
+  
+  s3: S3Client;
   
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
@@ -19,6 +26,16 @@ export class RendercvDo extends McpAgent<Env, Record<string, string>, {}> {
     });
 
     this.app.use('*', (c) => super.fetch(c.req.raw));
+    this.s3 = new S3Client({
+      region: "auto", // Required by AWS SDK, not used by R2
+      // Provide your R2 endpoint: https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+      endpoint: env.S3_URL,
+      credentials: {
+        // Provide your R2 Access Key ID and Secret Access Key
+        accessKeyId: env.S3_ACCESS_KEY_ID,
+        secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+      },
+    });
   }
 
   override async init() {
@@ -32,22 +49,39 @@ export class RendercvDo extends McpAgent<Env, Record<string, string>, {}> {
       },
     }, async ({ content }) => {
 
-      const response = await this.generateCV(content);
-      const data = await response.json<{ url: string, filename: string }>();
       
+      const response = await this.generateCV(content);
       // get the base64 encoded pdf from the response body
-      // const pdf = await response.text();
-      // const base64Pdf = Buffer.from(pdf).toString('base64');
-      // const uuid = crypto.randomUUID();
+      const pdfBuffer = await response.arrayBuffer();
+
+      const uuid = crypto.randomUUID();
+
+      // upload the pdf to s3
+      const fPath = `rendercv/${uuid}.pdf`;
+      const cmd = new PutObjectCommand({
+        Bucket: this.env.S3_BUCKET,
+        Key: fPath,
+        ContentType: 'application/pdf',
+        Body: new Uint8Array(pdfBuffer),
+      });
+      await this.s3.send(cmd);
+
+      const url = `${this.env.S3_PUBLIC_URL}/${fPath}`;
+
       return {
         content: [
           {
             type: "text",
-            text: data.url
-          },
+            text: url,
+          }
         ],
       };
     });
+
+      // get the base64 encoded pdf from the response body
+      // const pdf = await response.text();
+      // const base64Pdf = Buffer.from(pdf).toString('base64');
+      // const uuid = crypto.randomUUID();
 
   }
 

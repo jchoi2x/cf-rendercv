@@ -3,26 +3,10 @@ import { createRoute } from '@hono/zod-openapi';
 import type { HandlerFromRoute } from '@/routes/types';
 import { ErrorResponseSchema, GenerateSuccessSchema, RenderCvDocument } from '@cf-rendercv/contracts';
 import yaml from 'js-yaml';
-import {
-readFileSync,
-writeFileSync
-} from 'node:fs';
+import { writeFileSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { rimrafSync } from 'rimraf';
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-
-
-
-const s3 = new S3Client({
-  region: "auto", // Required by AWS SDK, not used by R2
-  // Provide your R2 endpoint: https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-  endpoint: process.env.S3_URL as string,
-  credentials: {
-    // Provide your R2 Access Key ID and Secret Access Key
-    accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
-  },
-});
 
 
 const route = createRoute({
@@ -86,33 +70,17 @@ const handler: HandlerFromRoute<typeof route> = async (c) => {
         console.debug('output:::\n', output)
       }
 
-      const base64 = readFileSync(outputPdfPath, 'base64');
+      // stream output of pdf to the response
+      const pdf = createReadStream(outputPdfPath);
 
-      // upload the pdf to s3
-      const cmd = new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET as string,
-        Key: `rendercv/${uuid}.pdf`,
-        ContentType: 'application/pdf',
-        Body: base64
-      });
-
-      await s3.send(cmd);
-
-      const url = `${process.env.S3_PUBLIC_URL}/rendercv/${uuid}.pdf`;
-
-      return c.json({ 
-        success: true,
-        message: 'CV generated successfully',
-        filename: `${uuid}.pdf`,
-        url 
-      });
-
+      c.header('Content-Type', 'application/pdf');
+      return c.body(pdf as unknown as ReadableStream);
     } catch(err) {
       const stdout = (err as any).stdout?.toString();
       console.error('stdout:::', (err as any).stdout?.toString());
       console.error('stderr:::', (err as any).stderr?.toString());
 
-      const statusCode = (stdout && stdout.includes('errors in the input file!') ? 400 : 500);
+      const statusCode = (stdout.includes('errors in the input file!') ? 400 : 500);
       return c.json({ error: (err as any).message, info: stdout }, statusCode);
 
     }
