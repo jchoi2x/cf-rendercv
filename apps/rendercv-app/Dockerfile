@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
 
 
 # Install pnpm (update corepack first to fix signature verification issues)
-RUN npm install -g corepack@latest && corepack enable && corepack prepare pnpm@10.26.2 --activate
+RUN npm install -g corepack@latest && corepack enable && corepack prepare pnpm@10.30.3 --activate
 
 # Copy package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./

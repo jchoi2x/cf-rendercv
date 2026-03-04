@@ -1,12 +1,28 @@
 import { createRoute } from '@hono/zod-openapi';
 
 import type { HandlerFromRoute } from '@/routes/types';
-import { ErrorResponseSchema, GenerateSuccessSchema, TRenderCvDocument } from '@cf-rendercv/contracts';
+import { ErrorResponseSchema, GenerateSuccessSchema, RenderCvDocument } from '@cf-rendercv/contracts';
 import yaml from 'js-yaml';
-import { writeFileSync } from 'node:fs';
-import { createReadStream } from 'node:fs';
+import {
+readFileSync,
+writeFileSync
+} from 'node:fs';
 import { execSync } from 'node:child_process';
 import { rimrafSync } from 'rimraf';
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+
+
+const s3 = new S3Client({
+  region: "auto", // Required by AWS SDK, not used by R2
+  // Provide your R2 endpoint: https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+  endpoint: process.env.S3_URL as string,
+  credentials: {
+    // Provide your R2 Access Key ID and Secret Access Key
+    accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
+  },
+});
 
 
 const route = createRoute({
@@ -20,7 +36,7 @@ const route = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: TRenderCvDocument,
+          schema: RenderCvDocument,
         },
       },
     },
@@ -48,41 +64,55 @@ const route = createRoute({
 const outputDir = `/tmp/rendercv_output`;
 
 const handler: HandlerFromRoute<typeof route> = async (c) => {
-    const _body = c.req.valid('json') as TRenderCvDocument;
+    const _body = c.req.valid('json') as RenderCvDocument;
     // convert to yaml text use js-yaml
     const yamlText = yaml.dump(_body);
     // rimraf delete the output directory
     rimrafSync(outputDir);
 
+    const uuid = crypto.randomUUID();
+    const resumeYamlPath = `/tmp/${uuid}.yaml`;
+    const outputPdfPath = `/tmp/${uuid}.pdf`;
+    const outputTypstPath = `/tmp/${uuid}.typ`;
     // write the yaml text to a file
-    writeFileSync('/tmp/resume.yaml', yamlText);
+    writeFileSync(resumeYamlPath, yamlText);
 
     try {
       // execute rendercv and stream the output to stdout
-      const result = execSync('rendercv render -nomd -nohtml -nopng -typ /tmp/output.typ -pdf /tmp/output.pdf /tmp/resume.yaml', { encoding: 'utf-8' });
+      const result = execSync(`rendercv render -nomd -nohtml -nopng -typ ${outputTypstPath} -pdf ${outputPdfPath} ${resumeYamlPath}`, { encoding: 'utf-8' });
 
       if (result) {
         const output = result.toString();
         console.debug('output:::\n', output)
       }
 
-      // stream output of pdf to the response
-      const pdfPath = `/tmp/output.pdf`;
-      const pdf = createReadStream(pdfPath);
-      const jsonSchema = TRenderCvDocument.toJSONSchema();
+      const base64 = readFileSync(outputPdfPath, 'base64');
 
-      writeFileSync('/tmp/json-schema.json', JSON.stringify(jsonSchema, null, 2));
+      // upload the pdf to s3
+      const cmd = new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET as string,
+        Key: `rendercv/${uuid}.pdf`,
+        ContentType: 'application/pdf',
+        Body: base64
+      });
 
-      
+      await s3.send(cmd);
 
-      c.header('Content-Type', 'application/pdf');
-      return c.body(pdf as unknown as ReadableStream);
+      const url = `${process.env.S3_PUBLIC_URL}/rendercv/${uuid}.pdf`;
+
+      return c.json({ 
+        success: true,
+        message: 'CV generated successfully',
+        filename: `${uuid}.pdf`,
+        url 
+      });
+
     } catch(err) {
       const stdout = (err as any).stdout?.toString();
       console.error('stdout:::', (err as any).stdout?.toString());
       console.error('stderr:::', (err as any).stderr?.toString());
 
-      const statusCode = (stdout.includes('errors in the input file!') ? 400 : 500);
+      const statusCode = (stdout && stdout.includes('errors in the input file!') ? 400 : 500);
       return c.json({ error: (err as any).message, info: stdout }, statusCode);
 
     }

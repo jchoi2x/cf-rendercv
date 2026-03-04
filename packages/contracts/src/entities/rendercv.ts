@@ -4012,7 +4012,7 @@ export const rendercv_schema_models_locale_english_locale_Phrases_9: z.ZodTypeAn
     .describe("Phrases"),
 );
 
-export const TRenderCvDocument = z
+export const RenderCvDocument = z
   .object({
     cv: Cv.optional(),
     design: BuiltInDesign.optional(),
@@ -4022,4 +4022,4 @@ export const TRenderCvDocument = z
   .strict()
   .describe("Typst-based CV/resume generator for academics and engineers.");
 
-export type TRenderCvDocument = z.infer<typeof TRenderCvDocument>;
+export type RenderCvDocument = z.infer<typeof RenderCvDocument>;

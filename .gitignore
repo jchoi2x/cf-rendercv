@@ -186,3 +186,4 @@ downloads/
 .wrangler
 *.tsbuildinfo
 .dev.vars
+.env

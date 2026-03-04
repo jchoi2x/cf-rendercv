@@ -1,4 +1,6 @@
 import { Container } from "@cloudflare/containers";
+import { env } from "cloudflare:workers";
+
 
 
 export class DockerRendercvApp extends Container<Env> {
@@ -9,6 +11,11 @@ export class DockerRendercvApp extends Container<Env> {
 
   // Environment variables passed to the container
   envVars = {
+    S3_ACCESS_KEY_ID: env.S3_ACCESS_KEY_ID,
+    S3_SECRET_ACCESS_KEY: env.S3_SECRET_ACCESS_KEY,
+    S3_URL: env.S3_URL,
+    S3_BUCKET: env.S3_BUCKET,
+    S3_PUBLIC_URL: env.S3_PUBLIC_URL,
   };
 
   // Optional lifecycle hooks

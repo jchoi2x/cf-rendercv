@@ -36,7 +36,15 @@ await build({
   outfile: 'dist/index.js',
   // Don't use packages: 'external' - we want to bundle @suno-mcp/contracts
   // Explicitly list what to keep external (all npm packages except workspace packages)
+  banner: {
+    js: `
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+    `.trim(),
+  },
+
   external: [
+    "buffer",
     '@hono/node-server',
     '@hono/swagger-ui',
     '@hono/zod-openapi',
