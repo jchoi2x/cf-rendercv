@@ -78,11 +78,77 @@ export class RendercvDo extends McpAgent<Env, Record<string, string>, {}> {
       };
     });
 
-      // get the base64 encoded pdf from the response body
-      // const pdf = await response.text();
-      // const base64Pdf = Buffer.from(pdf).toString('base64');
-      // const uuid = crypto.randomUUID();
+    // add a tool to get the rendercv json schema from the url https://raw.githubusercontent.com/rendercv/rendercv/refs/heads/main/schema.json
+    this.server.registerTool('rendercv_schema', {
+      title: "rendercv schema",
+      description: "Get the rendercv json schema. This is the schema that the rendercv mcp tool expects as input.",
+    }, async () => {
+      const response = await fetch('https://raw.githubusercontent.com/rendercv/rendercv/refs/heads/main/schema.json');
+      const schema = await response.json();
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(schema, null),
+          }
+        ],
+      };
+    });
 
+
+    const RENDERCV_SCHEMA_URI = "rendercv://schema-and-prompt";
+    this.server.registerResource(
+      "rendercv-schema-and-prompt",
+      RENDERCV_SCHEMA_URI,
+      {
+        description: "RenderCV JSON schema for the rendercv tool's content payload. Read this to build a valid content object.",
+        mimeType: "application/json",
+      },
+      async (uri) => {
+        const res = await fetch("https://raw.githubusercontent.com/rendercv/rendercv/refs/heads/main/schema.json");
+        const schema = await res.json();
+        const text = JSON.stringify(schema, null, 2);
+        return {
+          contents: [
+            {
+              uri: uri.toString(),
+              mimeType: "application/json",
+              text,
+            },
+          ],
+        };
+      }
+    );
+
+    this.server.registerPrompt(
+      "rendercv",
+      {
+        title: "Generate a CV with RenderCV",
+        description: "Instructions and context for using the rendercv tool to generate a CV PDF from a RenderCV document.",
+      },
+      async () => {
+        return {
+          description: "Instructions for using the rendercv tool to generate a CV",
+          messages: [
+            {
+              role: "user" as const,
+              content: {
+                type: "text" as const,
+                text: `Use the rendercv tool to generate a CV. The tool accepts a single argument "content" that must be a valid RenderCV document.
+
+Instructions:
+- Build the "content" object to match the RenderCV schema. Include sections such as personal info (name, email, etc.), experience, education, skills, and any other sections defined in the schema.
+- Pass the object as the "content" argument when calling the rendercv tool.
+- The tool returns a URL to the generated PDF.
+
+To see the full JSON schema for the content payload, read the resource at ${RENDERCV_SCHEMA_URI}.`,
+              },
+            },
+          ],
+        };
+      }
+    );
+    
   }
 
   async fetch(request: Request) {

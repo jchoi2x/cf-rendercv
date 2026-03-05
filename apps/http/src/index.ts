@@ -1,8 +1,11 @@
 import { RendercvDo, DockerRendercvApp } from './durable';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { RenderCvDocument } from '@cf-rendercv/contracts/entities';
 
 const app = new Hono<{ Bindings: Env }>();
+
+app.use('*', cors());
 
 app.get('/health', (c) => c.json({ message: 'OK' }));
 app.use('/sse*', (c) => {
