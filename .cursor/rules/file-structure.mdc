@@ -1,0 +1,76 @@
+---
+description: Monorepo file structure conventions for apps and packages
+alwaysApply: true
+---
+
+# Monorepo File Structure
+
+This rule documents and enforces the expected folder/file structure for this repository. It is based on the current organization of:
+
+- `apps/rendercv-app` (Hono API app with OpenAPI)
+- `packages/contracts` (shared schemas/entities)
+
+---
+
+## Monorepo Layout
+
+- Apps live under `apps/<app-name>/src`.
+- Shared contracts and domain models live under `packages/<pkg-name>/src`.
+
+---
+
+## Apps Conventions (`apps/**/src`)
+
+### App entrypoint (wiring)
+
+- Keep app wiring in `src/index.ts`.
+- Example: `apps/rendercv-app/src/index.ts` creates the Hono app and registers routes.
+
+### Endpoint modules (routes)
+
+- Put endpoint definitions under `src/routes/*`.
+- Route modules should use a consistent export shape:
+  - `src/routes/generate.ts` exports `const route` + `const handler`
+  - and then `export const generateRoute = { route, handler }`
+
+### Routes barrel
+
+- Ensure route modules are re-exported via a barrel at `src/routes/index.ts`.
+- Example: `apps/rendercv-app/src/routes/index.ts` exports everything from `./generate`.
+
+### App helpers
+
+- Put shared helper logic under `src/helpers/*`.
+- Example: `apps/rendercv-app/src/helpers/generate-swagger-html.ts`.
+
+### App types
+
+- Keep app types (e.g. `Env`) in `src/types.ts`.
+
+### Import style
+
+- Prefer the internal `@/*` alias for app-internal imports (see `apps/rendercv-app/tsconfig.json`).
+
+---
+
+## Contracts Conventions (`packages/**/src`)
+
+### Package barrel exports
+
+- Centralize exports from `src/index.ts`.
+- Example: `packages/contracts/src/index.ts` re-exports `./api` and `./entities`.
+
+### Separation of concerns
+
+- API schemas/types belong in `src/api/*`.
+- Domain entities belong in `src/entities/*`.
+- Example: `packages/contracts/src/entities/rendercv.ts`.
+
+---
+
+## Avoid
+
+- Do not define endpoint handlers directly in the app entrypoint (`src/index.ts`).
+  - Keep them in `src/routes/*` and re-export via `src/routes/index.ts`.
+- Do not place domain/entity models in app route files.
+  - Keep them in `packages/**/src/entities/*`.

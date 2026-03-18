@@ -1,22 +1,22 @@
 # cf-rendercv
 
-cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the `rendercv` **CLI**.
+cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the [`rendercv`](https://github.com/rendercv/rendercv) **CLI**.
 
-`rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the `rendercv` CLI available. A Node.js server wraps the CLI and exposes an HTTP endpoint; the Cloudflare Worker proxies requests to it.
+`rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the [`rendercv`](https://github.com/rendercv/rendercv) CLI available. A Node.js server wraps the CLI and exposes an HTTP endpoint; the Cloudflare Worker proxies requests to it.
 
 ## Projects
 
 The apps are:
 
 - `./apps/http`
-  - Cloudflare Worker (Hono)
+  - Cloudflare Worker ([Hono](https://hono.dev))
   - MCPAgent (MCP tool/agent wiring)
-  - hosts an MCP server that registers the `rendercv` tool, plus a prompt and a JSON schema resource
+  - hosts an MCP server that registers the `rendercv` tool, plus a prompt and a JSON schema resource (see `./apps/http/src/mcp/rendercv.mcp.ts`)
   - handles MCP tool calls by routing them to the container-backed PDF generator
-  - Cloudflare Container (starts/manages the Docker container lifecycle)
+  - Cloudflare Container ([`docker run`](https://docs.docker.com/engine/reference/commandline/run/)) (starts/manages the Docker container lifecycle)
 - `./apps/rendercv-app` (lives inside the Docker container)
   - Node.js HTTP server
-  - Hono + Swagger routes
+  - [Hono](https://hono.dev) + Swagger routes
   - Executes `rendercv` to generate the returned `application/pdf`
 
 ## Architecture
@@ -25,12 +25,12 @@ The apps are:
   - Boots a Docker container when needed.
   - Proxies incoming HTTP traffic to the Node.js app running inside the container.
 
-- **Node.js Resume Generator (`./apps/rendercv-app`)**
+- **Node.js API (`./apps/rendercv-app`)**
   - **Endpoint**: `POST /api/v1/generate`
-  - **Request Body**: RenderCV configuration provided as JSON (a JSON equivalent of the RenderCV YAML file).
+  - **Request Body**: RenderCV configuration provided as JSON or yaml (a JSON equivalent of the `rendercv` YAML file).
   - **Response**:
     - `Content-Type: application/pdf`
-    - Body is the generated resume PDF.
+    - Body is the generated PDF.
 
 ## Diagrams
 
