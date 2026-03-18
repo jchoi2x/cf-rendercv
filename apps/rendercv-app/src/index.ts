@@ -6,7 +6,6 @@ import { showRoutes } from 'hono/dev';
 import { logger } from 'hono/logger';
 
 import * as routes from '@/routes';
-import type { RouteExports } from '@/routes/types';
 import type { Env } from './types';
 
 const port = Number(process.env.PORT) || 8080;
@@ -49,7 +48,13 @@ app.doc('/openapi.json', {
 
 
 // Register routes dynamically on the sub-app
-const r = routes as RouteExports<Env, typeof app.openapi>;
+type P = Parameters<typeof app.openapi>;
+type R = P[0];
+type H = P[1];
+const r = routes as unknown as Record<string, { route: R; handler: H }>;
+
+
+
 
 Object.keys(r).forEach((route) => {
   if (r[route] && typeof r[route] === 'object' && 'route' in r[route] && 'handler' in r[route]) {

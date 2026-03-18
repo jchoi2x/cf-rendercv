@@ -18,6 +18,15 @@ cf-rendercv is a small system for generating PDF resumes using [RenderCV](https:
     - `Content-Type: application/pdf`
     - Body is the generated resume PDF.
 
+#### Diagram
+
+```mermaid
+graph TD
+  HTTP[HTTP Worker] -->|POST /api/v1/generate| DO[RenderCvDo durable object]
+  DO -->|POST /api/v1/generate| DockerContainer[Container durable object]
+  DockerContainer -->|POST /api/v1/generate| RenderCVApp[RenderCV App]
+```
+
 See `./apps/rendercv-app/README.md` for detailed API docs and examples.
 
 ### Development

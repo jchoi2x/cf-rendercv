@@ -1,12 +1,13 @@
+import type {RouteHandler } from '@hono/zod-openapi';
 import { createRoute } from '@hono/zod-openapi';
 
-import type { HandlerFromRoute } from '@/routes/types';
 import { ErrorResponseSchema, GenerateSuccessSchema, RenderCvDocument } from '@cf-rendercv/contracts';
 import yaml from 'js-yaml';
 import { writeFileSync } from 'node:fs';
 import { createReadStream } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { rimrafSync } from 'rimraf';
+import type { Env } from '@/types';
 
 
 const route = createRoute({
@@ -47,8 +48,9 @@ const route = createRoute({
 
 const outputDir = `/tmp/rendercv_output`;
 
-const handler: HandlerFromRoute<typeof route> = async (c) => {
-    const _body = c.req.valid('json') as RenderCvDocument;
+
+const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
+    const _body = c.req.valid('json');
     // convert to yaml text use js-yaml
     const yamlText = yaml.dump(_body);
     // rimraf delete the output directory
