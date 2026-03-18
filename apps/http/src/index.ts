@@ -1,4 +1,4 @@
-import { RendercvDo, DockerRendercvApp } from './durable';
+import { RendercvDo, DockerRendercvApp, RendercvOAuthProvider } from './durable';
 import { Hono } from 'hono';
 import { RenderCvDocument } from '@cf-rendercv/contracts/entities';
 import { showRoutes } from 'hono/dev';
@@ -6,16 +6,15 @@ import { showRoutes } from 'hono/dev';
 const app = new Hono<{ Bindings: Env }>();
 
 
-app.get('/health', (c) => c.json({ message: 'OK' }));
-app.use('/sse*', (c) => {
-  return RendercvDo.serveSSE('/sse').fetch(c.req.raw, c.env, c.executionCtx as ExecutionContext<unknown>);
-});
 
-app.use('/mcp', (c) => {
-  return RendercvDo.serve('/mcp').fetch(c.req.raw, c.env, c.executionCtx as ExecutionContext<unknown>);
-});
+const pathMathes = ['/api/v1/generate', '/swagger-ui', '/openapi.json'];
 
-app.all('*', async (c) => {
+app.all('*', async (c, next) => {
+  const path = c.req.path;
+  if (!pathMathes.includes(path)) {
+    return next();
+  }
+
   const clonedRequest = c.req.raw.clone();
 
   let request = new Request(clonedRequest, {})
@@ -42,6 +41,10 @@ app.all('*', async (c) => {
   const stub = c.env.MCP_OBJECT.get(id);
   const subject = await stub.fetch(request);
   return subject;
+});
+
+app.use(async (c) => {
+  return RendercvOAuthProvider.fetch(c.req.raw, c.env, c.executionCtx as ExecutionContext<unknown>);
 });
 
 showRoutes(app);

@@ -32,7 +32,7 @@ The apps are:
     - `Content-Type: application/pdf`
     - Body is the generated PDF.
 
-### Rendering via HTTP and MCP
+## Rendering via HTTP and MCP
 
 This Worker supports using RenderCV in two ways:
 

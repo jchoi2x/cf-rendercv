@@ -58,6 +58,21 @@
       "tag": "v2"
     }
   ],
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "ruNJLv9kPkP0h",
+      "simple": {
+        "limit": 100,
+        "period": 60
+      },
+    }
+  ],
   "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "686aae8546fd42e088c9cf6df5cfb2a9",
+      "preview_id": "bf19dba2e28e4451a86f00b588a4295e"
+    }
   ]
 }

@@ -59,6 +59,9 @@ importers:
       '@cloudflare/containers':
         specifier: ^0.0.30
         version: 0.0.30
+      '@cloudflare/workers-oauth-provider':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@mcp-ui/server':
         specifier: ^6.1.0
         version: 6.1.0(@cfworker/json-schema@4.1.1)(hono@4.12.3)(react@19.2.4)(zod@4.3.6)
@@ -532,6 +535,9 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@cloudflare/workers-oauth-provider@0.3.0':
+    resolution: {integrity: sha512-I39kyUzNQWxVTIQs56xbnnHSrOY5UjiGKVeYI2zY5h+LjUxqeiuOBTTlKEDUirRvnMmBg3yppA6pR8bYKBrTAA==}
 
   '@cloudflare/workers-types@4.20260305.0':
     resolution: {integrity: sha512-sCgPFnQ03SVpC2OVW8wysONLZW/A8hlp9Mq2ckG/h1oId4kr9NawA6vUiOmOjCWRn2hIohejBYVQ+Vu20rCdKA==}
@@ -3998,6 +4004,8 @@ snapshots:
 
   '@cloudflare/workerd-windows-64@1.20260312.1':
     optional: true
+
+  '@cloudflare/workers-oauth-provider@0.3.0': {}
 
   '@cloudflare/workers-types@4.20260305.0': {}
 
