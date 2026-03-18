@@ -7,6 +7,7 @@ import { logger } from 'hono/logger';
 
 import * as routes from '@/routes';
 import type { Env } from './types';
+import { generateSwaggerHtml } from './helpers/generate-swagger-html';
 
 const port = Number(process.env.PORT) || 8080;
 
@@ -28,22 +29,23 @@ app.get('/health', (c) => {
 });
 
 // Swagger UI
-app.get('/swagger-ui', swaggerUI({ url: '/openapi.json' }));
+
+app.get('/swagger-ui', swaggerUI({ 
+  url: '/openapi.json',  
+  plugins: [],
+
+  manuallySwaggerUIHtml: generateSwaggerHtml
+}));
 
 // OpenAPI documentation
 app.doc('/openapi.json', {
   openapi: '3.0.0',
   info: {
     version: '1.1.0',
-    title: 'Suno API',
-    description: 'Use API to call the music generation service of suno.ai, and easily integrate it into agents like GPTs.',
+    title: 'RenderCV API',
+    description: 'Use API render resumes using RenderCV.',
   },
-  servers: [
-    {
-      url: `http://0.0.0.0:${port}`,
-      description: 'Local server',
-    },
-  ],
+  servers: [],
 });
 
 
@@ -65,11 +67,7 @@ Object.keys(r).forEach((route) => {
 
 // Root endpoint
 app.get('/', (c) => {
-  return c.json({
-    message: 'Suno API Server',
-    version: '1.1.0',
-    docs: '/swagger-ui',
-  });
+  return c.redirect('/swagger-ui');
 });
 
 // Export app for testing

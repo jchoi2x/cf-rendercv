@@ -3,11 +3,12 @@ import { createRoute } from '@hono/zod-openapi';
 
 import { ErrorResponseSchema, GenerateSuccessSchema, RenderCvDocument } from '@cf-rendercv/contracts';
 import yaml from 'js-yaml';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { createReadStream } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { rimrafSync } from 'rimraf';
 import type { Env } from '@/types';
+import { z } from '@hono/zod-openapi';
 
 
 const route = createRoute({
@@ -16,12 +17,15 @@ const route = createRoute({
   tags: ['Generate'],
   summary: 'Validate and generate CV from RenderCV YAML payload',
   description:
-    'Accepts a RenderCV YAML document (JSON equivalent). Validates against the RenderCV schema and returns success or validation errors. Use this to validate CV data before rendering.',
+    'Accepts a RenderCV document as either JSON (validated directly) or YAML (parsed into JSON, then validated). Validates against the RenderCV schema and generates a PDF using the rendercv CLI.',
   request: {
     body: {
       content: {
         'application/json': {
           schema: RenderCvDocument,
+        },
+        'application/yaml': {
+          schema: z.string().describe('RenderCV YAML document'),
         },
       },
     },
@@ -50,16 +54,60 @@ const outputDir = `/tmp/rendercv_output`;
 
 
 const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
-    const _body = c.req.valid('json');
-    // convert to yaml text use js-yaml
-    const yamlText = yaml.dump(_body);
+    const contentType = (c.req.header('content-type') ?? '').toLowerCase();
+
+    const isJson = contentType.includes('application/json');
+    const isYaml =
+      contentType.includes('application/yaml') ||
+      contentType.includes('application/x-yaml') ||
+      contentType.includes('text/yaml') ||
+      contentType.includes('+yaml');
+
+    if (!isJson && !isYaml) {
+      return c.json(
+        { success: false, error: `Unsupported content-type: ${contentType || '(missing)'}` },
+        415,
+      );
+    }
+
+    // Parse to a JSON object first, then validate against the RenderCV Zod schema.
+    // This keeps both JSON and YAML paths consistent.
+    let parsedDocument: unknown;
+    if (isJson) {
+      parsedDocument = c.req.valid('json');
+    } else {
+      const yamlTextInput = await c.req.text();
+      parsedDocument = yaml.load(yamlTextInput);
+    }
+
+    const validation = RenderCvDocument.safeParse(parsedDocument);
+    if (!validation.success) {
+      return c.json(
+        {
+          success: false,
+          error: 'Validation error',
+          details: validation.error.flatten(),
+        },
+        400,
+      );
+    }
+
+    const rendercvJson = validation.data;
+
+    // Convert validated JSON to YAML for the rendercv CLI.
+    const yamlText = yaml.dump(rendercvJson);
+
     // rimraf delete the output directory
     rimrafSync(outputDir);
 
     const uuid = crypto.randomUUID();
-    const resumeYamlPath = `/tmp/${uuid}.yaml`;
-    const outputPdfPath = `/tmp/${uuid}.pdf`;
-    const outputTypstPath = `/tmp/${uuid}.typ`;
+    const requestDir = `${outputDir}/${uuid}`;
+    mkdirSync(requestDir, { recursive: true });
+
+    const resumeYamlPath = `${requestDir}/resume.yaml`;
+    const outputPdfPath = `${requestDir}/resume.pdf`;
+    const outputTypstPath = `${requestDir}/resume.typ`;
+
     // write the yaml text to a file
     writeFileSync(resumeYamlPath, yamlText);
 
@@ -78,13 +126,15 @@ const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
       c.header('Content-Type', 'application/pdf');
       return c.body(pdf as unknown as ReadableStream);
     } catch(err) {
-      const stdout = (err as any).stdout?.toString();
-      console.error('stdout:::', (err as any).stdout?.toString());
+      const stdout = (err as any).stdout?.toString() ?? '';
+      console.error('stdout:::', stdout);
       console.error('stderr:::', (err as any).stderr?.toString());
 
       const statusCode = (stdout.includes('errors in the input file!') ? 400 : 500);
-      return c.json({ error: (err as any).message, info: stdout }, statusCode);
-
+      return c.json(
+        { success: false, error: (err as any).message ?? 'RenderCV render failed', details: stdout },
+        statusCode,
+      );
     }
 };
 
