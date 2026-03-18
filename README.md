@@ -32,107 +32,6 @@ The apps are:
     - `Content-Type: application/pdf`
     - Body is the generated PDF.
 
-## Diagrams
-
-### Sequence (HTTP)
-
-Rendering a resume via HTTP request
-
-```mermaid
-sequenceDiagram
-  participant C as HTTP Client
-  participant W as Cloudflare Worker (Hono)
-  box Blue Durable Objects
-    participant D as RendercvDo (MCPAgent durable object)
-    participant K as DockerRendercvApp (Container)
-  end
-  box Purple Container
-    participant A as rendercv-app (Node.js + Hono)
-    participant R as rendercv CLI
-  end
-
-
-  C->>W: POST /api/v1/generate (RenderCV JSON)
-  W->>D: stub.fetch(request)
-  D->>K: callContainerService(path, method, body)
-  K->>A: HTTP POST /api/v1/generate
-  A->>R: rendercv (generate PDF)
-  R-->>A: PDF binary
-  A-->>K: application/pdf response
-  K-->>D: proxy response
-  D-->>W: proxy response
-  W-->>C: application/pdf
-```
-
-### Sequence (MCP)
-
-MCP is the Model Context Protocol, a protocol for building agents that can interact with other agents and tools.
-
-```mermaid
-sequenceDiagram
-  participant M as MCP Client (agent)
-  participant R2 as R2 Bucket
-  box Blue Durable Objects
-    participant D as RendercvDo (MCPAgent durable object)
-    participant T as MCP tool: rendercv
-    participant K as DockerRendercvApp (Container)
-  end
-  box Purple Container
-    participant A as rendercv-app (Node.js + Hono)
-    participant R as rendercv CLI
-  end
-
-
-  M->>D: MCP request to RendercvDo (/mcp)
-  D->>T: invoke tool rendercv (content, format)
-  T->>K: callContainerService('/api/v1/generate', body)
-  K->>A: HTTP POST /api/v1/generate
-  A->>R: rendercv (generate PDF)
-  R-->>A: PDF binary
-  A-->>K: application/pdf
-
-  rect rgba(33, 66, 99, 0.12)
-    K-->>T: proxy response (PDF)
-    T-->>R2: upload to R2 bucket
-  end
-
-  T-->>D: tool result (PDF URL)
-  D-->>M: MCP response (PDF URL)
-```
-
-### MCP Discovery (tools/resources/prompts)
-
-Discovery is the process of the MCP client (agent) discovering the tools, resources, and prompts available on the MCP server.
-
-```mermaid
-sequenceDiagram
-  participant M as MCP Client (agent)
-  participant D as RendercvDo (MCPAgent durable object)
-  participant G as GitHub: rendercv/schema.json
-
-  M->>D: MCP initialize
-
-  M->>D: tools/list
-  D-->>M: tools include rendercv (input schema: RenderCV JSON)
-
-  M->>D: resources/list
-  D-->>M: resources include rendercv://schema-and-prompt
-
-  M->>D: resources/read(rendercv://schema-and-prompt)
-  D->>G: fetch schema.json
-  G-->>D: schema.json (raw JSON)
-  D->>D: parse JSON + JSON.stringify(schema, 2)
-  D-->>M: resource text (application/json) containing the RenderCV schema
-
-  M->>D: prompts/list
-  D-->>M: prompts include rendercv
-
-  M->>D: prompts/get('rendercv')
-  D-->>M: prompt text with examples/instructions to build content (see rendercv://schema-and-prompt for the full schema)
-  Note over M,D: Using the tool list + prompt examples + the schema resource, <br/>the LLM knows how to build a valid `content` payload, then calls the MCP tool when the user asks to generate a resume.
-  M->>D: tool call rendercv { content, format: "url" }
-```
-
 ### Rendering via HTTP and MCP
 
 This Worker supports using RenderCV in two ways:
@@ -190,3 +89,121 @@ Use the `@modelcontextprotocol/inspector` tool to debug the MCP server.
 ```bash
 npx @modelcontextprotocol/inspector@latest
 ```
+
+## Diagrams
+
+<details>
+
+<summary>Sequence Diagram (HTTP)</summary>
+
+### Sequence (HTTP)
+
+Rendering a resume via HTTP request
+
+```mermaid
+sequenceDiagram
+  participant C as HTTP Client
+  participant W as Cloudflare Worker (Hono)
+  box Blue Durable Objects
+    participant D as RendercvDo (MCPAgent durable object)
+    participant K as DockerRendercvApp (Container)
+  end
+  box Purple Container
+    participant A as rendercv-app (Node.js + Hono)
+    participant R as rendercv CLI
+  end
+
+
+  C->>W: POST /api/v1/generate (RenderCV JSON)
+  W->>D: stub.fetch(request)
+  D->>K: callContainerService(path, method, body)
+  K->>A: HTTP POST /api/v1/generate
+  A->>R: rendercv (generate PDF)
+  R-->>A: PDF binary
+  A-->>K: application/pdf response
+  K-->>D: proxy response
+  D-->>W: proxy response
+  W-->>C: application/pdf
+```
+
+</details>
+
+<details>
+
+<summary>Sequence Diagram (MCP)</summary>
+
+### Sequence (MCP)
+
+MCP is the Model Context Protocol, a protocol for building agents that can interact with other agents and tools.
+
+```mermaid
+sequenceDiagram
+  participant M as MCP Client (agent)
+  participant R2 as R2 Bucket
+  box Blue Durable Objects
+    participant D as RendercvDo (MCPAgent durable object)
+    participant T as MCP tool: rendercv
+    participant K as DockerRendercvApp (Container)
+  end
+  box Purple Container
+    participant A as rendercv-app (Node.js + Hono)
+    participant R as rendercv CLI
+  end
+
+
+  M->>D: MCP request to RendercvDo (/mcp)
+  D->>T: invoke tool rendercv (content, format)
+  T->>K: callContainerService('/api/v1/generate', body)
+  K->>A: HTTP POST /api/v1/generate
+  A->>R: rendercv (generate PDF)
+  R-->>A: PDF binary
+  A-->>K: application/pdf
+
+  rect rgba(33, 66, 99, 0.12)
+    K-->>T: proxy response (PDF)
+    T-->>R2: upload to R2 bucket
+  end
+
+  T-->>D: tool result (PDF URL)
+  D-->>M: MCP response (PDF URL)
+```
+
+</details>
+
+<details>
+<summary>Sequence Diagram (MCP Discovery)</summary>
+
+### MCP Discovery (tools/resources/prompts)
+
+Discovery is the process of the MCP client (agent) discovering the tools, resources, and prompts available on the MCP server.
+
+```mermaid
+sequenceDiagram
+  participant M as MCP Client (agent)
+  participant D as RendercvDo (MCPAgent durable object)
+  participant G as GitHub: rendercv/schema.json
+
+  M->>D: MCP initialize
+
+  M->>D: tools/list
+  D-->>M: tools include rendercv (input schema: RenderCV JSON)
+
+  M->>D: resources/list
+  D-->>M: resources include rendercv://schema-and-prompt
+
+  M->>D: resources/read(rendercv://schema-and-prompt)
+  D->>G: fetch schema.json
+  G-->>D: schema.json (raw JSON)
+  D->>D: parse JSON + JSON.stringify(schema, 2)
+  D-->>M: resource text (application/json) containing the RenderCV schema
+
+  M->>D: prompts/list
+  D-->>M: prompts include rendercv
+
+  M->>D: prompts/get('rendercv')
+  D-->>M: prompt text with examples/instructions to build content (see rendercv://schema-and-prompt for the full schema)
+  Note over M,D: Using the tool list + prompt examples + the schema resource, <br/>the LLM knows how to build a valid `content` payload, then calls the MCP tool when the user asks to generate a resume.
+  M->>D: tool call rendercv { content, format: "url" }
+```
+
+</details>
