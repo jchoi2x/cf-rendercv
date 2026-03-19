@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import { GrantType } from "@cloudflare/workers-oauth-provider";
 import type {
   AuthRequest,
@@ -6,6 +5,7 @@ import type {
   TokenExchangeCallbackOptions,
   TokenExchangeCallbackResult,
 } from "@cloudflare/workers-oauth-provider";
+import { env } from "cloudflare:workers";
 import { Hono, type Context } from "hono";
 import * as oauth from "oauth4webapi";
 

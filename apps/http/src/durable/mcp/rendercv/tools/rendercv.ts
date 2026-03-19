@@ -1,11 +1,17 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
-import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+
 import { RenderCvDocument } from "@cf-rendercv/contracts";
-import { generateCV } from "../../../helpers/rendercv.js";
+
+import { generateCV } from "../../../helpers/rendercv";
+import type { AuthContext } from "../../../oauth/auth0";
 
 // check if the authenticated user has a cookie set
-export const registerRenderCvTool = (server: McpServer) => {
+export const registerRenderCvTool = (
+  server: McpServer,
+  _props?: AuthContext,
+) => {
   return registerAppTool(
     server,
     "rendercv",
@@ -19,7 +25,11 @@ export const registerRenderCvTool = (server: McpServer) => {
       _meta: {},
     },
     async ({ content, format = "url" }) => {
-      const url = await generateCV({ content, format });
+      const id = _props?.claims?.sub
+        ? _props.claims.sub.split("|").join("_")
+        : "anonymous";
+
+      const url = await generateCV({ content, format, prefix: id });
 
       return {
         content: [

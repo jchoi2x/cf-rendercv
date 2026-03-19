@@ -1,7 +1,8 @@
 import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
+import importPlugin from "eslint-plugin-import";
 import importNewlines from "eslint-plugin-import-newlines";
 import prettierRecommended from "eslint-plugin-prettier/recommended";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -15,7 +16,12 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    settings: {
+      // Treat workspace + `@/` alias as `internal` before scoped-package → external.
+      "import/internal-regex": "^@(cf-rendercv/|/)",
+    },
     plugins: {
+      import: importPlugin,
       "import-newlines": importNewlines,
     },
     rules: {
@@ -50,7 +56,7 @@ export default tseslint.config(
       ],
 
       // General rules
-      "no-console": ["warn", { allow: ["error", "warn", "info"] }],
+      "no-console": ["warn", { allow: ["error", "warn", "info", "debug"] }],
       "no-debugger": "warn",
 
       // Import formatting rules
@@ -62,6 +68,40 @@ export default tseslint.config(
           forceSingleLine: false,
         },
       ],
+
+      // Local specifiers only (`./`, `../`, `@/…`). Scoped packages are
+      // `@scope/...` (second char is not `/`), so they are not matched.
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^(?:\\./|\\.\\./|@/).*\\.js$",
+              message:
+                "Omit the .js extension for local imports (relative paths and the @/ alias).",
+            },
+          ],
+        },
+      ],
+
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+            "object",
+          ],
+          "newlines-between": "always",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+          warnOnUnassignedImports: false,
+        },
+      ],
     },
   },
   prettierRecommended,
@@ -71,6 +111,7 @@ export default tseslint.config(
   },
   {
     ignores: [
+      "**/build.js",
       "node_modules/**",
       "**/dist/**",
       "**/build/**",

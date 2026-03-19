@@ -1,5 +1,6 @@
 import { OAuthProvider } from "@cloudflare/workers-oauth-provider";
 import type { McpAgent } from "agents/mcp";
+
 import { GoogleHandler } from "./google.handler";
 
 export const createGoogleOAuthProvider = (

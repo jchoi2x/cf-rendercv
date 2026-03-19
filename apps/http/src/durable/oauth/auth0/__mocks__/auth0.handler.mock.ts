@@ -44,7 +44,9 @@ export function auth0HandlerTestBindings(
 }
 
 /** Minimal bindings for `/callback` tests that only need KV + OAuth provider. */
-export function auth0CallbackRouteTestBindings(overrides: Record<string, any> = {}): any {
+export function auth0CallbackRouteTestBindings(
+  overrides: Record<string, any> = {},
+): any {
   const {
     OAUTH_KV = createMemoryKV(),
     OAUTH_PROVIDER = {},

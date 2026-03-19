@@ -1,8 +1,13 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { widgetUI } from "../widgets/widgetUI";
 import { registerAppResource } from "@modelcontextprotocol/ext-apps/server";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-export const registerWidgetUiResource = (server: McpServer) => {
+import type { AuthContext } from "../../../oauth/auth0";
+import { widgetUI } from "../widgets/widgetUI";
+
+export const registerWidgetUiResource = (
+  server: McpServer,
+  _props?: AuthContext,
+) => {
   return registerAppResource(
     server,
     "widget_ui",

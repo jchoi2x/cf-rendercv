@@ -1,7 +1,12 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+
+import type { AuthContext } from "../../../oauth/auth0";
 import { RENDERCV_SCHEMA_URI } from "../constants";
 
-export const registerRenderscvPrompt = (server: McpServer) => {
+export const registerRenderscvPrompt = (
+  server: McpServer,
+  _props?: AuthContext,
+) => {
   return server.registerPrompt(
     "rendercv",
     {

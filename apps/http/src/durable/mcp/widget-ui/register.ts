@@ -1,8 +1,10 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerShowWidgetTool } from "./tools/show-widget";
-import { registerWidgetUiResource } from "./resources/widget-ui";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 
-export const registerWidgetUi = (server: McpServer) => {
-  registerShowWidgetTool(server);
-  registerWidgetUiResource(server);
+import { registerWidgetUiResource } from "./resources/widget-ui";
+import { registerShowWidgetTool } from "./tools/show-widget";
+import type { AuthContext } from "../../oauth/auth0";
+
+export const registerWidgetUi = (server: McpServer, _props?: AuthContext) => {
+  registerShowWidgetTool(server, _props);
+  registerWidgetUiResource(server, _props);
 };

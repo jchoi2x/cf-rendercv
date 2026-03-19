@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-undef */
 // Build script - bundles only source code, keeps all dependencies external
-import { build } from 'esbuild';
 import { execSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
+
+import { build } from 'esbuild';
 
 // Step 1: Compile TypeScript with tsc (handles decorators properly)
 // This creates a temp directory with compiled JS

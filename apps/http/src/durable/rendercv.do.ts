@@ -1,11 +1,12 @@
-import { McpAgent, getMcpAuthContext } from "agents/mcp";
-import { Hono, type Context } from "hono";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { callContainerService } from "../utils/call-container";
-
-import { registerWidgetUi } from "./mcp/widget-ui/register";
-import { registerRenderscv } from "./mcp/rendercv/register";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import type { Connection, ConnectionContext } from "agents";
+import { McpAgent } from "agents/mcp";
+import { Hono, type Context } from "hono";
+
+import { callContainerService } from "../utils/call-container";
+import { registerRenderscv } from "./mcp/rendercv/register";
+import { registerWidgetUi } from "./mcp/widget-ui/register";
+import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
 
 const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
@@ -22,10 +23,6 @@ const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
   });
 };
 
-type AuthContext = {
-  claims: { sub: string; name: string; email: string };
-  permissions: string[];
-};
 export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
   app = new Hono<{ Bindings: Env }>();
 
@@ -57,12 +54,9 @@ export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
   }
 
   override async init() {
-    const auth = getMcpAuthContext();
-
-    console.debug(`init::${this.name}`, auth);
     // register mcp tools, prompts and resources
-    registerRenderscv(this.server);
-    registerWidgetUi(this.server);
+    registerRenderscv(this.server, this.props);
+    registerWidgetUi(this.server, this.props);
   }
 
   override async onConnect(

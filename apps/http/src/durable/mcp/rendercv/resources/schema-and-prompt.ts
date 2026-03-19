@@ -1,8 +1,13 @@
 import { registerAppResource } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+
+import type { AuthContext } from "../../../oauth/auth0";
 import { RENDERCV_SCHEMA_URI } from "../constants";
 
-export const registerRenderscvSchemaAndPromptResource = (server: McpServer) => {
+export const registerRenderscvSchemaAndPromptResource = (
+  server: McpServer,
+  _props?: AuthContext,
+) => {
   return registerAppResource(
     server,
     "rendercv-schema-and-prompt",

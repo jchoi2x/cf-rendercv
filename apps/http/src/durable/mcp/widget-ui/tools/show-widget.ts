@@ -1,9 +1,14 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
-import { widgetUI } from "../widgets/widgetUI.js";
 
-export const registerShowWidgetTool = (server: McpServer) => {
+import type { AuthContext } from "../../../oauth/auth0";
+import { widgetUI } from "../widgets/widgetUI";
+
+export const registerShowWidgetTool = (
+  server: McpServer,
+  _props?: AuthContext,
+) => {
   return registerAppTool(
     server,
     "show_widget",

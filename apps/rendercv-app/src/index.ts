@@ -6,8 +6,9 @@ import { showRoutes } from 'hono/dev';
 import { logger } from 'hono/logger';
 
 import * as routes from '@/routes';
-import type { Env } from './types';
+
 import { generateSwaggerHtml } from './helpers/generate-swagger-html';
+import type { Env } from './types';
 
 const port = Number(process.env.PORT) || 8080;
 

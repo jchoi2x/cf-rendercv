@@ -1,11 +1,13 @@
+import { Hono } from "hono";
+import { showRoutes } from "hono/dev";
+
+import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
+
 import {
   RendercvDo,
   DockerRendercvApp,
   RendercvOAuthProvider,
 } from "./durable";
-import { Hono } from "hono";
-import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
-import { showRoutes } from "hono/dev";
 import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
 const app = new Hono<{ Bindings: Env }>();

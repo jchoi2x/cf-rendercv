@@ -1,5 +1,5 @@
-import { env } from "cloudflare:workers";
 import { getContainer } from "@cloudflare/containers";
+import { env } from "cloudflare:workers";
 
 export type CallContainerServiceOptions = {
   path: string;
