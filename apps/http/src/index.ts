@@ -3,78 +3,48 @@ import {
   DockerRendercvApp,
   RendercvOAuthProvider,
 } from "./durable";
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
 import { showRoutes } from "hono/dev";
+import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
 const app = new Hono<{ Bindings: Env }>();
 
-const pathMathes = ["/api/v1/generate", "/swagger-ui", "/openapi.json"];
-
-// a function to get the rate limit key
-const getRateLimitKey = (c: Context) => {
-  // use authorization header if present, otherwise if cf ip address use it, otherwise just url
-
-  const authorization = c.req.header("authorization");
-  const cfIpAddress = c.req.header("CF-Connecting-IP");
-
-  const prefix = authorization || cfIpAddress || "";
-
-  return `${prefix}:${c.req.method}:${c.req.path}`;
-};
+const pathMathes = ["/swagger-ui", "/openapi.json"];
 
 app.get("/health", (c) => c.json({ ok: true }));
 
 // rate limit the request
-app.use(async (c, next) => {
-  const rateLimit = c.env.RATE_LIMITER;
-  const key = getRateLimitKey(c);
+app.use(rateLimiterMiddleware);
 
-  console.debug(`rate limit key: ${key}`);
-  const result = await rateLimit.limit({
-    key,
-  });
-
-  if (!result.success) {
-    return c.json({ error: "Rate limit exceeded" }, 429);
-  }
-  return next();
-});
-
-app.all("*", async (c, next) => {
-  const path = c.req.path;
-  if (!pathMathes.includes(path)) {
-    return next();
-  }
-
-  const clonedRequest = c.req.raw.clone();
-
-  let request = new Request(clonedRequest, {});
-
-  // if POST /api/v1/generate, validate the body
-  if (c.req.raw.method === "POST") {
-    const body = await c.req.json();
-    const { success, data, error } = RenderCvDocument.safeParse(body);
-    if (!success) {
-      console.error({
-        error,
-        success,
-        data,
-      });
-      return c.json({ error: error.message }, 400);
-    }
-
-    request = new Request(request, {
-      body: JSON.stringify(body),
+app.post("/api/v1/generate", async (c) => {
+  const requestForStub = c.req.raw.clone();
+  const body = await c.req.json();
+  const { success, data, error } = RenderCvDocument.safeParse(body);
+  if (!success) {
+    console.error({
+      error,
+      success,
+      data,
     });
+    return c.json({ error: error.message }, 400);
   }
 
   const id = c.env.MCP_OBJECT.idFromName("rendercv");
-
   const stub = c.env.MCP_OBJECT.get(id);
-  const subject = await stub.fetch(request);
+  const subject = await stub.fetch(requestForStub);
   return subject;
 });
+
+for (const i of pathMathes) {
+  app.get(i, async (c) => {
+    const id = c.env.MCP_OBJECT.idFromName("rendercv");
+
+    const stub = c.env.MCP_OBJECT.get(id);
+    const subject = await stub.fetch(c.req.raw.clone());
+    return subject;
+  });
+}
 
 // delegate to the OAuth provider
 app.use(async (c) => {

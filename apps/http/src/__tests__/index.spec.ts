@@ -45,7 +45,7 @@ describe("src/index.ts app wiring", () => {
     expect(ok.status).toBe(200);
     const txt = await ok.text();
     expect(txt).toBe("do");
-    
+
     expect(stubFetch).toHaveBeenCalledTimes(1);
 
     const bad = await app.fetch(

@@ -44,16 +44,15 @@ export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
   }
 
   override async onStart() {
-    console.debug(`onStart::${this.name}`, this.props);
     return super.onStart();
   }
-  onClose(
+
+  override onClose(
     ctx: Connection<unknown>,
     code: number,
     reason: string,
     wasClean: boolean,
   ) {
-    console.debug(`onClose::${this.name}`, this.props);
     return super.onClose(ctx, code, reason, wasClean);
   }
 
