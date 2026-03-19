@@ -1,5 +1,5 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import type { AuthContext } from "../../../oauth/auth0";
@@ -18,7 +18,7 @@ export const registerShowWidgetTool = (
       _meta: { ui: { resourceUri: widgetUI.resource.uri } },
     },
     async ({ query }) => {
-      return { content: [{ type: "text", text: `Query: ${query}` }] };
+      return { content: [{ type: "text", text: `Query: ${query}` }, widgetUI] };
     },
   );
 };

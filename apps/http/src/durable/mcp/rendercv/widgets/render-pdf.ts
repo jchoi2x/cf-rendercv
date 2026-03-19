@@ -1,11 +1,14 @@
 import { createUIResource } from "@mcp-ui/server";
-
-export const widgetUI = createUIResource({
-  uri: "ui://my-server/widget",
-  content: {
-    type: "rawHtml",
-    htmlString: `
-      <div id="root"><p>Waiting for data...</p></div>
+// https://block.github.io/goose/blog/2025/09/08/turn-any-mcp-server-mcp-ui-compatible/#2-import-it
+export const renderPdf = (url: string) =>
+  createUIResource({
+    uri: "ui://rendercv/pdf",
+    content: {
+      type: "rawHtml",
+      htmlString: `
+      <div id="root">
+        <embed src="${url}" width="100%" height="100%"></embed>
+      </div>
       <script>
         console.log('widgetUI script loaded', window);
         window.addEventListener('message', (event) => {
@@ -18,6 +21,6 @@ export const widgetUI = createUIResource({
         });
       </script>
     `,
-  },
-  encoding: "text",
-});
+    },
+    encoding: "text",
+  });
