@@ -3,13 +3,40 @@ import {
   DockerRendercvApp,
   RendercvOAuthProvider,
 } from "./durable";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
 import { showRoutes } from "hono/dev";
 
 const app = new Hono<{ Bindings: Env }>();
 
 const pathMathes = ["/api/v1/generate", "/swagger-ui", "/openapi.json"];
+// a function to get the rate limit key
+const getRateLimitKey = (c: Context) => {
+  // use authorization header if present, otherwise if cf ip address use it, otherwise just url
+
+  const authorization = c.req.header("authorization");
+  const cfIpAddress = c.req.header("CF-Connecting-IP");
+
+  const prefix = authorization || cfIpAddress || "";
+
+  return `${prefix}:${c.req.method}:${c.req.path}`;
+};
+
+// rate limit the request
+app.use(async (c, next) => {
+  const rateLimit = c.env.RATE_LIMITER;
+  const key = getRateLimitKey(c);
+
+  console.debug(`rate limit key: ${key}`);
+  const result = await rateLimit.limit({
+    key,
+  });
+
+  if (!result.success) {
+    return c.json({ error: "Rate limit exceeded" }, 429);
+  }
+  return next();
+});
 
 app.all("*", async (c, next) => {
   const path = c.req.path;
@@ -21,6 +48,7 @@ app.all("*", async (c, next) => {
 
   let request = new Request(clonedRequest, {});
 
+  // if POST /api/v1/generate, validate the body
   if (c.req.raw.method === "POST") {
     const body = await c.req.json();
     const { success, data, error } = RenderCvDocument.safeParse(body);
@@ -45,6 +73,7 @@ app.all("*", async (c, next) => {
   return subject;
 });
 
+// delegate to the OAuth provider
 app.use(async (c) => {
   return RendercvOAuthProvider.fetch(
     c.req.raw,

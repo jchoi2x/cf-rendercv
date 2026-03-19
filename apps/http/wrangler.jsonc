@@ -61,11 +61,13 @@
   "ratelimits": [
     {
       "name": "RATE_LIMITER",
-      "namespace_id": "ruNJLv9kPkP0h",
+      // Replace with your Cloudflare Rate Limit namespace UUID.
+      // This must be a UUID (Wrangler validates the format).
+      "namespace_id": "10110101010111",
       "simple": {
         "limit": 100,
         "period": 60
-      },
+      }
     }
   ],
   "kv_namespaces": [
