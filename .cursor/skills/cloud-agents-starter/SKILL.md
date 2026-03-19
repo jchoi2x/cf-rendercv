@@ -74,6 +74,7 @@ There is no dedicated feature-flag framework in this repo today. Use these pract
    - `file /tmp/resume.pdf`
 
 Notes:
+
 - Unit tests mock RenderCV CLI execution; they do not require the actual CLI for most behavior checks.
 - Manual PDF generation requires a valid RenderCV payload and working RenderCV runtime path.
 
@@ -95,6 +96,7 @@ Notes:
    - Verify tools/resources/prompts expose `rendercv` and `rendercv://schema-and-prompt`.
 
 Notes:
+
 - For local MCP tests that should avoid cloud object storage setup, prefer `format: "base64"`.
 - If auth setup is incomplete, still run unit tests and HTTP proxy smoke tests that do not require a full OAuth round-trip.
 
