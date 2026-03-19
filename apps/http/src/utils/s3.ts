@@ -1,6 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { env } from "./workers-env";
+import { env } from "cloudflare:workers";
 
 export const s3 = new S3Client({
   region: "auto", // Required by AWS SDK, not used by R2
@@ -15,7 +15,7 @@ export const s3 = new S3Client({
 
 export async function uploadPdfToS3(
   bucket: string,
-  buffer: ArrayBuffer,
+  buffer: ArrayBufferLike,
   options?: { prefix?: string; contentType?: string; name?: string },
 ): Promise<string> {
   const {

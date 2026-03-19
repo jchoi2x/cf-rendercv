@@ -1,0 +1,29 @@
+---
+description: Require unit tests + coverage check after agent code changes
+globs: "{apps,packages}/**/*.ts"
+alwaysApply: false
+---
+
+# Agent Change Test Gate
+
+Whenever an agent **changes any code** in this repository (adds/edits/deletes code), the agent must run the unit test suite locally and ensure it passes **before ending the task**.
+
+## Required commands (run from repo root)
+
+- **Unit tests must pass**:
+
+```bash
+pnpm run test:unit
+```
+
+- **Coverage must be checked** (and any negative impact must be called out and addressed when feasible):
+
+```bash
+pnpm run test:unit:coverage
+```
+
+## Expectations
+
+- Do not skip tests after code changes.
+- If tests fail, fix the failures and rerun until passing.
+- If coverage changes, report the change and take reasonable steps to prevent regressions (add/adjust tests as appropriate).

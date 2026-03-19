@@ -16,7 +16,7 @@
     "lint:biome": "biome lint --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --config vitest.coverage.config.ts --coverage"
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1002.0",

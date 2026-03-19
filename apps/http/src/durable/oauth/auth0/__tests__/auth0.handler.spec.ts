@@ -1,6 +1,10 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Hono } from "hono";
-import { createMemoryKV, installWebPlatformPolyfills } from "./test-setup";
+import { createMemoryKV } from "../__mocks__/memory-kv.mock";
+import {
+  auth0CallbackRouteTestBindings,
+  auth0HandlerTestBindings,
+} from "../__mocks__/auth0.handler.mock";
 import { addApprovedClient, bindStateToSession, createOAuthState } from "../workers-oauth-utils";
 
 const oauthMock = {
@@ -19,20 +23,6 @@ const oauthMock = {
 };
 
 vi.mock("oauth4webapi", () => oauthMock);
-
-vi.mock("cloudflare:workers", () => ({
-  env: {
-    AUTH0_CLIENT_ID: "auth0-client",
-    AUTH0_CLIENT_SECRET: "auth0-secret",
-    AUTH0_DOMAIN: "example.auth0.com",
-    AUTH0_AUDIENCE: "aud",
-    AUTH0_SCOPE: "read:all",
-  },
-}));
-
-beforeAll(() => {
-  installWebPlatformPolyfills();
-});
 
 function makeApp(handlers: {
   authorize: any;
@@ -79,11 +69,11 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({})),
       },
-    } as any;
+    });
 
     const res = await app.request("https://e.com/authorize", {}, env);
     expect(res.status).toBe(400);
@@ -94,12 +84,12 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({ clientId: "c1" })),
         lookupClient: vi.fn(async () => null),
       },
-    } as any;
+    });
 
     const res = await app.request("https://e.com/authorize", {}, env);
     expect(res.status).toBe(400);
@@ -110,14 +100,7 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
+    const env = auth0HandlerTestBindings({
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({ clientId: "c1" })),
         lookupClient: vi.fn(async () => ({
@@ -126,7 +109,7 @@ describe("auth0.handler", () => {
           redirectUris: ["https://ok.example.com"],
         })),
       },
-    } as any;
+    });
 
     const res = await app.request("https://e.com/authorize", {}, env);
     expect(res.status).toBe(200);
@@ -151,19 +134,14 @@ describe("auth0.handler", () => {
     const app = makeApp({ authorize, confirmConsent, callback });
 
     const kv = createMemoryKV();
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
+    const env = auth0HandlerTestBindings({
       OAUTH_KV: kv,
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
       AUTH0_SCOPE: undefined,
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({ clientId: "c1", scope: "x" })),
         lookupClient: vi.fn(async () => ({ clientId: "c1" })),
       },
-    } as any;
+    });
 
     // Mark client approved by issuing the cookie first.
     const approvedCookie = (await addApprovedClient(new Request("https://e.com/authorize"), "c1", "secret"))
@@ -185,7 +163,7 @@ describe("auth0.handler", () => {
     expect(res.headers.get("Set-Cookie")).toContain("__Host-CONSENTED_STATE=");
 
     // State should be stored in KV under some generated UUID (we don't assert exact value).
-    expect(Array.from(kv._store.keys()).some((k) => k.startsWith("oauth:state:"))).toBe(true);
+    expect([...kv._store.keys()].some((k) => String(k).startsWith("oauth:state:"))).toBe(true);
   });
 
   it("authorize includes normalized required scopes when AUTH0_SCOPE is non-empty", async () => {
@@ -201,19 +179,13 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
+    const env = auth0HandlerTestBindings({
       AUTH0_SCOPE: "custom-scope openid",
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({ clientId: "c1", scope: "x" })),
         lookupClient: vi.fn(async () => ({ clientId: "c1" })),
       },
-    } as any;
+    });
 
     const approvedCookie = (await addApprovedClient(new Request("https://e.com/authorize"), "c1", "secret"))
       .split(";")[0]!;
@@ -243,19 +215,12 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
+    const env = auth0HandlerTestBindings({
       OAUTH_PROVIDER: {
         parseAuthRequest: vi.fn(async () => ({ clientId: "c1" })),
         lookupClient: vi.fn(async () => ({ clientId: "c1" })),
       },
-    } as any;
+    });
 
     const approvedCookie = (await addApprovedClient(new Request("https://e.com/authorize"), "c1", "secret"))
       .split(";")[0]!;
@@ -272,16 +237,7 @@ describe("auth0.handler", () => {
     const fd = new FormData();
     fd.set("csrf_token", "t1");
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0HandlerTestBindings();
 
     const res = await app.request(
       "https://e.com/authorize",
@@ -300,16 +256,7 @@ describe("auth0.handler", () => {
     fd.set("csrf_token", "t1");
     fd.set("state", "not-base64-json");
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0HandlerTestBindings();
 
     const res = await app.request(
       "https://e.com/authorize",
@@ -324,16 +271,7 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0HandlerTestBindings();
 
     const fd = new FormData();
     fd.set("csrf_token", "t1");
@@ -359,16 +297,7 @@ describe("auth0.handler", () => {
     const app = makeApp({ authorize, confirmConsent, callback });
 
     const kv = createMemoryKV();
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: kv,
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0HandlerTestBindings({ OAUTH_KV: kv });
 
     const oauthReqInfo = { clientId: "c1", scope: "s" };
     const auth0Data = {
@@ -398,7 +327,7 @@ describe("auth0.handler", () => {
     expect(setCookieCombined).toContain("__Host-APPROVED_CLIENTS=");
     expect(setCookieCombined).toContain("__Host-CONSENTED_STATE=");
 
-    expect(Array.from(kv._store.keys()).some((k) => k.startsWith("oauth:state:"))).toBe(true);
+    expect([...kv._store.keys()].some((k) => String(k).startsWith("oauth:state:"))).toBe(true);
   });
 
   it("confirmConsent returns OAuthError response when CSRF invalid", async () => {
@@ -409,16 +338,7 @@ describe("auth0.handler", () => {
     fd.set("csrf_token", "t1");
     fd.set("state", btoa(JSON.stringify({ oauthReqInfo: { clientId: "c1" }, auth0Data: { codeVerifier: "x", codeChallenge: "y", nonce: "z", transactionState: "", consentToken: "" } })));
 
-    const env = {
-      COOKIE_ENCRYPTION_KEY: "secret",
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0HandlerTestBindings();
 
     const res = await app.request("https://e.com/authorize", { method: "POST", body: fd }, env);
     expect(res.status).toBe(400);
@@ -433,16 +353,9 @@ describe("auth0.handler", () => {
     bad.set("csrf_token", "t1");
     bad.set("state", btoa(JSON.stringify({ oauthReqInfo: { clientId: "c1" }, auth0Data: { codeVerifier: "x", codeChallenge: "y", nonce: "z", transactionState: "", consentToken: "" } })));
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       COOKIE_ENCRYPTION_KEY: "", // will cause internal error when signing cookie
-      OAUTH_KV: createMemoryKV(),
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
-      AUTH0_AUDIENCE: "aud",
-      AUTH0_SCOPE: "",
-      OAUTH_PROVIDER: {},
-    } as any;
+    });
 
     const res = await app.request(
       "https://e.com/authorize",
@@ -457,10 +370,7 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
-      OAUTH_KV: createMemoryKV(),
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0CallbackRouteTestBindings();
 
     const res = await app.request("https://e.com/auth/callback/auth0?state=missing", {}, env);
     expect(res.status).toBe(400);
@@ -471,15 +381,14 @@ describe("auth0.handler", () => {
     const { authorize, confirmConsent, callback } = await import("../auth0.handler");
     const app = makeApp({ authorize, confirmConsent, callback });
 
-    const env = {
+    const env = auth0CallbackRouteTestBindings({
       OAUTH_KV: {
         get: vi.fn(async () => {
           throw new Error("boom");
         }),
         delete: vi.fn(async () => {}),
       },
-      OAUTH_PROVIDER: {},
-    } as any;
+    });
 
     const res = await app.request("https://e.com/auth/callback/auth0?state=abc", {}, env);
     expect(res.status).toBe(500);
@@ -494,10 +403,7 @@ describe("auth0.handler", () => {
     const { stateToken } = await createOAuthState({ scope: "x" } as any, kv);
     const { setCookie } = await bindStateToSession(stateToken);
 
-    const env = {
-      OAUTH_KV: kv,
-      OAUTH_PROVIDER: {},
-    } as any;
+    const env = auth0CallbackRouteTestBindings({ OAUTH_KV: kv });
 
     const res = await app.request(
       `https://e.com/auth/callback/auth0?state=${stateToken}`,
@@ -545,15 +451,12 @@ describe("auth0.handler", () => {
     const { stateToken } = await createOAuthState(stored as any, kv);
     const { setCookie } = await bindStateToSession(stateToken);
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       OAUTH_KV: kv,
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
       OAUTH_PROVIDER: {
         completeAuthorization: vi.fn(async () => ({ redirectTo: "https://mcp.example.com/done" })),
       },
-    } as any;
+    });
 
     const res = await app.request(
       `https://e.com/auth/callback/auth0?state=${stateToken}&code=abc`,
@@ -609,13 +512,10 @@ describe("auth0.handler", () => {
       email: "a@b.c",
     });
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       OAUTH_KV: kv,
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
       OAUTH_PROVIDER: { completeAuthorization },
-    } as any;
+    });
 
     const res = await app.request(
       `https://e.com/auth/callback/auth0?state=${stateToken}&code=abc`,
@@ -634,11 +534,14 @@ describe("auth0.handler", () => {
       expect(opts.metadata.label).toBe("user-2");
       return { redirectTo: "https://mcp.example.com/done2" };
     });
-    const env2 = { ...env, OAUTH_KV: kv2, OAUTH_PROVIDER: { completeAuthorization: completeAuthorization2 } };
+    const env2 = auth0HandlerTestBindings({
+      OAUTH_KV: kv2,
+      OAUTH_PROVIDER: { completeAuthorization: completeAuthorization2 },
+    });
     const res2 = await app.request(
       `https://e.com/auth/callback/auth0?state=${st2}&code=abc`,
       { headers: { Cookie: sc2.split(";")[0]! } },
-      env2 as any,
+      env2,
     );
     expect(res2.status).toBe(302);
   });
@@ -675,13 +578,10 @@ describe("auth0.handler", () => {
     const { stateToken } = await createOAuthState(stored as any, kv);
     const { setCookie } = await bindStateToSession(stateToken);
 
-    const env = {
+    const env = auth0HandlerTestBindings({
       OAUTH_KV: kv,
-      AUTH0_CLIENT_ID: "auth0-client",
-      AUTH0_CLIENT_SECRET: "auth0-secret",
-      AUTH0_DOMAIN: "example.auth0.com",
       OAUTH_PROVIDER: { completeAuthorization: vi.fn() },
-    } as any;
+    });
 
     const res = await app.request(
       `https://e.com/auth/callback/auth0?state=${stateToken}&code=abc`,

@@ -1,0 +1,64 @@
+---
+description: Unit test layout, naming, shared mocks, and Vitest setup file locations
+globs: "{apps,packages}/**/*.ts"
+alwaysApply: false
+---
+
+# Unit testing conventions
+
+## Test files
+
+- **Filename**: `<name>.spec.ts` (e.g. `auth0.handler.spec.ts`).
+- **Location**: In a directory named `__tests__` that sits **next to** the module under test (same parent directory as the implementation file).
+
+Example:
+
+```text
+src/durable/oauth/auth0/
+  auth0.handler.ts
+  __tests__/
+    auth0.handler.spec.ts
+```
+
+## Shared mock data and test helpers
+
+- **Directory**: `__mocks__` as a **sibling** of `__tests__` (same parent as the implementation + `__tests__`).
+- **Plain mock data** (fixtures, constants, sample payloads):
+  - Prefer `<name>.mock-data.ts` where `<name>` matches the **unit test file’s basename** (without `.spec.ts`).
+  - If the same mock data is imported by **more than one** `*.spec.ts` file, use a **descriptive** basename instead of duplicating the single-test name.
+- **Test helpers** (functions used by specs: builders, stubs, small harnesses):
+  - Filename: `<name>.mock.ts` in that `__mocks__` directory (`<name>` usually aligns with the spec or helper’s purpose; use a descriptive name when shared).
+
+Example:
+
+```text
+src/durable/oauth/auth0/
+  auth0.handler.ts
+  __tests__/
+    auth0.handler.spec.ts
+  __mocks__/
+    auth0.handler.mock-data.ts
+    auth0.handler.mock.ts
+```
+
+Keep **production code** free of test-only imports; tests and `__mocks__` live under `src/**` but are excluded from app bundles as needed via existing build/test config.
+
+## Vitest setup (per app)
+
+Paths are relative to `apps/<app-name>/` (e.g. `apps/http`).
+
+| Role | Path |
+|------|------|
+| Global setup (runs once in a separate Node process) | `apps/<app-name>/.vitest/unit/global-setup.ts` |
+| Per-test-file setup (same isolate as tests) | `apps/<app-name>/.vitest/unit/setup-files/<name>.ts` |
+
+Register `globalSetup` and `setupFiles` in that app’s `vitest.config.ts` (and coverage config if applicable).
+
+### What belongs in `setup-files`
+
+Setup modules should either:
+
+- **Patch globals** on `globalThis` (e.g. polyfills required by the runtime), **or**
+- Use Vitest lifecycle hooks: `beforeEach`, `beforeAll`, `afterEach`, `afterAll` to initialize or reset shared state.
+
+Avoid relying on `globalSetup` for things that must run in the **same isolate** as Worker tests (e.g. patching `crypto` for `@cloudflare/vitest-pool-workers`); use `setupFiles` for that.

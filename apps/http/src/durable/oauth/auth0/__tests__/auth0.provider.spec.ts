@@ -2,10 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const OAuthProviderMock = vi.fn();
 
-vi.mock("cloudflare:workers", () => ({
-  env: {},
-}));
-
 vi.mock("@cloudflare/workers-oauth-provider", () => ({
   OAuthProvider: function OAuthProvider(this: any, opts: any) {
     OAuthProviderMock(opts);

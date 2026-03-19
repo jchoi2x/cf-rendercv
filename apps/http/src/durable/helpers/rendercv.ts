@@ -1,6 +1,6 @@
 import { callContainerService } from "../../utils/call-container.js";
 import { uploadPdfToS3 } from "../../utils/s3.js";
-import { env } from "../../utils/workers-env.js";
+import { env } from "cloudflare:workers";
 
 // define a type for a function where the return type is a string unless the format is 'response'
 type GenerateCvOpts = {

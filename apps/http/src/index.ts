@@ -10,6 +10,7 @@ import { showRoutes } from "hono/dev";
 const app = new Hono<{ Bindings: Env }>();
 
 const pathMathes = ["/api/v1/generate", "/swagger-ui", "/openapi.json"];
+
 // a function to get the rate limit key
 const getRateLimitKey = (c: Context) => {
   // use authorization header if present, otherwise if cf ip address use it, otherwise just url
@@ -21,6 +22,8 @@ const getRateLimitKey = (c: Context) => {
 
   return `${prefix}:${c.req.method}:${c.req.path}`;
 };
+
+app.get("/health", (c) => c.json({ ok: true }));
 
 // rate limit the request
 app.use(async (c, next) => {

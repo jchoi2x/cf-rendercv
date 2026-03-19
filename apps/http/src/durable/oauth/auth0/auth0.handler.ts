@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-import { env } from "../../../utils/workers-env";
+import { env } from "cloudflare:workers";
+import { GrantType } from "@cloudflare/workers-oauth-provider";
 import type {
   AuthRequest,
   OAuthHelpers,
@@ -416,7 +416,7 @@ export async function tokenExchangeCallback(
 ): Promise<TokenExchangeCallbackResult | void> {
   // During the Authorization Code Exchange, we want to make sure that the Access Token issued
   // by the MCP Server has the same TTL as the one issued by Auth0.
-  if (options.grantType === "authorization_code") {
+  if (options.grantType === GrantType.AUTHORIZATION_CODE) {
     return {
       accessTokenTTL: options.props.tokenSet.accessTokenTTL,
       newProps: {
@@ -425,7 +425,7 @@ export async function tokenExchangeCallback(
     };
   }
 
-  if (options.grantType === "refresh_token") {
+  if (options.grantType === GrantType.REFRESH_TOKEN) {
     const auth0RefreshToken = options.props.tokenSet.refreshToken;
     if (!auth0RefreshToken) {
       throw new Error("No Auth0 refresh token found");

@@ -2,12 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const getContainerMock = vi.fn();
 
-vi.mock('../workers-env', () => ({
-  env: {
-    DOCKER_RENDERCV_APP: 'docker-rendercv-app',
-  },
-}));
-
 vi.mock('@cloudflare/containers', () => ({
   getContainer: (...args: unknown[]) => getContainerMock(...args),
 }));

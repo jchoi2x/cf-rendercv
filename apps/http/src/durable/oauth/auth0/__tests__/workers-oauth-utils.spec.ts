@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   OAuthError,
   addApprovedClient,
@@ -12,11 +12,7 @@ import {
   validateCSRFToken,
   validateOAuthState,
 } from "../workers-oauth-utils";
-import { createMemoryKV, installWebPlatformPolyfills } from "./test-setup";
-
-beforeAll(() => {
-  installWebPlatformPolyfills();
-});
+import { createMemoryKV } from "../__mocks__/memory-kv.mock";
 
 describe("workers-oauth-utils", () => {
   it("OAuthError.toResponse returns OAuth-compliant JSON", async () => {
@@ -52,7 +48,7 @@ describe("workers-oauth-utils", () => {
 
   it("generateCSRFProtection creates token and cookie with expected attributes", () => {
     const spy = vi
-      .spyOn(globalThis.crypto, "randomUUID")
+      .spyOn(crypto, "randomUUID")
       .mockReturnValue("uuid-123");
 
     const { token, setCookie } = generateCSRFProtection();
@@ -103,7 +99,7 @@ describe("workers-oauth-utils", () => {
 
   it("createOAuthState stores state in KV and returns token", async () => {
     const spy = vi
-      .spyOn(globalThis.crypto, "randomUUID")
+      .spyOn(crypto, "randomUUID")
       .mockReturnValue("state-1");
 
     const kv = createMemoryKV();

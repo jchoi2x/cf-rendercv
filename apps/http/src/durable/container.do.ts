@@ -1,5 +1,5 @@
 import { Container } from "@cloudflare/containers";
-import { env } from "../utils/workers-env";
+import { env } from "cloudflare:workers";
 
 export class DockerRendercvApp extends Container<Env> {
   // Port the container listens on (default: 8080)

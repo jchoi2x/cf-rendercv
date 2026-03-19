@@ -1,0 +1,20 @@
+---
+description: Run cf-typegen when wrangler/.dev.vars change
+globs: "{**/wrangler.jsonc,**/.dev.vars}"
+alwaysApply: false
+---
+
+# Cloudflare type generation gate
+
+Whenever an agent changes `wrangler.jsonc` or any `.dev.vars` file, it must regenerate Cloudflare binding types **before ending the task**.
+
+## Required command (run from repo root)
+
+```bash
+pnpm run cf-typegen
+```
+
+## Expectations
+
+- Do not skip type generation after changing `wrangler.jsonc` or `.dev.vars`.
+- If `cf-typegen` modifies files, include those changes and ensure the repo still builds/tests as expected.
