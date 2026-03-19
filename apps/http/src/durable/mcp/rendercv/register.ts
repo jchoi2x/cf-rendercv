@@ -7,4 +7,4 @@ export const registerRenderscv = (server: McpServer) => {
   registerRenderCvTool(server);
   registerRenderscvSchemaAndPromptResource(server);
   registerRenderscvPrompt(server);
-}
+};

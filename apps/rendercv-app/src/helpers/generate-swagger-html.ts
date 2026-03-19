@@ -1,10 +1,7 @@
 import type { swaggerUI } from '@hono/swagger-ui';
 
-
 type Opts = Parameters<typeof swaggerUI>[0];
 type ManuallySwaggerUIHtml = Opts['manuallySwaggerUIHtml'];
-
-
 
 export const generateSwaggerHtml: ManuallySwaggerUIHtml = (asset) => `
   <!doctype html>
@@ -124,4 +121,4 @@ export const generateSwaggerHtml: ManuallySwaggerUIHtml = (asset) => `
       </script>
     </body>
   </html>
-`
+`;

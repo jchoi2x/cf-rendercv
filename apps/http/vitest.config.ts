@@ -1,16 +1,18 @@
 import { defineConfig } from 'vitest/config';
 
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
+
 export default defineConfig({
+  plugins: [
+    cloudflareTest({
+      wrangler: {
+        configPath: './wrangler.jsonc',
+      },
+    }),
+  ],
   test: {
     globals: true,
-    environment: 'node',
-    include: ['src/**/__tests__/**/*.test.ts'],
+    include: ['src/**/__tests__/**/*.spec.ts'],
     exclude: ['**/node_modules/**', '**/dist/**'],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      include: ['src/**/*.ts'],
-      exclude: ['src/**/__tests__/**', 'src/**/*.test.ts', 'src/**/*.d.ts', 'src/**/types.ts'],
-    },
   },
 });

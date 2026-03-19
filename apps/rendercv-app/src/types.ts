@@ -1,4 +1,3 @@
 export type Env = {
-  Variables: {
-  };
+  Variables: {};
 };

@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env } from "./workers-env";
 import { getContainer } from "@cloudflare/containers";
 
 export type CallContainerServiceOptions = {
@@ -9,7 +9,7 @@ export type CallContainerServiceOptions = {
 };
 
 export async function callContainerService(
-  opts: CallContainerServiceOptions
+  opts: CallContainerServiceOptions,
 ): Promise<Response> {
   const { path, body, method = "POST", name = "rendercv-http" } = opts;
   const container = getContainer(env.DOCKER_RENDERCV_APP, name);

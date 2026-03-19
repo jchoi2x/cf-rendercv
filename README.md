@@ -56,6 +56,13 @@ At a high level, you will:
 - node >= 20
 - pnpm >= 10.30.3
 
+### Google OAuth (required for local MCP)
+
+The HTTP/MCP server uses Google OAuth for authentication.
+
+To run locally, you must set up a Google OAuth client application in the Google Cloud console: https://console.cloud.google.com/auth/clients/create
+After creating the app, configure the resulting `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for the worker.
+
 ### Steps
 
 1. Install dependencies at the repo root:

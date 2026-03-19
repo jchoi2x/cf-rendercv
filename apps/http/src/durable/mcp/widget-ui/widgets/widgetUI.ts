@@ -1,9 +1,9 @@
 import { createUIResource } from "@mcp-ui/server";
 
 export const widgetUI = createUIResource({
-  uri: 'ui://my-server/widget',
-  content: { 
-    type: 'rawHtml', 
+  uri: "ui://my-server/widget",
+  content: {
+    type: "rawHtml",
     htmlString: `
       <div id="root"><p>Waiting for data...</p></div>
       <script>
@@ -15,8 +15,7 @@ export const widgetUI = createUIResource({
           }
         });
       </script>
-    `
+    `,
   },
-  encoding: 'text',
+  encoding: "text",
 });
-

@@ -1,9 +1,7 @@
-
-
 /**
  * Get the Google authorize URL
  * @param opts - The options for the Google authorize URL
- * @returns 
+ * @returns
  */
 export function getGoogleAuthorizeUrl(opts: {
   client_id: string;
@@ -28,7 +26,7 @@ export function getGoogleAuthorizeUrl(opts: {
 /**
  * Exchange the code for tokens
  * @param opts - The options for the code exchange
- * @returns 
+ * @returns
  */
 export async function exchangeCodeForTokens(opts: {
   client_id: string;
@@ -51,8 +49,8 @@ export async function exchangeCodeForTokens(opts: {
       client_secret: opts.client_secret,
       code: opts.code,
       grant_type: "authorization_code",
-      redirect_uri: opts.redirect_uri
-    })
+      redirect_uri: opts.redirect_uri,
+    }),
   });
 
   if (!res.ok) {
@@ -66,7 +64,7 @@ export async function exchangeCodeForTokens(opts: {
 /**
  * Fetch the user info from Google
  * @param accessToken - The access token to fetch the user info
- * @returns 
+ * @returns
  */
 export async function fetchGoogleUserInfo(accessToken: string): Promise<{
   sub: string;
@@ -77,7 +75,7 @@ export async function fetchGoogleUserInfo(accessToken: string): Promise<{
 }> {
   // OIDC userinfo
   const res = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
-    headers: { authorization: `Bearer ${accessToken}` }
+    headers: { authorization: `Bearer ${accessToken}` },
   });
 
   if (!res.ok) {

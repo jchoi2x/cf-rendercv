@@ -1,9 +1,9 @@
 import { createUIResource } from "@mcp-ui/server";
 
 export const formUI = createUIResource({
-  uri: 'ui://my-server/form',
-  content: { 
-    type: 'rawHtml', 
+  uri: "ui://my-server/form",
+  content: {
+    type: "rawHtml",
     htmlString: `
       <div id="root"><p>Form UI</p></div>
       <form id="form">
@@ -24,8 +24,7 @@ export const formUI = createUIResource({
           }
         });
       </script>
-    `
+    `,
   },
-  encoding: 'text',
+  encoding: "text",
 });
-

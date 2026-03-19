@@ -1,15 +1,17 @@
-import { RendercvDo, DockerRendercvApp, RendercvOAuthProvider } from './durable';
-import { Hono } from 'hono';
-import { RenderCvDocument } from '@cf-rendercv/contracts/entities';
-import { showRoutes } from 'hono/dev';
+import {
+  RendercvDo,
+  DockerRendercvApp,
+  RendercvOAuthProvider,
+} from "./durable";
+import { Hono } from "hono";
+import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
+import { showRoutes } from "hono/dev";
 
 const app = new Hono<{ Bindings: Env }>();
 
+const pathMathes = ["/api/v1/generate", "/swagger-ui", "/openapi.json"];
 
-
-const pathMathes = ['/api/v1/generate', '/swagger-ui', '/openapi.json'];
-
-app.all('*', async (c, next) => {
+app.all("*", async (c, next) => {
   const path = c.req.path;
   if (!pathMathes.includes(path)) {
     return next();
@@ -17,9 +19,9 @@ app.all('*', async (c, next) => {
 
   const clonedRequest = c.req.raw.clone();
 
-  let request = new Request(clonedRequest, {})
+  let request = new Request(clonedRequest, {});
 
-  if (c.req.raw.method === 'POST') { 
+  if (c.req.raw.method === "POST") {
     const body = await c.req.json();
     const { success, data, error } = RenderCvDocument.safeParse(body);
     if (!success) {
@@ -27,7 +29,7 @@ app.all('*', async (c, next) => {
         error,
         success,
         data,
-      })
+      });
       return c.json({ error: error.message }, 400);
     }
 
@@ -36,7 +38,7 @@ app.all('*', async (c, next) => {
     });
   }
 
-  const id = c.env.MCP_OBJECT.idFromName('rendercv');
+  const id = c.env.MCP_OBJECT.idFromName("rendercv");
 
   const stub = c.env.MCP_OBJECT.get(id);
   const subject = await stub.fetch(request);
@@ -44,7 +46,11 @@ app.all('*', async (c, next) => {
 });
 
 app.use(async (c) => {
-  return RendercvOAuthProvider.fetch(c.req.raw, c.env, c.executionCtx as ExecutionContext<unknown>);
+  return RendercvOAuthProvider.fetch(
+    c.req.raw,
+    c.env,
+    c.executionCtx as ExecutionContext<unknown>,
+  );
 });
 
 showRoutes(app);

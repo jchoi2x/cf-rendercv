@@ -40,11 +40,11 @@ await build({
     js: `
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-    `.trim(),
+    `.trim()
   },
 
   external: [
-    "buffer",
+    'buffer',
     '@hono/node-server',
     '@hono/swagger-ui',
     '@hono/zod-openapi',
@@ -67,12 +67,11 @@ const require = createRequire(import.meta.url);
     'rebrowser-playwright-core',
     'user-agents',
     'yn',
-    'zod',
-  ],
+    'zod'
+  ]
 });
 
 // Step 4: Clean up temp directory
 console.log('Cleaning up...');
 rmSync(tempDir, { recursive: true, force: true });
 console.log('Build complete!');
-

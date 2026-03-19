@@ -1,4 +1,4 @@
-import { z } from '@hono/zod-openapi';
+import { z } from "@hono/zod-openapi";
 
 // export const GenerateSuccessSchema = z.object({
 //   success: z.literal(true).describe('Request validated successfully'),
@@ -7,9 +7,9 @@ import { z } from '@hono/zod-openapi';
 //   filename: z.string().describe('Filename of the generated PDF'),
 // });
 export const GenerateSuccessSchema = z.string().openapi({
-  type: 'string',
-  format: 'binary',
-  description: 'The generated PDF',
+  type: "string",
+  format: "binary",
+  description: "The generated PDF",
 });
 
 export type GenerateSuccess = z.infer<typeof GenerateSuccessSchema>;

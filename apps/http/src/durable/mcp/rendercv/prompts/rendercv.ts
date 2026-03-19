@@ -6,11 +6,13 @@ export const registerRenderscvPrompt = (server: McpServer) => {
     "rendercv",
     {
       title: "Generate a CV with RenderCV",
-      description: "Instructions and context for using the rendercv tool to generate a CV PDF from a RenderCV document.",
+      description:
+        "Instructions and context for using the rendercv tool to generate a CV PDF from a RenderCV document.",
     },
     async () => {
       return {
-        description: "Instructions for using the rendercv tool to generate a CV",
+        description:
+          "Instructions for using the rendercv tool to generate a CV",
         messages: [
           {
             role: "user" as const,
@@ -27,7 +29,6 @@ export const registerRenderscvPrompt = (server: McpServer) => {
           },
         ],
       };
-    }
+    },
   );
-}
-
+};

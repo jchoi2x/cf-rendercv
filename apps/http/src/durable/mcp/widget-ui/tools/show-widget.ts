@@ -4,12 +4,16 @@ import { z } from "zod";
 import { widgetUI } from "../widgets/widgetUI.js";
 
 export const registerShowWidgetTool = (server: McpServer) => {
-  return registerAppTool(server, 'show_widget', {
-    description: 'Show widget',
-    inputSchema: { query: z.string() },
-    _meta: { ui: { resourceUri: widgetUI.resource.uri } }
-  }, async ({ query }) => {
-    return { content: [{ type: 'text', text: `Query: ${query}` }] };
-  });
-}
-
+  return registerAppTool(
+    server,
+    "show_widget",
+    {
+      description: "Show widget",
+      inputSchema: { query: z.string() },
+      _meta: { ui: { resourceUri: widgetUI.resource.uri } },
+    },
+    async ({ query }) => {
+      return { content: [{ type: "text", text: `Query: ${query}` }] };
+    },
+  );
+};

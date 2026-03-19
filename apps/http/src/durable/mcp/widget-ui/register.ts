@@ -5,5 +5,4 @@ import { registerWidgetUiResource } from "./resources/widget-ui";
 export const registerWidgetUi = (server: McpServer) => {
   registerShowWidgetTool(server);
   registerWidgetUiResource(server);
-
-}
+};
