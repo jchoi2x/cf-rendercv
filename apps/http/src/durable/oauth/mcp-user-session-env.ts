@@ -6,11 +6,12 @@ function oauthUserSub(props: unknown): string | undefined {
   if (claims && typeof claims === "object" && "sub" in claims) {
     const sub = (claims as { sub?: unknown }).sub;
     if (sub !== undefined && sub !== null && sub !== "") {
-      return String(sub);
+      return String(sub as string);
     }
   }
   const sub = p.sub;
-  if (sub !== undefined && sub !== null && sub !== "") return String(sub);
+  if (sub !== undefined && sub !== null && sub !== "")
+    return String(sub as string);
   return undefined;
 }
 
@@ -18,15 +19,13 @@ function sanitizeMcpSessionKey(sub: string): string {
   return sub.split("|").join("_");
 }
 
-type McpEnv = { MCP_OBJECT: DurableObjectNamespace<unknown> };
-
 /**
  * When the agents MCP transport allocates a new session, it uses
  * `namespace.newUniqueId().toString()` as the session key. Replacing that with a
  * stable key derived from the authenticated user routes all MCP sessions for
  * that user to one Durable Object (same as the prior `agents` patch).
  */
-export function envWithUserPinnedMcpObject<Env extends McpEnv>(
+export function envWithUserPinnedMcpObject(
   env: Env,
   ctx: { props?: unknown },
 ): Env {
@@ -63,14 +62,12 @@ type McpRouteHandler = {
   ): Response | Promise<Response>;
 };
 
-export function wrapMcpAgentHandler<Env extends McpEnv>(
-  handler: McpRouteHandler,
-): McpRouteHandler {
+export function wrapMcpAgentHandler(handler: McpRouteHandler): McpRouteHandler {
   return {
     fetch(request, env, ctx) {
       return handler.fetch(
         request,
-        envWithUserPinnedMcpObject(env as Env, ctx as { props?: unknown }),
+        envWithUserPinnedMcpObject(env, ctx as { props?: unknown }),
         ctx,
       );
     },

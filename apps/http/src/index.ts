@@ -43,7 +43,6 @@ for (const i of pathMathes) {
   app.get(i, async (c) => {
     const key = c.get("key");
     const id = c.env.MCP_OBJECT.idFromName(key);
-    console.log("get", id);
     const stub = c.env.MCP_OBJECT.get(id);
     const subject = await stub.fetch(c.req.raw.clone());
     return subject;
@@ -52,7 +51,6 @@ for (const i of pathMathes) {
 
 // delegate to the OAuth provider
 app.use(async (c) => {
-  console.log("delegate to the OAuth provider");
   return RendercvOAuthProvider.fetch(
     c.req.raw,
     c.env,
