@@ -10,7 +10,7 @@ describe("durable/mcp/rendercv/prompts/rendercv", () => {
     const registerPrompt = vi.fn((_name: string, _meta: any, cb: any) => cb());
     const server = { registerPrompt } as any;
     const { registerRenderscvPrompt } = await import("../rendercv");
-    const res = await registerRenderscvPrompt(server);
+    const res = await registerRenderscvPrompt({ server } as any);
     expect(registerPrompt).toHaveBeenCalled();
     const body = res as {
       messages?: Array<{ content?: { text?: string } }>;

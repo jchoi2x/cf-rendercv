@@ -1,13 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
-
-import type { AuthContext } from "../../../oauth/auth0";
+import type { RenderCvMcpAgent } from "../../../rendercv.do";
 import { RENDERCV_SCHEMA_URI } from "../constants";
 
-export const registerRenderscvPrompt = (
-  server: McpServer,
-  _props?: AuthContext,
-) => {
-  return server.registerPrompt(
+export const registerRenderscvPrompt = (agent: RenderCvMcpAgent) => {
+  return agent.server.registerPrompt(
     "rendercv",
     {
       title: "Generate a CV with RenderCV",

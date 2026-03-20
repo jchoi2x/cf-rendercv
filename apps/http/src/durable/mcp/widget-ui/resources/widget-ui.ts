@@ -1,15 +1,11 @@
 import { registerAppResource } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import type { AuthContext } from "../../../oauth/auth0";
+import type { RenderCvMcpAgent } from "../../../rendercv.do";
 import { widgetUI } from "../widgets/widgetUI";
 
-export const registerWidgetUiResource = (
-  server: McpServer,
-  _props?: AuthContext,
-) => {
+export const registerWidgetUiResource = (agent: RenderCvMcpAgent) => {
   return registerAppResource(
-    server,
+    agent.server,
     "widget_ui",
     widgetUI.resource.uri,
     {

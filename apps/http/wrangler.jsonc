@@ -10,6 +10,14 @@
     "nodejs_compat",
     "global_fetch_strictly_public"
   ],
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.html"
+      ]
+    }
+  ],
   "observability": {
     "logs": {
       "enabled": true,

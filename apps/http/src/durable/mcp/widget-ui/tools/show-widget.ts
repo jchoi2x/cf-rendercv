@@ -1,16 +1,12 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import type { AuthContext } from "../../../oauth/auth0";
+import type { RenderCvMcpAgent } from "../../../rendercv.do";
 import { widgetUI } from "../widgets/widgetUI";
 
-export const registerShowWidgetTool = (
-  server: McpServer,
-  _props?: AuthContext,
-) => {
+export const registerShowWidgetTool = (agent: RenderCvMcpAgent) => {
   return registerAppTool(
-    server,
+    agent.server,
     "show_widget",
     {
       description: "Show widget",

@@ -27,7 +27,7 @@ describe("google-oauth.utils", () => {
   });
 
   it("exchangeCodeForTokens returns JSON on success", async () => {
-    const fetchMock = vi.fn(async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => {
       return new Response(
         JSON.stringify({
           access_token: "at",

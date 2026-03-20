@@ -49,7 +49,12 @@ describe("durable/rendercv.do.ts", () => {
     const { RendercvDo, RendercvOAuthProvider } = await import("../rendercv.do");
     expect(RendercvOAuthProvider).toBeDefined();
 
-    const obj = new RendercvDo({} as any, {} as any);
+    const sqlExec = vi.fn();
+    const obj = new RendercvDo(
+      { storage: { sql: { exec: sqlExec } } } as any,
+      {} as any,
+    );
+    expect(sqlExec).toHaveBeenCalledTimes(1);
     await obj.init();
     expect(registerRenderscv).toHaveBeenCalledTimes(1);
     expect(registerWidgetUi).toHaveBeenCalledTimes(1);

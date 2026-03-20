@@ -187,7 +187,7 @@ describe("GoogleHandler", () => {
     const goodState = (globalThis as any).btoa(JSON.stringify(oauthReqInfo));
     const url = `https://svc/callback?code=CODE&state=${encodeURIComponent(goodState)}`;
 
-    const completeAuthorization = vi.fn(async () => ({
+    const completeAuthorization = vi.fn(async (_args: unknown) => ({
       redirectTo: "https://mcp.example/complete?token=1",
     }));
 
@@ -250,7 +250,7 @@ describe("GoogleHandler", () => {
     const goodState = (globalThis as any).btoa(JSON.stringify(oauthReqInfo));
     const url = `https://svc/callback?code=CODE&state=${encodeURIComponent(goodState)}`;
 
-    const completeAuthorization = vi.fn(async () => ({
+    const completeAuthorization = vi.fn(async (_args: unknown) => ({
       redirectTo: "https://mcp.example/complete?token=2",
     }));
 

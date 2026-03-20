@@ -20,7 +20,7 @@ describe("durable/mcp/widget-ui/tools/show-widget", () => {
       widgetUI: { resource: { uri: "mcp://widget" } },
     }));
     const { registerShowWidgetTool } = await import("../show-widget");
-    registerShowWidgetTool({} as any);
+    registerShowWidgetTool({ server: {} } as any);
 
     expect(typeof handlers.show_widget).toBe("function");
     const out2 = await handlers.show_widget({ query: "hello" });

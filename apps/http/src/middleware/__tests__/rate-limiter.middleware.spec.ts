@@ -19,7 +19,7 @@ describe("rateLimiterMiddleware", () => {
   }
 
   function testEnv(): Env {
-    return { RATE_LIMITER: { limit } } as Env;
+    return { RATE_LIMITER: { limit } } as unknown as Env;
   }
 
   it("calls limit with auth header in the key when present", async () => {

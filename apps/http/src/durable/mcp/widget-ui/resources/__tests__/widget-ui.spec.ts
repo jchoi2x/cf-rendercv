@@ -18,7 +18,7 @@ describe("durable/mcp/widget-ui/resources/widget-ui", () => {
     vi.doMock("@modelcontextprotocol/ext-apps/server", () => ({ registerAppResource }));
 
     const { registerWidgetUiResource } = await import("../widget-ui");
-    const out = await registerWidgetUiResource({} as any);
+    const out = await registerWidgetUiResource({ server: {} } as any);
     const body = out as unknown as { contents: Array<{ uri: string }> };
     expect(body.contents[0].uri).toBe(widgetUI.resource.uri);
   });

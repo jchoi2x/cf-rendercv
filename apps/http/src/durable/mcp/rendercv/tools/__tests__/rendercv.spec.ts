@@ -28,7 +28,7 @@ describe("durable/mcp/rendercv/tools/rendercv", () => {
     }));
 
     const { registerRenderCvTool } = await import("../rendercv");
-    registerRenderCvTool({} as any);
+    registerRenderCvTool({ server: {}, props: undefined } as any);
 
     expect(typeof handlers.rendercv).toBe("function");
     const out = await handlers.rendercv({ content: { x: 1 }, format: "url" });

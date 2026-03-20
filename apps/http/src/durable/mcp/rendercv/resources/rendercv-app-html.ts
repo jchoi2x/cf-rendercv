@@ -2,80 +2,47 @@
  * Single-page MCP App (text/html;profile=mcp-app) for the `rendercv` tool.
  * Uses the browser build from esm.sh; CSP allowlists are set on the resource.
  */
-export const RENDERCV_APP_HTML = `<!DOCTYPE html>
+export const RENDERCV_APP_HTML = `
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RenderCV</title>
-  <style>
-    :root {
-      font-family: var(--font-sans, system-ui, sans-serif);
-      color: var(--color-text-primary, #111);
-      background: var(--color-background-primary, #fff);
-      line-height: 1.45;
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@19.2.0/client"
+      }
     }
-    body { margin: 0; padding: 12px; box-sizing: border-box; min-height: 100vh; }
-    h1 {
-      font-size: var(--font-heading-md-size, 1.15rem);
-      margin: 0 0 4px;
-    }
-    .muted {
-      color: var(--color-text-secondary, #555);
-      font-size: var(--font-text-sm-size, 0.9rem);
-      margin: 0 0 12px;
-    }
-    .panel {
-      border: 1px solid var(--color-border-primary, #ddd);
-      border-radius: var(--border-radius-md, 8px);
-      padding: 12px;
-      background: var(--color-background-secondary, #f8f8f8);
-    }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    button {
-      font: inherit;
-      padding: 8px 14px;
-      border-radius: var(--border-radius-sm, 6px);
-      border: 1px solid var(--color-border-secondary, #ccc);
-      background: var(--color-background-primary, #fff);
-      color: var(--color-text-primary, #111);
-      cursor: pointer;
-    }
-    button:hover { filter: brightness(0.97); }
-    #viewer {
-      margin-top: 12px;
-      width: 100%;
-      min-height: 420px;
-      border: none;
-      border-radius: var(--border-radius-md, 8px);
-      background: var(--color-background-tertiary, #eee);
-    }
-    .status { margin: 8px 0 0; font-size: var(--font-text-sm-size, 0.9rem); }
-    pre.err {
-      white-space: pre-wrap;
-      color: var(--color-text-danger, #b00020);
-      margin: 8px 0 0;
-    }
-  </style>
+  </script>
 </head>
-<body>
+<body class='min-w-screen min-h-screen'>
+
   <h1>RenderCV</h1>
-  <p class="muted">Generated resume PDF from your RenderCV JSON.</p>
-  <div class="panel">
+  <div class="panel flex flex-col gap-4">
     <p id="status" class="status">Connecting…</p>
     <div id="actions" class="actions" hidden></div>
-    <iframe id="viewer" title="PDF preview" hidden></iframe>
     <pre id="error" class="err" hidden></pre>
   </div>
+  <div id="viewer" hidden style="margin-top:12px;height:560px"></div>
+
   <script type="module">
+    import "https://esm.sh/@tailwindcss/browser@4.0.6";
     import {
       App,
       PostMessageTransport,
       applyDocumentTheme,
       applyHostStyleVariables,
       applyHostFonts,
-    } from "https://esm.sh/@modelcontextprotocol/ext-apps@1.2.2";
+    } from "https://esm.sh/@modelcontextprotocol/ext-apps@1.2.2?deps=@modelcontextprotocol/sdk@1.25.2,zod@3";
 
+    import WebViewer from "https://esm.sh/@pdftron/webviewer";
+
+    const APRYSE_LICENSE = "demo:1773251044163:637ef9590300000000e0776822862dfcea1362e5ec2c24eef968e7609f";
+    const WEBVIEWER_CDN = "https://cdn.jsdelivr.net/npm/@pdftron/webviewer@11.11.0/public";
+ 
     const statusEl = document.getElementById("status");
     const actionsEl = document.getElementById("actions");
     const viewerEl = document.getElementById("viewer");
@@ -100,14 +67,43 @@ export const RENDERCV_APP_HTML = `<!DOCTYPE html>
     }
 
     function resetViewer() {
-      if (viewerEl.dataset.blobUrl) {
-        URL.revokeObjectURL(viewerEl.dataset.blobUrl);
-        delete viewerEl.dataset.blobUrl;
-      }
+      if (viewerEl.dataset.blobUrl) URL.revokeObjectURL(viewerEl.dataset.blobUrl);
+      delete viewerEl.dataset.blobUrl;
+      delete viewerEl.dataset.ready;
       viewerEl.hidden = true;
-      viewerEl.removeAttribute("src");
+      viewerEl.innerHTML = "";
       actionsEl.innerHTML = "";
       actionsEl.hidden = true;
+    }
+
+    async function loadPdfIntoViewer(url) {
+      if (viewerEl.dataset.ready !== "1") {
+        await WebViewer(
+          {
+            path: WEBVIEWER_CDN,
+            licenseKey: APRYSE_LICENSE,
+            initialDoc: url,
+          },
+          viewerEl,
+        );
+        viewerEl.dataset.ready = "1";
+        return;
+      }
+
+      const instance = viewerEl.querySelector("iframe")?.contentWindow?.instance;
+      if (instance?.UI?.loadDocument) {
+        await instance.UI.loadDocument(url);
+      } else {
+        // Fallback for environments where instance isn't exposed from the iframe.
+        await WebViewer(
+          {
+            path: WEBVIEWER_CDN,
+            licenseKey: APRYSE_LICENSE,
+            initialDoc: url,
+          },
+          viewerEl,
+        );
+      }
     }
 
     const app = new App({ name: "RenderCV", version: "1.0.0" });
@@ -134,6 +130,8 @@ export const RENDERCV_APP_HTML = `<!DOCTYPE html>
       clearError();
       resetViewer();
 
+      console.log('result', result);
+
       if (result.isError) {
         const parts =
           (result.content || []).filter(function (b) {
@@ -149,7 +147,9 @@ export const RENDERCV_APP_HTML = `<!DOCTYPE html>
       }
 
       const sc = result.structuredContent;
+
       if (!sc || typeof sc !== "object") {
+        console.log('sc is not an object');
         statusEl.textContent = "Done (no preview data).";
         const txt = (result.content || [])
           .filter(function (b) {
@@ -166,7 +166,7 @@ export const RENDERCV_APP_HTML = `<!DOCTYPE html>
       const fmt = sc.format;
       if (fmt === "url" && typeof sc.pdfUrl === "string") {
         statusEl.textContent = "PDF ready.";
-        viewerEl.src = sc.pdfUrl;
+        await loadPdfIntoViewer(sc.pdfUrl);
         viewerEl.hidden = false;
 
         const openBtn = document.createElement("button");
@@ -183,9 +183,14 @@ export const RENDERCV_APP_HTML = `<!DOCTYPE html>
       if (fmt === "base64" && typeof sc.pdfBase64 === "string") {
         statusEl.textContent = "PDF ready (inline).";
         try {
-          const blobUrl = renderPdfFromBase64(sc.pdfBase64);
-          viewerEl.dataset.blobUrl = blobUrl;
-          viewerEl.src = blobUrl;
+          // Prefer URL when available to avoid decoding very large payloads.
+          if (typeof sc.pdfUrl === "string") {
+            await loadPdfIntoViewer(sc.pdfUrl);
+          } else {
+            const blobUrl = renderPdfFromBase64(sc.pdfBase64);
+            viewerEl.dataset.blobUrl = blobUrl;
+            await loadPdfIntoViewer(blobUrl);
+          }
           viewerEl.hidden = false;
         } catch (e) {
           showError("Could not decode PDF: " + (e && e.message ? e.message : String(e)));

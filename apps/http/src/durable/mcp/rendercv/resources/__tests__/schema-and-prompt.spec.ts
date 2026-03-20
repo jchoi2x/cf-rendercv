@@ -18,7 +18,7 @@ describe("durable/mcp/rendercv/resources/schema-and-prompt", () => {
     vi.stubGlobal("fetch", fetchMock as any);
 
     const { registerRenderscvSchemaAndPromptResource } = await import("../schema-and-prompt");
-    const out = await registerRenderscvSchemaAndPromptResource({} as any);
+    const out = await registerRenderscvSchemaAndPromptResource({ server: {} } as any);
     expect(fetchMock).toHaveBeenCalled();
     const body = out as unknown as { contents: Array<{ text: string }> };
     expect(body.contents[0].text).toContain('"a": 1');

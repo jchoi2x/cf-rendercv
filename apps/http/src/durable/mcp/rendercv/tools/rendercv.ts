@@ -1,17 +1,14 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import { RenderCvDocument } from "@cf-rendercv/contracts";
 
 import { generateCV } from "../../../helpers/rendercv";
-import type { AuthContext } from "../../../oauth/auth0";
+import type { RenderCvMcpAgent } from "../../../rendercv.do";
 import { RENDERCV_APP_UI_URI } from "../constants";
 
-export const registerRenderCvTool = (
-  server: McpServer,
-  _props?: AuthContext,
-) => {
+export const registerRenderCvTool = (agent: RenderCvMcpAgent) => {
+  const { server, props } = agent;
   return registerAppTool(
     server,
     "rendercv",
@@ -25,8 +22,8 @@ export const registerRenderCvTool = (
       _meta: { ui: { resourceUri: RENDERCV_APP_UI_URI } },
     },
     async ({ content, format = "url" }) => {
-      const id = _props?.claims?.sub
-        ? _props.claims.sub.split("|").join("_")
+      const id = props?.claims?.sub
+        ? props.claims.sub.split("|").join("_")
         : "anonymous";
 
       if (format === "url") {
@@ -50,6 +47,14 @@ export const registerRenderCvTool = (
         format: "base64",
         prefix: id,
       });
+
+      // Some MCP hosts/sandboxes don't reliably render `blob:` / inline base64 inside iframes.
+      // Including a normal URL lets the UI preview reliably.
+      const pdfUrl = await generateCV({
+        content,
+        format: "url",
+        prefix: id,
+      });
       return {
         content: [
           {
@@ -60,6 +65,7 @@ export const registerRenderCvTool = (
         structuredContent: {
           format: "base64" as const,
           pdfBase64,
+          pdfUrl,
         },
       };
     },

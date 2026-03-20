@@ -2,21 +2,17 @@ import {
   registerAppResource,
   RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import type { AuthContext } from "../../../oauth/auth0";
+import type { RenderCvMcpAgent } from "../../../rendercv.do";
 import { RENDERCV_APP_UI_URI } from "../constants";
 import { RENDERCV_APP_HTML } from "./rendercv-app-html";
 
 /**
  * Static MCP App shell for the `rendercv` tool (inline preview + open in new tab).
  */
-export const registerRendercvAppUiResource = (
-  server: McpServer,
-  _props?: AuthContext,
-) =>
+export const registerRendercvAppUiResource = (agent: RenderCvMcpAgent) =>
   registerAppResource(
-    server,
+    agent.server,
     "rendercv-app",
     RENDERCV_APP_UI_URI,
     {
@@ -26,6 +22,8 @@ export const registerRendercvAppUiResource = (
           csp: {
             resourceDomains: ["https://esm.sh", "https://*.esm.sh"],
             connectDomains: ["https://esm.sh", "https://*.esm.sh"],
+            // Allow the UI iframe to load inline previews created from the tool result.
+            frameDomains: ["blob:", "data:"],
           },
         },
       },
@@ -41,6 +39,7 @@ export const registerRendercvAppUiResource = (
               csp: {
                 resourceDomains: ["https://esm.sh", "https://*.esm.sh"],
                 connectDomains: ["https://esm.sh", "https://*.esm.sh"],
+                frameDomains: ["blob:", "data:"],
               },
             },
           },

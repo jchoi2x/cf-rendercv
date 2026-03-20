@@ -1,10 +1,8 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
-
+import type { RenderCvMcpAgent } from "../../rendercv.do";
 import { registerWidgetUiResource } from "./resources/widget-ui";
 import { registerShowWidgetTool } from "./tools/show-widget";
-import type { AuthContext } from "../../oauth/auth0";
 
-export const registerWidgetUi = (server: McpServer, _props?: AuthContext) => {
-  registerShowWidgetTool(server, _props);
-  registerWidgetUiResource(server, _props);
+export const registerWidgetUi = (agent: RenderCvMcpAgent) => {
+  registerShowWidgetTool(agent);
+  registerWidgetUiResource(agent);
 };

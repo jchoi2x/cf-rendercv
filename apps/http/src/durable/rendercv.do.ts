@@ -10,20 +10,25 @@ import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
 
 const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
-  let payload = {};
-  if (c.req.method === "POST") {
-    payload = await c.req.json();
-  }
-
   return callContainerService({
     path: c.req.path,
     method: c.req.method,
     name: "rendercv-app",
-    body: c.req.method === "POST" ? payload : undefined,
+    body: c.req.method === "POST" ? await c.req.json() : undefined,
   });
 };
 
-export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
+export interface RenderCvMcpAgent extends Omit<
+  McpAgent<Env, unknown, AuthContext>,
+  "server"
+> {
+  server: McpServer;
+}
+
+export class RendercvDo
+  extends McpAgent<Env, unknown, AuthContext>
+  implements RenderCvMcpAgent
+{
   app = new Hono<{ Bindings: Env }>();
 
   server = new McpServer({
@@ -33,6 +38,16 @@ export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
 
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
+
+    state.storage.sql.exec(`
+      CREATE TABLE IF NOT EXISTS documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        path TEXT NOT NULL,
+        bucket TEXT,
+        created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        data TEXT
+      );
+    `);
 
     this.app.post("/api/v1/generate", proxyToContainer);
     this.app.get("/swagger-ui", proxyToContainer);
@@ -55,8 +70,8 @@ export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
 
   override async init() {
     // register mcp tools, prompts and resources
-    registerRenderscv(this.server, this.props);
-    registerWidgetUi(this.server, this.props);
+    registerRenderscv(this);
+    registerWidgetUi(this);
   }
 
   override async onConnect(
