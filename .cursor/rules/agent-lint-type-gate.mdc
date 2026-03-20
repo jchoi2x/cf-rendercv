@@ -1,0 +1,36 @@
+---
+description: Require ESLint + TypeScript check after agent code changes; fix before finishing
+alwaysApply: true
+---
+
+# Agent Lint & Type Gate
+
+Whenever an agent **changes code** in this repository (adds, edits, or deletes implementation or test files), it must **run lint and TypeScript checks**, resolve failures it caused or that block the change, and **not treat the task as complete** until those checks are clean for the affected surface.
+
+## Required commands (run from repo root)
+
+- **Lint** (ESLint across the monorepo):
+
+```bash
+pnpm run lint
+```
+
+- **Typecheck** (project references in root `tsconfig.json` — `contracts`, `apps/http`, `apps/rendercv-app`):
+
+```bash
+pnpm exec tsc -b
+```
+
+- **Integration specs** under `integration/`: if you edited those files, also verify they typecheck:
+
+```bash
+pnpm exec tsc -p integration/tsconfig.json
+```
+
+(Use `pnpm run lint:fix` only when autofixes are appropriate and you re-run `pnpm run lint` afterward.)
+
+## Expectations
+
+- Run lint and `tsc -b` after substantive code changes before wrapping up the task.
+- If either command fails, fix the reported issues and rerun until passing (or until the only remaining issues are clearly pre-existing and out of scope — in that case, say so explicitly and avoid leaving new failures behind).
+- Docs-only or Markdown-only changes that do not touch TS/JS sources do not require this gate unless tooling or types were part of the edit.

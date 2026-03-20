@@ -9,6 +9,9 @@ describe("durable/mcp/rendercv/register", () => {
   it("registers rendercv tool/resource/prompt", async () => {
     const calls: string[] = [];
 
+    vi.doMock("../resources/rendercv-app-ui", () => ({
+      registerRendercvAppUiResource: () => calls.push("app-ui"),
+    }));
     vi.doMock("../tools/rendercv", () => ({
       registerRenderCvTool: () => calls.push("tool"),
     }));
@@ -21,6 +24,6 @@ describe("durable/mcp/rendercv/register", () => {
 
     const { registerRenderscv } = await import("../register");
     registerRenderscv({} as any);
-    expect(calls).toEqual(["tool", "resource", "prompt"]);
+    expect(calls).toEqual(["app-ui", "tool", "resource", "prompt"]);
   });
 });

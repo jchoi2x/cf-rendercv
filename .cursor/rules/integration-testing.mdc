@@ -1,0 +1,47 @@
+---
+description: Repo-root Worker integration tests using Cloudflare Vitest pool (workerd)
+globs: integration/**/*.ts
+alwaysApply: false
+---
+
+# Integration testing (`./integration`)
+
+Worker **integration** tests live at the **repository root** under `integration/`, separate from per-app unit tests in `apps/**/src/**/__tests__/`.
+
+## Purpose
+
+- Run inside **`workerd`** via `@cloudflare/vitest-pool-workers`, with the same Wrangler project as `./apps/http` (`apps/http/wrangler.jsonc`).
+- Exercise the **real** Worker entry (`export default` from `apps/http/src/index.ts`) and bindings (Durable Objects, KV, rate limits, etc.) without starting `wrangler dev` in another terminal.
+
+## Configuration
+
+| File | Role |
+|------|------|
+| `vitest.integration.config.ts` | Vitest + `cloudflareTest({ wrangler: { configPath: 'apps/http/wrangler.jsonc' } })` |
+| `integration/tsconfig.json` | TypeScript project for specs (`@cloudflare/vitest-pool-workers/types`, includes `apps/http/worker-configuration.d.ts`) |
+| `integration/worker-env.d.ts` | `/// <reference types="@cloudflare/vitest-pool-workers/types" />` for `cloudflare:workers` / `cloudflare:test` |
+
+## Scripts (repo root)
+
+- `pnpm run test:integration` — run once
+- `pnpm run test:integration:watch` — watch mode
+
+## Conventions
+
+- **Filename**: `*.integration.spec.ts`
+- **Location**: e.g. `integration/worker/…` for HTTP Worker tests; add subdirectories per surface (`worker/`, future `mcp/`, etc.) as needed.
+- **Requests**: Prefer `exports.default.fetch()` from `cloudflare:workers` (integration tests against the main Worker). Optionally use `env` from `cloudflare:workers` and helpers from `cloudflare:test` (e.g. `runInDurableObject`, `createExecutionContext`) per [Test APIs](https://developers.cloudflare.com/workers/testing/vitest-integration/test-apis/).
+- **Do not** mock `cloudflare:workers` in integration specs; that defeats the pool/runtime.
+
+### R2 / AWS SDK note
+
+`uploadPdfToS3` (`apps/http/src/utils/s3.ts`) is loaded via **dynamic `import()`** from `generateCV` only when returning a PDF URL, so routes like `/health` and validation-only `/api/v1/generate` paths can run in workerd without evaluating `@aws-sdk/*`. Full R2 upload behavior still belongs in staging/smoke tests.
+
+## Docs
+
+- [Vitest integration](https://developers.cloudflare.com/workers/testing/vitest-integration/)
+- [Test APIs (`exports`, `env`, Durable Objects helpers)](https://developers.cloudflare.com/workers/testing/vitest-integration/test-apis/)
+
+## Scope
+
+Integration tests here validate **Worker orchestration and HTTP behavior** in the isolate. They are **not** a substitute for container-backed PDF end-to-end checks or live `curl` smoke tests against a long-running dev server.

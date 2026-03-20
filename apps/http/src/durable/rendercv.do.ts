@@ -63,7 +63,7 @@ export class RendercvDo extends McpAgent<Env, unknown, AuthContext> {
     ctx: Connection<unknown>,
     { request: req }: ConnectionContext,
   ) {
-    console.debug(`onConnect::${this.name}`, this.props);
+    // console.debug(`onConnect::${this.name}`, this.props);
     return super.onConnect(ctx, { request: req });
   }
 

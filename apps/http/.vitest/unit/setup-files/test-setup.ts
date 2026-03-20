@@ -13,7 +13,7 @@ vi.mock("cloudflare:workers", async () => {
 });
 
 beforeAll(() => {
-  vi.spyOn(console, "debug").mockImplementation(() => {});
+  // vi.spyOn(console, "debug").mockImplementation(() => {});
 });
 
 /**

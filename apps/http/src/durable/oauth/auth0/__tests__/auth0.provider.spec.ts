@@ -17,8 +17,8 @@ describe("createAuth0OAuthProvider", () => {
   it("wires OAuthProvider with expected endpoints and handlers", async () => {
     const { createAuth0OAuthProvider } = await import("../auth0.provider");
 
-    const serve = vi.fn(() => "serve-handler");
-    const serveSSE = vi.fn(() => "serve-sse-handler");
+    const serve = vi.fn(() => ({ fetch: vi.fn() }));
+    const serveSSE = vi.fn(() => ({ fetch: vi.fn() }));
 
     const McpAgent = {
       serve,
@@ -34,11 +34,9 @@ describe("createAuth0OAuthProvider", () => {
     expect(opts.authorizeEndpoint).toBe("/authorize");
     expect(opts.clientRegistrationEndpoint).toBe("/register");
     expect(opts.tokenEndpoint).toBe("/token");
-    expect(opts.apiHandler).toBe("serve-handler");
-    expect(opts.apiHandlers).toEqual({
-      "/sse": "serve-sse-handler",
-      "/mcp": "serve-handler",
-    });
+    expect(typeof opts.apiHandler?.fetch).toBe("function");
+    expect(typeof opts.apiHandlers["/sse"]?.fetch).toBe("function");
+    expect(typeof opts.apiHandlers["/mcp"]?.fetch).toBe("function");
 
     expect(serve).toHaveBeenCalledWith("/mcp");
     expect(serve).toHaveBeenCalledWith("/mcp", { binding: "MCP_OBJECT" });
@@ -48,4 +46,3 @@ describe("createAuth0OAuthProvider", () => {
     expect(opts.tokenExchangeCallback).toBeTruthy();
   });
 });
-

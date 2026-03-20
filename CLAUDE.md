@@ -31,6 +31,7 @@ Because `rendercv` is not readily portable to Cloudflare `workerd`, PDF generati
 - When the tool is invoked, the Worker routes the request to the container-backed PDF generator and (for URL responses) uploads the PDF to R2.
 
 Key concepts from the root README:
+
 - The MCP server registers the `rendercv` tool, a prompt, and a schema resource.
 - Tool calls are routed to the container-backed generator.
 
@@ -46,10 +47,12 @@ Key concepts from the root README:
 ### `packages/contracts` — shared schemas/types (zod-openapi)
 
 This package is described as shared **zod-openapi schemas** with:
+
 - **Entities**: data models with Zod schema + OpenAPI metadata + inferred TS types
 - **API**: request/response/query schemas grouped by endpoints
 
 Notes:
+
 - The `packages/contracts/README.md` describes a contracts package in a generic way (and mentions `@suno-mcp/contracts`). Treat it as: “this repo uses a shared contracts package pattern” unless the code indicates otherwise.
 
 ---
@@ -57,6 +60,7 @@ Notes:
 ## Development prerequisites
 
 From the root README:
+
 - `docker`
 - Node.js **>= 20**
 - `pnpm` **>= 10.30.3**
@@ -92,6 +96,8 @@ pnpm run dev:api
 
 ### If you changed the Worker (`apps/http`)
 
+- Run unit tests: `pnpm run test:http`
+- Run Worker integration tests (Vitest pool, same `wrangler.jsonc`): `pnpm run test:integration`
 - Ensure the Worker still:
   - Boots the container when needed
   - Proxies `/api/v1/generate`
@@ -125,6 +131,7 @@ The Worker supports MCP discovery + tool calls:
 - **prompts/get('rendercv')** should return prompt text that points to the schema resource
 
 Tool call outcome:
+
 - Input: `{ content, format }`
 - Output:
   - `format: "url"` → returns a downloadable URL (PDF stored in R2)
@@ -165,4 +172,3 @@ npx @modelcontextprotocol/inspector@latest
   - Container app = invoke `rendercv` + return PDF
   - Contracts = schemas/types shared by both
 - Don’t commit generated artifacts (e.g. coverage output) unless the repo explicitly wants them.
-

@@ -1,10 +1,12 @@
 import type { Context } from "hono";
-import { createMiddleware } from "hono/factory";
+import { createFactory } from "hono/factory";
 
 type E = {
   Bindings: Env;
   Variables: { key: string };
 };
+
+const c = createFactory<E>();
 
 const getRateLimitKey = (c: Context<E>) => {
   // use authorization header if present, otherwise if cf ip address use it, otherwise just url
@@ -17,7 +19,7 @@ const getRateLimitKey = (c: Context<E>) => {
   return `${prefix}:${c.req.method}:${c.req.path}`;
 };
 
-export const rateLimiterMiddleware = createMiddleware<E>(async (c, next) => {
+export const rateLimiterMiddleware = c.createMiddleware(async (c, next) => {
   const rateLimit = c.env.RATE_LIMITER;
   const key = getRateLimitKey(c);
   const { success } = await rateLimit.limit({ key });

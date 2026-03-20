@@ -6,6 +6,8 @@ alwaysApply: false
 
 # Unit testing conventions
 
+Worker **integration** tests (repo-root `integration/`, `exports.default.fetch`, Vitest pool) are documented in `.cursor/rules/integration-testing.mdc`.
+
 ## Test files
 
 - **Filename**: `<name>.spec.ts` (e.g. `auth0.handler.spec.ts`).
@@ -47,10 +49,10 @@ Keep **production code** free of test-only imports; tests and `__mocks__` live u
 
 Paths are relative to `apps/<app-name>/` (e.g. `apps/http`).
 
-| Role | Path |
-|------|------|
-| Global setup (runs once in a separate Node process) | `apps/<app-name>/.vitest/unit/global-setup.ts` |
-| Per-test-file setup (same isolate as tests) | `apps/<app-name>/.vitest/unit/setup-files/<name>.ts` |
+| Role                                                | Path                                                 |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| Global setup (runs once in a separate Node process) | `apps/<app-name>/.vitest/unit/global-setup.ts`       |
+| Per-test-file setup (same isolate as tests)         | `apps/<app-name>/.vitest/unit/setup-files/<name>.ts` |
 
 Register `globalSetup` and `setupFiles` in that app’s `vitest.config.ts` (and coverage config if applicable).
 

@@ -19,8 +19,8 @@ describe("createGoogleOAuthProvider", () => {
       GoogleHandler: { mocked: true },
     }));
 
-    const serveSSE = vi.fn(() => ({ kind: "sse" }));
-    const serve = vi.fn(() => ({ kind: "http" }));
+    const serveSSE = vi.fn(() => ({ fetch: vi.fn() }));
+    const serve = vi.fn(() => ({ fetch: vi.fn() }));
 
     const McpAgent = {
       serveSSE,
@@ -39,10 +39,7 @@ describe("createGoogleOAuthProvider", () => {
 
     expect(serveSSE).toHaveBeenCalledWith("/sse", { binding: "MCP_OBJECT" });
     expect(serve).toHaveBeenCalledWith("/mcp", { binding: "MCP_OBJECT" });
-    expect(opts.apiHandlers).toEqual({
-      "/sse": { kind: "sse" },
-      "/mcp": { kind: "http" },
-    });
+    expect(typeof opts.apiHandlers["/sse"]?.fetch).toBe("function");
+    expect(typeof opts.apiHandlers["/mcp"]?.fetch).toBe("function");
   });
 });
-

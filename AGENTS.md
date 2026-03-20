@@ -36,8 +36,16 @@ From repo root:
 - Worker tests only: `pnpm run test:http`
 - Render app tests only: `pnpm run test:api`
 - Render app e2e tests: `pnpm run test:e2e:api`
+- Worker integration tests (workerd / Vitest pool): `pnpm run test:integration`
 
 ## File structure conventions
+
+### Integration tests (repo root)
+
+- **Directory**: `./integration/` — Worker integration specs for this monorepo.
+- **Config**: `vitest.integration.config.ts` at the repo root (Wrangler project: `apps/http/wrangler.jsonc`).
+- **Naming**: `*.integration.spec.ts` (e.g. `integration/worker/http.worker.integration.spec.ts`).
+- **Runtime**: Tests execute in the Workers runtime via `@cloudflare/vitest-pool-workers`; use `exports.default.fetch()` from `cloudflare:workers` for integration-style requests (see Cloudflare Vitest integration docs).
 
 ### Apps (`apps/**/src`)
 
@@ -79,7 +87,7 @@ From repo root:
 
 Run targeted checks for touched areas:
 
-- Worker changes: `pnpm run test:http`
+- Worker changes: `pnpm run test:http` and, when exercising full Worker routing/bindings: `pnpm run test:integration`
 - Render app changes: `pnpm run test:api`
 - Shared contracts changes: run affected app tests, typically both `test:http` and `test:api`
 

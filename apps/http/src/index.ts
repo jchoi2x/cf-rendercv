@@ -10,7 +10,7 @@ import {
 } from "./durable";
 import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env; Variables: { key: string } }>();
 
 const pathMathes = ["/swagger-ui", "/openapi.json"];
 
@@ -24,15 +24,16 @@ app.post("/api/v1/generate", async (c) => {
   const body = await c.req.json();
   const { success, data, error } = RenderCvDocument.safeParse(body);
   if (!success) {
-    console.error({
+    const responseData = {
       error,
       success,
       data,
-    });
-    return c.json({ error: error.message }, 400);
+    };
+    return c.json(responseData, 400);
   }
 
-  const id = c.env.MCP_OBJECT.idFromName("rendercv");
+  const key = c.get("key");
+  const id = c.env.MCP_OBJECT.idFromName(key);
   const stub = c.env.MCP_OBJECT.get(id);
   const subject = await stub.fetch(requestForStub);
   return subject;
@@ -40,8 +41,9 @@ app.post("/api/v1/generate", async (c) => {
 
 for (const i of pathMathes) {
   app.get(i, async (c) => {
-    const id = c.env.MCP_OBJECT.idFromName("rendercv");
-
+    const key = c.get("key");
+    const id = c.env.MCP_OBJECT.idFromName(key);
+    console.log("get", id);
     const stub = c.env.MCP_OBJECT.get(id);
     const subject = await stub.fetch(c.req.raw.clone());
     return subject;
@@ -50,6 +52,7 @@ for (const i of pathMathes) {
 
 // delegate to the OAuth provider
 app.use(async (c) => {
+  console.log("delegate to the OAuth provider");
   return RendercvOAuthProvider.fetch(
     c.req.raw,
     c.env,

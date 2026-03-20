@@ -33,5 +33,9 @@ describe("durable/mcp/rendercv/tools/rendercv", () => {
     expect(typeof handlers.rendercv).toBe("function");
     const out = await handlers.rendercv({ content: { x: 1 }, format: "url" });
     expect(out.content[0].text).toContain("https://public.example.com/out.pdf");
+    expect(out.structuredContent).toEqual({
+      format: "url",
+      pdfUrl: "https://public.example.com/out.pdf",
+    });
   });
 });
