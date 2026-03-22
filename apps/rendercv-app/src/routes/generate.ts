@@ -138,7 +138,7 @@ const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
     return c.json(
       {
         success: false,
-        error: (err as any).message ?? 'RenderCV render failed',
+        error: (err as any).message ?? 'RenderCV render failed failed to run',
         details: stdout
       },
       statusCode
