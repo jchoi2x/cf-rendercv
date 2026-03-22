@@ -22,7 +22,7 @@
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
-      "persist": true,
+      "persist": false,
       "destinations": [
         "datadog-otel-logs"
       ],
@@ -34,7 +34,7 @@
         "datadog-otel-traces"
       ],
       "head_sampling_rate": 1,
-      "persist": true
+      "persist": false
     }
   },
   "containers": [
