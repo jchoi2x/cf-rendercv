@@ -119,15 +119,10 @@ const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
 
   try {
     // execute rendercv and stream the output to stdout
-    const result = execSync(
+    execSync(
       `rendercv render -nomd -nohtml -nopng -typ ${outputTypstPath} -pdf ${outputPdfPath} ${resumeYamlPath}`,
       { encoding: 'utf-8' }
     );
-
-    if (result) {
-      const output = result.toString();
-      console.debug('output:::\n', output);
-    }
 
     // stream output of pdf to the response
     const pdf = createReadStream(outputPdfPath);
