@@ -24,11 +24,18 @@ describe("durable/mcp/rendercv/tools/rendercv", () => {
     }));
 
     vi.doMock("../../../../../utils/s3", () => ({
-      uploadPdfToS3: vi.fn().mockResolvedValue("https://public.example.com/out.pdf"),
+      uploadPdfToS3: vi.fn().mockResolvedValue({
+        url: "https://public.example.com/out.pdf",
+        path: "rendercv/out.pdf",
+      }),
     }));
 
     const { registerRenderCvTool } = await import("../rendercv");
-    registerRenderCvTool({ server: {}, props: undefined } as any);
+    registerRenderCvTool({
+      server: {},
+      props: undefined,
+      addDocument: vi.fn(),
+    } as any);
 
     expect(typeof handlers.rendercv).toBe("function");
     const out = await handlers.rendercv({ content: { x: 1 }, format: "url" });
@@ -36,6 +43,7 @@ describe("durable/mcp/rendercv/tools/rendercv", () => {
     expect(out.structuredContent).toEqual({
       format: "url",
       pdfUrl: "https://public.example.com/out.pdf",
+      pdfBase64: "AQID",
     });
   });
 });

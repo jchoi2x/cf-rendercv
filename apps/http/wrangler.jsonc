@@ -23,10 +23,16 @@
       "enabled": true,
       "head_sampling_rate": 1,
       "persist": true,
+      "destinations": [
+        "datadog-otel-logs"
+      ],
       "invocation_logs": true
     },
     "traces": {
       "enabled": true,
+      "destinations": [
+        "datadog-otel-traces"
+      ],
       "head_sampling_rate": 1,
       "persist": true
     }

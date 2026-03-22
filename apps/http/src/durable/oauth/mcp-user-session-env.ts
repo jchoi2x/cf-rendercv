@@ -38,6 +38,7 @@ export function envWithUserPinnedMcpObject(
   const pinned = new Proxy(ns, {
     get(target, prop, receiver) {
       if (prop === "newUniqueId") {
+        console.debug("newUniqueId", sessionKey);
         return () =>
           ({
             toString: () => sessionKey,
@@ -64,9 +65,49 @@ type McpRouteHandler = {
 
 export function wrapMcpAgentHandler(handler: McpRouteHandler): McpRouteHandler {
   return {
-    fetch(request, env, ctx) {
+    async fetch(request, env, ctx) {
+      // MCP JSON-RPC `initialize` must not include `sessionId` in `params`.
+      // Some host-side transports/proxies can accidentally forward it.
+      // Since we control the Cloudflare endpoint, we defensively strip it.
+      let nextRequest = request;
+      try {
+        const contentType = request.headers.get("content-type") ?? "";
+        if (contentType.includes("application/json")) {
+          const cloned = request.clone();
+          const body = await cloned.json();
+
+          let changed = false;
+          const sanitizeOne = (obj: any) => {
+            if (!obj || typeof obj !== "object") return obj;
+            if (obj.method !== "initialize") return obj;
+            if (obj.params && typeof obj.params === "object") {
+              if ("sessionId" in obj.params) {
+                delete obj.params.sessionId;
+                changed = true;
+              }
+            }
+            return obj;
+          };
+
+          const sanitized = Array.isArray(body)
+            ? body.map(sanitizeOne)
+            : sanitizeOne(body);
+
+          // Only recreate the request body if we actually removed `sessionId`.
+          if (changed) {
+            nextRequest = new Request(request.url, {
+              method: request.method,
+              headers: new Headers(request.headers),
+              body: JSON.stringify(sanitized),
+            });
+          }
+        }
+      } catch {
+        // If we can't parse/inspect the request, fall back to forwarding it.
+      }
+
       return handler.fetch(
-        request,
+        nextRequest,
         envWithUserPinnedMcpObject(env, ctx as { props?: unknown }),
         ctx,
       );

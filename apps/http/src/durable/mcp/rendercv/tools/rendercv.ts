@@ -1,4 +1,5 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
+import { env } from "cloudflare:workers";
 import { z } from "zod";
 
 import { RenderCvDocument } from "@cf-rendercv/contracts";
@@ -26,44 +27,30 @@ export const registerRenderCvTool = (agent: RenderCvMcpAgent) => {
         ? props.claims.sub.split("|").join("_")
         : "anonymous";
 
-      if (format === "url") {
-        const pdfUrl = await generateCV({ content, format, prefix: id });
-        return {
-          content: [
-            {
-              type: "text",
-              text: pdfUrl,
-            },
-          ],
-          structuredContent: {
-            format: "url" as const,
-            pdfUrl,
-          },
-        };
-      }
-
-      const pdfBase64 = await generateCV({
+      const { pdfUrl, pdfBase64, path } = await generateCV({
         content,
-        format: "base64",
+        format: "url-and-base64",
         prefix: id,
+      });
+
+      agent.addDocument({
+        path,
+        bucket: env.S3_BUCKET,
+        createdAt: new Date().toISOString(),
+        data: JSON.stringify(content),
       });
 
       // Some MCP hosts/sandboxes don't reliably render `blob:` / inline base64 inside iframes.
       // Including a normal URL lets the UI preview reliably.
-      const pdfUrl = await generateCV({
-        content,
-        format: "url",
-        prefix: id,
-      });
       return {
         content: [
           {
             type: "text",
-            text: pdfBase64,
+            text: format === "url" ? pdfUrl : pdfBase64,
           },
         ],
         structuredContent: {
-          format: "base64" as const,
+          format: format === "url" ? "url" : ("base64" as const),
           pdfBase64,
           pdfUrl,
         },

@@ -17,7 +17,7 @@ export async function uploadPdfToS3(
   bucket: string,
   buffer: ArrayBufferLike,
   options?: { prefix?: string; contentType?: string; name?: string },
-): Promise<string> {
+): Promise<{ url: string; path: string }> {
   const {
     prefix = "rendercv",
     contentType = "application/pdf",
@@ -35,5 +35,8 @@ export async function uploadPdfToS3(
 
   await s3.send(cmd);
 
-  return `${env.S3_PUBLIC_URL}/${fPath}`;
+  return {
+    url: `${env.S3_PUBLIC_URL}/${fPath}`,
+    path: fPath,
+  };
 }

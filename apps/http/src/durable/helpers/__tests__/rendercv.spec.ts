@@ -25,18 +25,28 @@ describe("durable/helpers/rendercv.ts", () => {
       callContainerService: vi.fn().mockResolvedValue(resp),
     }));
     vi.doMock("../../../utils/s3", () => ({
-      uploadPdfToS3: vi.fn(),
+      uploadPdfToS3: vi
+        .fn()
+        .mockResolvedValue({ url: "https://public.example.com/x.pdf", path: "rendercv/x.pdf" }),
     }));
 
     const { generateCV } = await import("../rendercv");
     const out = await generateCV({ content: { a: 1 }, format: "base64" });
-    expect(out).toBe(btoa("AB"));
+    // Helper typing only guarantees { url, path } for non-response formats.
+    // Runtime includes `pdfBase64` as well.
+    expect(out.url).toBe("https://public.example.com/x.pdf");
+    expect((out as any).pdfBase64).toBe(btoa("AB"));
   });
 
   it("uploads to S3 and returns URL by default", async () => {
     vi.resetModules();
     const resp = new Response(new Uint8Array([1, 2, 3]));
-    const uploadMock = vi.fn().mockResolvedValue("https://public.example.com/x.pdf");
+    const uploadMock = vi
+      .fn()
+      .mockResolvedValue({
+        url: "https://public.example.com/x.pdf",
+        path: "rendercv/x.pdf",
+      });
 
     vi.doMock("../../../utils/call-container", () => ({
       callContainerService: vi.fn().mockResolvedValue(resp),
@@ -47,7 +57,8 @@ describe("durable/helpers/rendercv.ts", () => {
 
     const { generateCV } = await import("../rendercv");
     const out = await generateCV({ content: { a: 1 }, format: "url" });
-    expect(out).toBe("https://public.example.com/x.pdf");
+    expect(out.url).toBe("https://public.example.com/x.pdf");
+    expect(out.path).toBe("rendercv/x.pdf");
     expect(uploadMock).toHaveBeenCalledTimes(1);
   });
 });

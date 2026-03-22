@@ -15,6 +15,18 @@ describe("durable/mcp/rendercv/register", () => {
     vi.doMock("../tools/rendercv", () => ({
       registerRenderCvTool: () => calls.push("tool"),
     }));
+    vi.doMock("../tools/get-docs", () => ({
+      registerGetDocsTool: () => calls.push("get-docs"),
+    }));
+    vi.doMock("../tools/get-resume-by-id", () => ({
+      registerGetResumeByIdTool: () => calls.push("get-resume-by-id"),
+    }));
+    vi.doMock("../tools/rename-resume-by-id", () => ({
+      registerRenameResumeByIdTool: () => calls.push("rename-resume-by-id"),
+    }));
+    vi.doMock("../tools/delete-resume-by-id", () => ({
+      registerDeleteResumeByIdTool: () => calls.push("delete-resume-by-id"),
+    }));
     vi.doMock("../resources/schema-and-prompt", () => ({
       registerRenderscvSchemaAndPromptResource: () => calls.push("resource"),
     }));
@@ -24,6 +36,15 @@ describe("durable/mcp/rendercv/register", () => {
 
     const { registerRenderscv } = await import("../register");
     registerRenderscv({} as any);
-    expect(calls).toEqual(["app-ui", "tool", "resource", "prompt"]);
+    expect(calls).toEqual([
+      "app-ui",
+      "tool",
+      "get-docs",
+      "get-resume-by-id",
+      "rename-resume-by-id",
+      "delete-resume-by-id",
+      "resource",
+      "prompt",
+    ]);
   });
 });

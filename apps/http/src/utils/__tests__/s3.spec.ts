@@ -42,9 +42,10 @@ describe('uploadPdfToS3', () => {
       const buffer = new ArrayBuffer(3);
       new Uint8Array(buffer).set([1, 2, 3]);
 
-      const url = await uploadPdfToS3('my-bucket', buffer);
+      const out = await uploadPdfToS3('my-bucket', buffer);
 
-      expect(url).toBe('https://public.example.com/rendercv/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.pdf');
+      expect(out.url).toBe('https://public.example.com/rendercv/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.pdf');
+      expect(out.path).toBe('rendercv/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.pdf');
       expect(s3SendMock).toHaveBeenCalledTimes(1);
 
       const cmd = s3SendMock.mock.calls[0]?.[0] as InstanceType<
@@ -62,13 +63,14 @@ describe('uploadPdfToS3', () => {
   it('honors prefix, name, and contentType options', async () => {
     const buffer = new TextEncoder().encode('hi').buffer;
 
-    const url = await uploadPdfToS3('other-bucket', buffer, {
+    const out = await uploadPdfToS3('other-bucket', buffer, {
       prefix: 'uploads/cv',
       name: 'fixed-name',
       contentType: 'application/pdf; profile=my-profile',
     });
 
-    expect(url).toBe('https://public.example.com/uploads/cv/fixed-name.pdf');
+    expect(out.url).toBe('https://public.example.com/uploads/cv/fixed-name.pdf');
+    expect(out.path).toBe('uploads/cv/fixed-name.pdf');
 
     const cmd = s3SendMock.mock.calls[0]?.[0] as InstanceType<
       typeof import('@aws-sdk/client-s3').PutObjectCommand
