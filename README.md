@@ -2,6 +2,12 @@
 
 cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the [`rendercv`](https://github.com/rendercv/rendercv) **CLI**.
 
+<p>
+  <a href="https://cursor.com/en-US/install-mcp?name=rendercv&config=eyJ1cmwiOiJodHRwczovL3JlbmRlcmN2LWh0dHAueHZ6Zi53b3JrZXJzLmRldi9tY3AifQ%3D%3D">
+    <img alt="Install to Cursor" src="https://img.shields.io/badge/Install_to_Cursor-1F6FEB?style=for-the-badge&logo=cursor&logoColor=white" />
+  </a>
+</p>
+
 `rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the [`rendercv`](https://github.com/rendercv/rendercv) CLI available. A Node.js server wraps the CLI and exposes an HTTP endpoint; the Cloudflare Worker proxies requests to it.
 
 ## Projects

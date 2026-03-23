@@ -35,6 +35,7 @@ type ExtendedAuthRequest = AuthRequest & {
 };
 
 const REQUIRED_OIDC_SCOPES = ["openid", "profile", "email"] as const;
+const AUTH0_CALLBACK_PATH = "/auth/callback/auth0";
 
 function normalizeAuth0Scope(scope: string | undefined) {
   const raw = (scope ?? "").trim();
@@ -138,7 +139,7 @@ export async function authorize(
     authorizationUrl.searchParams.set("client_id", c.env.AUTH0_CLIENT_ID);
     authorizationUrl.searchParams.set(
       "redirect_uri",
-      new URL("/auth/callback/auth0", c.req.url).href,
+      new URL(AUTH0_CALLBACK_PATH, c.req.url).href,
     );
     authorizationUrl.searchParams.set("response_type", "code");
     authorizationUrl.searchParams.set("audience", c.env.AUTH0_AUDIENCE);
@@ -259,7 +260,7 @@ export async function confirmConsent(
     authorizationUrl.searchParams.set("client_id", c.env.AUTH0_CLIENT_ID);
     authorizationUrl.searchParams.set(
       "redirect_uri",
-      new URL("/auth/callback/auth0", c.req.url).href,
+      new URL(AUTH0_CALLBACK_PATH, c.req.url).href,
     );
     authorizationUrl.searchParams.set("response_type", "code");
     authorizationUrl.searchParams.set("audience", c.env.AUTH0_AUDIENCE);
@@ -356,7 +357,7 @@ export async function callback(
     client,
     clientAuth,
     params,
-    new URL("/callback", c.req.url).href,
+    new URL(AUTH0_CALLBACK_PATH, c.req.url).href,
     auth0Data.codeVerifier,
   );
 

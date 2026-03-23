@@ -1,3 +1,7 @@
+## Auth0 application setup:
+## - Allowed Callback URLs must include:
+##   - http://localhost:8787/auth/callback/auth0
+##   - https://<your-deployed-domain>/auth/callback/auth0
 S3_ACCESS_KEY_ID=
 S3_SECRET_ACCESS_KEY=
 S3_URL=

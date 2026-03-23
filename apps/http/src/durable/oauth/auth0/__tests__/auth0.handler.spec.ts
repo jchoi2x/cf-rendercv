@@ -156,6 +156,9 @@ describe("auth0.handler", () => {
     expect(res.status).toBe(302);
     const loc = res.headers.get("Location")!;
     expect(loc).toContain("https://auth.example.com/authorize");
+    expect(loc).toContain(
+      encodeURIComponent("https://e.com/auth/callback/auth0"),
+    );
     expect(loc).toContain("scope=");
     expect(loc).toContain("openid");
     expect(loc).toContain("profile");
@@ -321,6 +324,9 @@ describe("auth0.handler", () => {
     expect(res.status).toBe(302);
     const loc = res.headers.get("Location")!;
     expect(loc).toContain("https://auth.example.com/authorize");
+    expect(loc).toContain(
+      encodeURIComponent("https://e.com/auth/callback/auth0"),
+    );
     expect(res.headers.get("Set-Cookie")).toBeTruthy();
 
     const setCookieCombined = res.headers.get("Set-Cookie")!;
@@ -469,6 +475,14 @@ describe("auth0.handler", () => {
     expect(res.headers.get("Set-Cookie")).toContain("__Host-CONSENTED_STATE=");
     expect(res.headers.get("Set-Cookie")).toContain("Max-Age=0");
     expect(env.OAUTH_PROVIDER.completeAuthorization).toHaveBeenCalledTimes(1);
+    expect(oauthMock.authorizationCodeGrantRequest).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      "https://e.com/auth/callback/auth0",
+      "ver",
+    );
   });
 
   it("callback label falls back to email then sub", async () => {
