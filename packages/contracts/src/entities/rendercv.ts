@@ -1,11 +1,11 @@
 /* Auto-generated Zod schemas from RenderCV JSON Schema. */
 import { z } from "@hono/zod-openapi";
 
-export const Alignment: z.ZodTypeAny = z.lazy(() =>
+export const Alignment = z.lazy(() =>
   z.enum(["left", "center", "right"] as const),
 );
 
-export const ArabicLocale: z.ZodTypeAny = z.lazy(() =>
+export const ArabicLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -98,11 +98,11 @@ export const ArabicLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("ArabicLocale"),
 );
 
-export const ArbitraryDate: z.ZodTypeAny = z.lazy(() =>
+export const ArbitraryDate = z.lazy(() =>
   z.union([z.number().int(), z.string()]),
 );
 
-export const BuiltInDesign: z.ZodTypeAny = z.lazy(() =>
+export const BuiltInDesign = z.lazy(() =>
   z.union([
     ClassicTheme,
     EngineeringclassicTheme,
@@ -112,11 +112,11 @@ export const BuiltInDesign: z.ZodTypeAny = z.lazy(() =>
   ]),
 );
 
-export const Bullet: z.ZodTypeAny = z.lazy(() =>
+export const Bullet = z.lazy(() =>
   z.enum(["●", "•", "◦", "-", "◆", "★", "■", "—", "○"] as const),
 );
 
-export const BulletEntry: z.ZodTypeAny = z.lazy(() =>
+export const BulletEntry = z.lazy(() =>
   z
     .object({
       bullet: z.string().describe("Bullet"),
@@ -125,7 +125,7 @@ export const BulletEntry: z.ZodTypeAny = z.lazy(() =>
     .describe("BulletEntry"),
 );
 
-export const ClassicTheme: z.ZodTypeAny = z.lazy(() =>
+export const ClassicTheme = z.lazy(() =>
   z
     .object({
       theme: z
@@ -151,7 +151,7 @@ export const ClassicTheme: z.ZodTypeAny = z.lazy(() =>
     .describe("ClassicTheme"),
 );
 
-export const CustomConnection: z.ZodTypeAny = z.lazy(() =>
+export const CustomConnection = z.lazy(() =>
   z
     .object({
       fontawesome_icon: z.string().describe("Fontawesome Icon"),
@@ -164,12 +164,32 @@ export const CustomConnection: z.ZodTypeAny = z.lazy(() =>
     .describe("CustomConnection"),
 );
 
-export const Cv: z.ZodTypeAny = z.lazy(() =>
+export const Cv = z.lazy(() =>
   z
     .object({
       name: z
         .union([z.string(), z.null()])
         .describe("Name")
+        .default(null)
+        .optional(),
+      _plain_name: z
+        .union([z.string(), z.null()])
+        .describe("Plain Name")
+        .default(null)
+        .optional(),
+      _footer: z
+        .union([z.string(), z.null()])
+        .describe("Footer text")
+        .default(null)
+        .optional(),
+      _top_note: z
+        .union([z.string(), z.null()])
+        .describe("Top note text")
+        .default(null)
+        .optional(),
+      _connections: z
+        .union([z.array(CustomConnection), z.null()])
+        .describe("Connections")
         .default(null)
         .optional(),
       headline: z
@@ -228,7 +248,7 @@ export const Cv: z.ZodTypeAny = z.lazy(() =>
     .describe("Cv"),
 );
 
-export const DanishLocale: z.ZodTypeAny = z.lazy(() =>
+export const DanishLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -319,7 +339,7 @@ export const DanishLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("DanishLocale"),
 );
 
-export const DutchLocale: z.ZodTypeAny = z.lazy(() =>
+export const DutchLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -412,7 +432,7 @@ export const DutchLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("DutchLocale"),
 );
 
-export const EngineeringclassicTheme: z.ZodTypeAny = z.lazy(() =>
+export const EngineeringclassicTheme = z.lazy(() =>
   z
     .object({
       theme: z
@@ -438,7 +458,7 @@ export const EngineeringclassicTheme: z.ZodTypeAny = z.lazy(() =>
     .describe("EngineeringclassicTheme"),
 );
 
-export const EngineeringresumesTheme: z.ZodTypeAny = z.lazy(() =>
+export const EngineeringresumesTheme = z.lazy(() =>
   z
     .object({
       theme: z
@@ -464,7 +484,7 @@ export const EngineeringresumesTheme: z.ZodTypeAny = z.lazy(() =>
     .describe("EngineeringresumesTheme"),
 );
 
-export const EnglishLocale: z.ZodTypeAny = z.lazy(() =>
+export const EnglishLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -561,15 +581,11 @@ export const EnglishLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("EnglishLocale"),
 );
 
-export const ExactDate: z.ZodTypeAny = z.lazy(() =>
-  z.union([z.string(), z.number().int()]),
-);
+export const ExactDate = z.lazy(() => z.union([z.string(), z.number().int()]));
 
-export const ExistingPathRelativeToInput: z.ZodTypeAny = z.lazy(() =>
-  z.string().min(1),
-);
+export const ExistingPathRelativeToInput = z.lazy(() => z.string().min(1));
 
-export const FrenchLocale: z.ZodTypeAny = z.lazy(() =>
+export const FrenchLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -662,7 +678,7 @@ export const FrenchLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("FrenchLocale"),
 );
 
-export const GermanLocale: z.ZodTypeAny = z.lazy(() =>
+export const GermanLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -755,7 +771,7 @@ export const GermanLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("GermanLocale"),
 );
 
-export const HebrewLocale: z.ZodTypeAny = z.lazy(() =>
+export const HebrewLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -848,7 +864,7 @@ export const HebrewLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("HebrewLocale"),
 );
 
-export const HindiLocale: z.ZodTypeAny = z.lazy(() =>
+export const HindiLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -941,7 +957,7 @@ export const HindiLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("HindiLocale"),
 );
 
-export const IndonesianLocale: z.ZodTypeAny = z.lazy(() =>
+export const IndonesianLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1036,7 +1052,7 @@ export const IndonesianLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("IndonesianLocale"),
 );
 
-export const ItalianLocale: z.ZodTypeAny = z.lazy(() =>
+export const ItalianLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1129,7 +1145,7 @@ export const ItalianLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("ItalianLocale"),
 );
 
-export const JapaneseLocale: z.ZodTypeAny = z.lazy(() =>
+export const JapaneseLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1220,7 +1236,7 @@ export const JapaneseLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("JapaneseLocale"),
 );
 
-export const KoreanLocale: z.ZodTypeAny = z.lazy(() =>
+export const KoreanLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1311,7 +1327,7 @@ export const KoreanLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("KoreanLocale"),
 );
 
-export const ListOfEntries: z.ZodTypeAny = z.lazy(() =>
+export const ListOfEntries = z.lazy(() =>
   z.union([
     z.array(z.string()),
     z.array(rendercv_schema_models_cv_entries_one_line_OneLineEntry),
@@ -1325,7 +1341,7 @@ export const ListOfEntries: z.ZodTypeAny = z.lazy(() =>
   ]),
 );
 
-export const Locale: z.ZodTypeAny = z.lazy(() =>
+export const Locale = z.lazy(() =>
   z.union([
     EnglishLocale,
     ArabicLocale,
@@ -1350,7 +1366,7 @@ export const Locale: z.ZodTypeAny = z.lazy(() =>
   ]),
 );
 
-export const MandarinChineseLocale: z.ZodTypeAny = z.lazy(() =>
+export const MandarinChineseLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1443,7 +1459,7 @@ export const MandarinChineseLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("MandarinChineseLocale"),
 );
 
-export const ModerncvTheme: z.ZodTypeAny = z.lazy(() =>
+export const ModerncvTheme = z.lazy(() =>
   z
     .object({
       theme: z
@@ -1469,7 +1485,7 @@ export const ModerncvTheme: z.ZodTypeAny = z.lazy(() =>
     .describe("ModerncvTheme"),
 );
 
-export const NorwegianBokm_lLocale: z.ZodTypeAny = z.lazy(() =>
+export const NorwegianBokm_lLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1562,7 +1578,7 @@ export const NorwegianBokm_lLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("NorwegianBokmålLocale"),
 );
 
-export const NorwegianNynorskLocale: z.ZodTypeAny = z.lazy(() =>
+export const NorwegianNynorskLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1655,7 +1671,7 @@ export const NorwegianNynorskLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("NorwegianNynorskLocale"),
 );
 
-export const NumberedEntry: z.ZodTypeAny = z.lazy(() =>
+export const NumberedEntry = z.lazy(() =>
   z
     .object({
       number: z.string().describe("Number"),
@@ -1664,11 +1680,11 @@ export const NumberedEntry: z.ZodTypeAny = z.lazy(() =>
     .describe("NumberedEntry"),
 );
 
-export const PageSize: z.ZodTypeAny = z.lazy(() =>
+export const PageSize = z.lazy(() =>
   z.enum(["a4", "a5", "us-letter", "us-executive"] as const),
 );
 
-export const PersianLocale: z.ZodTypeAny = z.lazy(() =>
+export const PersianLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1761,15 +1777,13 @@ export const PersianLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("PersianLocale"),
 );
 
-export const PhoneNumberFormatType: z.ZodTypeAny = z.lazy(() =>
+export const PhoneNumberFormatType = z.lazy(() =>
   z.enum(["national", "international", "E164"] as const),
 );
 
-export const PlannedPathRelativeToInput: z.ZodTypeAny = z.lazy(() =>
-  z.string().min(1),
-);
+export const PlannedPathRelativeToInput = z.lazy(() => z.string().min(1));
 
-export const PortugueseLocale: z.ZodTypeAny = z.lazy(() =>
+export const PortugueseLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -1864,7 +1878,7 @@ export const PortugueseLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("PortugueseLocale"),
 );
 
-export const RenderCommand: z.ZodTypeAny = z.lazy(() =>
+export const RenderCommand = z.lazy(() =>
   z
     .object({
       output_folder: PlannedPathRelativeToInput.optional(),
@@ -1917,7 +1931,7 @@ export const RenderCommand: z.ZodTypeAny = z.lazy(() =>
     .describe("RenderCommand"),
 );
 
-export const ReversedNumberedEntry: z.ZodTypeAny = z.lazy(() =>
+export const ReversedNumberedEntry = z.lazy(() =>
   z
     .object({
       reversed_number: z
@@ -1930,7 +1944,7 @@ export const ReversedNumberedEntry: z.ZodTypeAny = z.lazy(() =>
     .describe("ReversedNumberedEntry"),
 );
 
-export const RussianLocale: z.ZodTypeAny = z.lazy(() =>
+export const RussianLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -2023,7 +2037,7 @@ export const RussianLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("RussianLocale"),
 );
 
-export const Sb2novTheme: z.ZodTypeAny = z.lazy(() =>
+export const Sb2novTheme = z.lazy(() =>
   z
     .object({
       theme: z.literal("sb2nov").describe("Theme").default("sb2nov").optional(),
@@ -2045,9 +2059,9 @@ export const Sb2novTheme: z.ZodTypeAny = z.lazy(() =>
     .describe("Sb2novTheme"),
 );
 
-export const Section: z.ZodTypeAny = z.lazy(() => ListOfEntries);
+export const Section = z.lazy(() => ListOfEntries);
 
-export const SectionTitleType: z.ZodTypeAny = z.lazy(() =>
+export const SectionTitleType = z.lazy(() =>
   z.enum([
     "with_partial_line",
     "with_full_line",
@@ -2056,7 +2070,7 @@ export const SectionTitleType: z.ZodTypeAny = z.lazy(() =>
   ] as const),
 );
 
-export const Settings: z.ZodTypeAny = z.lazy(() =>
+export const Settings = z.lazy(() =>
   z
     .object({
       current_date: z
@@ -2084,7 +2098,7 @@ export const Settings: z.ZodTypeAny = z.lazy(() =>
     .describe("Settings"),
 );
 
-export const SmallCaps: z.ZodTypeAny = z.lazy(() =>
+export const SmallCaps = z.lazy(() =>
   z
     .object({
       name: z
@@ -2120,7 +2134,7 @@ export const SmallCaps: z.ZodTypeAny = z.lazy(() =>
     .describe("SmallCaps"),
 );
 
-export const SocialNetwork: z.ZodTypeAny = z.lazy(() =>
+export const SocialNetwork = z.lazy(() =>
   z
     .object({
       network: SocialNetworkName,
@@ -2130,7 +2144,7 @@ export const SocialNetwork: z.ZodTypeAny = z.lazy(() =>
     .describe("SocialNetwork"),
 );
 
-export const SocialNetworkName: z.ZodTypeAny = z.lazy(() =>
+export const SocialNetworkName = z.lazy(() =>
   z.enum([
     "LinkedIn",
     "GitHub",
@@ -2152,7 +2166,7 @@ export const SocialNetworkName: z.ZodTypeAny = z.lazy(() =>
   ] as const),
 );
 
-export const SpanishLocale: z.ZodTypeAny = z.lazy(() =>
+export const SpanishLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -2245,7 +2259,7 @@ export const SpanishLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("SpanishLocale"),
 );
 
-export const TurkishLocale: z.ZodTypeAny = z.lazy(() =>
+export const TurkishLocale = z.lazy(() =>
   z
     .object({
       language: z
@@ -2338,9 +2352,9 @@ export const TurkishLocale: z.ZodTypeAny = z.lazy(() =>
     .describe("TurkishLocale"),
 );
 
-export const TypstDimension: z.ZodTypeAny = z.lazy(() => z.string());
+export const TypstDimension = z.lazy(() => z.string());
 
-export const rendercv_schema_models_cv_entries_education_EducationEntry: z.ZodTypeAny =
+export const rendercv_schema_models_cv_entries_education_EducationEntry =
   z.lazy(() =>
     z
       .object({
@@ -2392,7 +2406,7 @@ export const rendercv_schema_models_cv_entries_education_EducationEntry: z.ZodTy
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_cv_entries_experience_ExperienceEntry: z.ZodTypeAny =
+export const rendercv_schema_models_cv_entries_experience_ExperienceEntry =
   z.lazy(() =>
     z
       .object({
@@ -2439,54 +2453,53 @@ export const rendercv_schema_models_cv_entries_experience_ExperienceEntry: z.Zod
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_cv_entries_normal_NormalEntry: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        name: z.string().describe("Name"),
-        date: z
-          .union([ArbitraryDate, z.null()])
-          .describe(
-            "The date of this event in YYYY-MM-DD, YYYY-MM, or YYYY format, or any custom text like 'Fall 2023'. Use this for single-day or imprecise dates. For date ranges, use `start_date` and `end_date` instead.",
-          )
-          .default(null)
-          .optional(),
-        start_date: z
-          .union([ExactDate, z.null()])
-          .describe("The start date in YYYY-MM-DD, YYYY-MM, or YYYY format.")
-          .default(null)
-          .optional(),
-        end_date: z
-          .union([ExactDate, z.literal("present"), z.null()])
-          .describe(
-            'The end date in YYYY-MM-DD, YYYY-MM, or YYYY format. Use "present" for ongoing events, or omit it to indicate the event is ongoing.',
-          )
-          .default(null)
-          .optional(),
-        location: z
-          .union([z.string(), z.null()])
-          .describe("Location")
-          .default(null)
-          .optional(),
-        summary: z
-          .union([z.string(), z.null()])
-          .describe("Summary")
-          .default(null)
-          .optional(),
-        highlights: z
-          .union([z.array(z.string()), z.null()])
-          .describe(
-            "Bullet points for key achievements, responsibilities, or contributions.",
-          )
-          .default(null)
-          .optional(),
-      })
-      .passthrough()
-      .describe("NormalEntry"),
-  );
+export const rendercv_schema_models_cv_entries_normal_NormalEntry = z.lazy(() =>
+  z
+    .object({
+      name: z.string().describe("Name"),
+      date: z
+        .union([ArbitraryDate, z.null()])
+        .describe(
+          "The date of this event in YYYY-MM-DD, YYYY-MM, or YYYY format, or any custom text like 'Fall 2023'. Use this for single-day or imprecise dates. For date ranges, use `start_date` and `end_date` instead.",
+        )
+        .default(null)
+        .optional(),
+      start_date: z
+        .union([ExactDate, z.null()])
+        .describe("The start date in YYYY-MM-DD, YYYY-MM, or YYYY format.")
+        .default(null)
+        .optional(),
+      end_date: z
+        .union([ExactDate, z.literal("present"), z.null()])
+        .describe(
+          'The end date in YYYY-MM-DD, YYYY-MM, or YYYY format. Use "present" for ongoing events, or omit it to indicate the event is ongoing.',
+        )
+        .default(null)
+        .optional(),
+      location: z
+        .union([z.string(), z.null()])
+        .describe("Location")
+        .default(null)
+        .optional(),
+      summary: z
+        .union([z.string(), z.null()])
+        .describe("Summary")
+        .default(null)
+        .optional(),
+      highlights: z
+        .union([z.array(z.string()), z.null()])
+        .describe(
+          "Bullet points for key achievements, responsibilities, or contributions.",
+        )
+        .default(null)
+        .optional(),
+    })
+    .passthrough()
+    .describe("NormalEntry"),
+);
 
-export const rendercv_schema_models_cv_entries_one_line_OneLineEntry: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_cv_entries_one_line_OneLineEntry = z.lazy(
+  () =>
     z
       .object({
         label: z.string().describe("Label"),
@@ -2494,9 +2507,9 @@ export const rendercv_schema_models_cv_entries_one_line_OneLineEntry: z.ZodTypeA
       })
       .passthrough()
       .describe("OneLineEntry"),
-  );
+);
 
-export const rendercv_schema_models_cv_entries_publication_PublicationEntry: z.ZodTypeAny =
+export const rendercv_schema_models_cv_entries_publication_PublicationEntry =
   z.lazy(() =>
     z
       .object({
@@ -2540,351 +2553,336 @@ export const rendercv_schema_models_cv_entries_publication_PublicationEntry: z.Z
       .describe("PublicationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_Bold_1: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        name: z
-          .boolean()
-          .describe(
-            "Whether to make the name bold. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-        headline: z
-          .boolean()
-          .describe(
-            "Whether to make the headline bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        connections: z
-          .boolean()
-          .describe(
-            "Whether to make connections bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        section_titles: z
-          .boolean()
-          .describe(
-            "Whether to make section titles bold. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-      })
-      .strict()
-      .describe("Bold"),
-  );
+export const rendercv_schema_models_design_classic_theme_Bold_1 = z.lazy(() =>
+  z
+    .object({
+      name: z
+        .boolean()
+        .describe("Whether to make the name bold. The default value is `true`.")
+        .default(true)
+        .optional(),
+      headline: z
+        .boolean()
+        .describe(
+          "Whether to make the headline bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      connections: z
+        .boolean()
+        .describe(
+          "Whether to make connections bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      section_titles: z
+        .boolean()
+        .describe(
+          "Whether to make section titles bold. The default value is `true`.",
+        )
+        .default(true)
+        .optional(),
+    })
+    .strict()
+    .describe("Bold"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Bold_2: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        name: z
-          .boolean()
-          .describe(
-            "Whether to make the name bold. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-        headline: z
-          .boolean()
-          .describe(
-            "Whether to make the headline bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        connections: z
-          .boolean()
-          .describe(
-            "Whether to make connections bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        section_titles: z
-          .boolean()
-          .describe(
-            "Whether to make section titles bold. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Bold"),
-  );
+export const rendercv_schema_models_design_classic_theme_Bold_2 = z.lazy(() =>
+  z
+    .object({
+      name: z
+        .boolean()
+        .describe("Whether to make the name bold. The default value is `true`.")
+        .default(false)
+        .optional(),
+      headline: z
+        .boolean()
+        .describe(
+          "Whether to make the headline bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      connections: z
+        .boolean()
+        .describe(
+          "Whether to make connections bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      section_titles: z
+        .boolean()
+        .describe(
+          "Whether to make section titles bold. The default value is `true`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Bold"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Bold_3: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        name: z
-          .boolean()
-          .describe(
-            "Whether to make the name bold. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-        headline: z
-          .boolean()
-          .describe(
-            "Whether to make the headline bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        connections: z
-          .boolean()
-          .describe(
-            "Whether to make connections bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        section_titles: z
-          .boolean()
-          .describe(
-            "Whether to make section titles bold. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-      })
-      .strict()
-      .describe("Bold"),
-  );
+export const rendercv_schema_models_design_classic_theme_Bold_3 = z.lazy(() =>
+  z
+    .object({
+      name: z
+        .boolean()
+        .describe("Whether to make the name bold. The default value is `true`.")
+        .default(false)
+        .optional(),
+      headline: z
+        .boolean()
+        .describe(
+          "Whether to make the headline bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      connections: z
+        .boolean()
+        .describe(
+          "Whether to make connections bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      section_titles: z
+        .boolean()
+        .describe(
+          "Whether to make section titles bold. The default value is `true`.",
+        )
+        .default(true)
+        .optional(),
+    })
+    .strict()
+    .describe("Bold"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Bold_4: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        name: z
-          .boolean()
-          .describe(
-            "Whether to make the name bold. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-        headline: z
-          .boolean()
-          .describe(
-            "Whether to make the headline bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        connections: z
-          .boolean()
-          .describe(
-            "Whether to make connections bold. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        section_titles: z
-          .boolean()
-          .describe(
-            "Whether to make section titles bold. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Bold"),
-  );
+export const rendercv_schema_models_design_classic_theme_Bold_4 = z.lazy(() =>
+  z
+    .object({
+      name: z
+        .boolean()
+        .describe("Whether to make the name bold. The default value is `true`.")
+        .default(false)
+        .optional(),
+      headline: z
+        .boolean()
+        .describe(
+          "Whether to make the headline bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      connections: z
+        .boolean()
+        .describe(
+          "Whether to make connections bold. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+      section_titles: z
+        .boolean()
+        .describe(
+          "Whether to make section titles bold. The default value is `true`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Bold"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Colors_1: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        body: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
-          )
-          .default("rgb(0, 0, 0)")
-          .optional(),
-        name: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
-          )
-          .default("rgb(0, 79, 144)")
-          .optional(),
-        headline: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
-          )
-          .default("rgb(0, 79, 144)")
-          .optional(),
-        connections: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
-          )
-          .default("rgb(0, 79, 144)")
-          .optional(),
-        section_titles: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
-          )
-          .default("rgb(0, 79, 144)")
-          .optional(),
-        links: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
-          )
-          .default("rgb(0, 79, 144)")
-          .optional(),
-        footer: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-        top_note: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-      })
-      .strict()
-      .describe("Colors"),
-  );
+export const rendercv_schema_models_design_classic_theme_Colors_1 = z.lazy(() =>
+  z
+    .object({
+      body: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
+        )
+        .default("rgb(0, 0, 0)")
+        .optional(),
+      name: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
+        )
+        .default("rgb(0, 79, 144)")
+        .optional(),
+      headline: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
+        )
+        .default("rgb(0, 79, 144)")
+        .optional(),
+      connections: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
+        )
+        .default("rgb(0, 79, 144)")
+        .optional(),
+      section_titles: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
+        )
+        .default("rgb(0, 79, 144)")
+        .optional(),
+      links: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 79, 144)`.",
+        )
+        .default("rgb(0, 79, 144)")
+        .optional(),
+      footer: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+      top_note: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+    })
+    .strict()
+    .describe("Colors"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Colors_2: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        body: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
-          )
-          .default("rgb(0, 0, 0)")
-          .optional(),
-        name: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        headline: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        connections: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        section_titles: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        links: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        footer: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-        top_note: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-      })
-      .strict()
-      .describe("Colors"),
-  );
+export const rendercv_schema_models_design_classic_theme_Colors_2 = z.lazy(() =>
+  z
+    .object({
+      body: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
+        )
+        .default("rgb(0, 0, 0)")
+        .optional(),
+      name: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      headline: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      connections: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      section_titles: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      links: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      footer: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+      top_note: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+    })
+    .strict()
+    .describe("Colors"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Colors_3: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        body: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
-          )
-          .default("rgb(0, 0, 0)")
-          .optional(),
-        name: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        headline: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        connections: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        section_titles: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        links: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
-          )
-          .default("rgb(0,0,0)")
-          .optional(),
-        footer: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-        top_note: z
-          .string()
-          .describe(
-            "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
-          )
-          .default("rgb(128, 128, 128)")
-          .optional(),
-      })
-      .strict()
-      .describe("Colors"),
-  );
+export const rendercv_schema_models_design_classic_theme_Colors_3 = z.lazy(() =>
+  z
+    .object({
+      body: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0, 0, 0)`.",
+        )
+        .default("rgb(0, 0, 0)")
+        .optional(),
+      name: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      headline: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      connections: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      section_titles: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      links: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(0,0,0)`.",
+        )
+        .default("rgb(0,0,0)")
+        .optional(),
+      footer: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+      top_note: z
+        .string()
+        .describe(
+          "The color can be specified either with their name (https://www.w3.org/TR/SVG11/types.html#ColorKeywords), hexadecimal value, RGB value, or HSL value. The default value is `rgb(128, 128, 128)`.",
+        )
+        .default("rgb(128, 128, 128)")
+        .optional(),
+    })
+    .strict()
+    .describe("Colors"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Connections_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Connections_1 = z.lazy(
+  () =>
     z
       .object({
         phone_number_format: PhoneNumberFormatType.optional(),
@@ -2920,10 +2918,10 @@ export const rendercv_schema_models_design_classic_theme_Connections_1: z.ZodTyp
       })
       .strict()
       .describe("Connections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Connections_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Connections_2 = z.lazy(
+  () =>
     z
       .object({
         phone_number_format: PhoneNumberFormatType.optional(),
@@ -2959,10 +2957,10 @@ export const rendercv_schema_models_design_classic_theme_Connections_2: z.ZodTyp
       })
       .strict()
       .describe("Connections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Connections_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Connections_3 = z.lazy(
+  () =>
     z
       .object({
         phone_number_format: PhoneNumberFormatType.optional(),
@@ -2998,9 +2996,9 @@ export const rendercv_schema_models_design_classic_theme_Connections_3: z.ZodTyp
       })
       .strict()
       .describe("Connections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_EducationEntry_1: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_EducationEntry_1 =
   z.lazy(() =>
     z
       .object({
@@ -3030,7 +3028,7 @@ export const rendercv_schema_models_design_classic_theme_EducationEntry_1: z.Zod
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_EducationEntry_2: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_EducationEntry_2 =
   z.lazy(() =>
     z
       .object({
@@ -3062,7 +3060,7 @@ export const rendercv_schema_models_design_classic_theme_EducationEntry_2: z.Zod
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_EducationEntry_3: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_EducationEntry_3 =
   z.lazy(() =>
     z
       .object({
@@ -3094,7 +3092,7 @@ export const rendercv_schema_models_design_classic_theme_EducationEntry_3: z.Zod
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_EducationEntry_4: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_EducationEntry_4 =
   z.lazy(() =>
     z
       .object({
@@ -3126,7 +3124,7 @@ export const rendercv_schema_models_design_classic_theme_EducationEntry_4: z.Zod
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_EducationEntry_5: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_EducationEntry_5 =
   z.lazy(() =>
     z
       .object({
@@ -3156,8 +3154,8 @@ export const rendercv_schema_models_design_classic_theme_EducationEntry_5: z.Zod
       .describe("EducationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_Entries_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Entries_1 = z.lazy(
+  () =>
     z
       .object({
         date_and_location_width: TypstDimension.optional(),
@@ -3185,10 +3183,10 @@ export const rendercv_schema_models_design_classic_theme_Entries_1: z.ZodTypeAny
       })
       .strict()
       .describe("Entries"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Entries_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Entries_2 = z.lazy(
+  () =>
     z
       .object({
         date_and_location_width: TypstDimension.optional(),
@@ -3216,41 +3214,10 @@ export const rendercv_schema_models_design_classic_theme_Entries_2: z.ZodTypeAny
       })
       .strict()
       .describe("Entries"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Entries_3: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        date_and_location_width: TypstDimension.optional(),
-        side_space: TypstDimension.optional(),
-        space_between_columns: TypstDimension.optional(),
-        allow_page_break: z
-          .boolean()
-          .describe(
-            "Allow page breaks within entries. If false, entries that don't fit will move to a new page. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-        short_second_row: z
-          .boolean()
-          .describe(
-            "Shorten the second row to align with the date/location column. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-        degree_width: TypstDimension.optional(),
-        summary:
-          rendercv_schema_models_design_classic_theme_Summary_3.optional(),
-        highlights:
-          rendercv_schema_models_design_classic_theme_Highlights_3.optional(),
-      })
-      .strict()
-      .describe("Entries"),
-  );
-
-export const rendercv_schema_models_design_classic_theme_Entries_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Entries_4 = z.lazy(
+  () =>
     z
       .object({
         date_and_location_width: TypstDimension.optional(),
@@ -3278,10 +3245,10 @@ export const rendercv_schema_models_design_classic_theme_Entries_4: z.ZodTypeAny
       })
       .strict()
       .describe("Entries"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Entries_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Entries_5 = z.lazy(
+  () =>
     z
       .object({
         date_and_location_width: TypstDimension.optional(),
@@ -3309,9 +3276,9 @@ export const rendercv_schema_models_design_classic_theme_Entries_5: z.ZodTypeAny
       })
       .strict()
       .describe("Entries"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_ExperienceEntry_1: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_ExperienceEntry_1 =
   z.lazy(() =>
     z
       .object({
@@ -3334,7 +3301,7 @@ export const rendercv_schema_models_design_classic_theme_ExperienceEntry_1: z.Zo
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_ExperienceEntry_2: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_ExperienceEntry_2 =
   z.lazy(() =>
     z
       .object({
@@ -3357,7 +3324,7 @@ export const rendercv_schema_models_design_classic_theme_ExperienceEntry_2: z.Zo
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_ExperienceEntry_3: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_ExperienceEntry_3 =
   z.lazy(() =>
     z
       .object({
@@ -3380,7 +3347,7 @@ export const rendercv_schema_models_design_classic_theme_ExperienceEntry_3: z.Zo
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_ExperienceEntry_4: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_ExperienceEntry_4 =
   z.lazy(() =>
     z
       .object({
@@ -3403,7 +3370,7 @@ export const rendercv_schema_models_design_classic_theme_ExperienceEntry_4: z.Zo
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_ExperienceEntry_5: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_ExperienceEntry_5 =
   z.lazy(() =>
     z
       .object({
@@ -3426,8 +3393,8 @@ export const rendercv_schema_models_design_classic_theme_ExperienceEntry_5: z.Zo
       .describe("ExperienceEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_FontFamily: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_FontFamily = z.lazy(
+  () =>
     z
       .object({
         body: rendercv_schema_models_design_font_family_FontFamily.optional(),
@@ -3441,10 +3408,10 @@ export const rendercv_schema_models_design_classic_theme_FontFamily: z.ZodTypeAn
       })
       .strict()
       .describe("FontFamily"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_FontSize_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_FontSize_1 = z.lazy(
+  () =>
     z
       .object({
         body: TypstDimension.optional(),
@@ -3455,10 +3422,10 @@ export const rendercv_schema_models_design_classic_theme_FontSize_1: z.ZodTypeAn
       })
       .strict()
       .describe("FontSize"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_FontSize_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_FontSize_2 = z.lazy(
+  () =>
     z
       .object({
         body: TypstDimension.optional(),
@@ -3469,10 +3436,10 @@ export const rendercv_schema_models_design_classic_theme_FontSize_2: z.ZodTypeAn
       })
       .strict()
       .describe("FontSize"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_FontSize_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_FontSize_3 = z.lazy(
+  () =>
     z
       .object({
         body: TypstDimension.optional(),
@@ -3483,135 +3450,130 @@ export const rendercv_schema_models_design_classic_theme_FontSize_3: z.ZodTypeAn
       })
       .strict()
       .describe("FontSize"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Header_1: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        alignment: Alignment.optional(),
-        photo_width: TypstDimension.optional(),
-        photo_position: z
-          .enum(["left", "right"] as const)
-          .describe(
-            "Photo position (left or right). The default value is `left`.",
-          )
-          .default("left")
-          .optional(),
-        photo_space_left: TypstDimension.optional(),
-        photo_space_right: TypstDimension.optional(),
-        space_below_name: TypstDimension.optional(),
-        space_below_headline: TypstDimension.optional(),
-        space_below_connections: TypstDimension.optional(),
-        connections:
-          rendercv_schema_models_design_classic_theme_Connections_1.optional(),
-      })
-      .strict()
-      .describe("Header"),
-  );
+export const rendercv_schema_models_design_classic_theme_Header_1 = z.lazy(() =>
+  z
+    .object({
+      alignment: Alignment.optional(),
+      photo_width: TypstDimension.optional(),
+      photo_position: z
+        .enum(["left", "right"] as const)
+        .describe(
+          "Photo position (left or right). The default value is `left`.",
+        )
+        .default("left")
+        .optional(),
+      photo_space_left: TypstDimension.optional(),
+      photo_space_right: TypstDimension.optional(),
+      space_below_name: TypstDimension.optional(),
+      space_below_headline: TypstDimension.optional(),
+      space_below_connections: TypstDimension.optional(),
+      connections:
+        rendercv_schema_models_design_classic_theme_Connections_1.optional(),
+    })
+    .strict()
+    .describe("Header"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Header_2: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        alignment: Alignment.optional(),
-        photo_width: TypstDimension.optional(),
-        photo_position: z
-          .enum(["left", "right"] as const)
-          .describe(
-            "Photo position (left or right). The default value is `left`.",
-          )
-          .default("left")
-          .optional(),
-        photo_space_left: TypstDimension.optional(),
-        photo_space_right: TypstDimension.optional(),
-        space_below_name: TypstDimension.optional(),
-        space_below_headline: TypstDimension.optional(),
-        space_below_connections: TypstDimension.optional(),
-        connections:
-          rendercv_schema_models_design_classic_theme_Connections_1.optional(),
-      })
-      .strict()
-      .describe("Header"),
-  );
+export const rendercv_schema_models_design_classic_theme_Header_2 = z.lazy(() =>
+  z
+    .object({
+      alignment: Alignment.optional(),
+      photo_width: TypstDimension.optional(),
+      photo_position: z
+        .enum(["left", "right"] as const)
+        .describe(
+          "Photo position (left or right). The default value is `left`.",
+        )
+        .default("left")
+        .optional(),
+      photo_space_left: TypstDimension.optional(),
+      photo_space_right: TypstDimension.optional(),
+      space_below_name: TypstDimension.optional(),
+      space_below_headline: TypstDimension.optional(),
+      space_below_connections: TypstDimension.optional(),
+      connections:
+        rendercv_schema_models_design_classic_theme_Connections_1.optional(),
+    })
+    .strict()
+    .describe("Header"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Header_3: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        alignment: Alignment.optional(),
-        photo_width: TypstDimension.optional(),
-        photo_position: z
-          .enum(["left", "right"] as const)
-          .describe(
-            "Photo position (left or right). The default value is `left`.",
-          )
-          .default("left")
-          .optional(),
-        photo_space_left: TypstDimension.optional(),
-        photo_space_right: TypstDimension.optional(),
-        space_below_name: TypstDimension.optional(),
-        space_below_headline: TypstDimension.optional(),
-        space_below_connections: TypstDimension.optional(),
-        connections:
-          rendercv_schema_models_design_classic_theme_Connections_2.optional(),
-      })
-      .strict()
-      .describe("Header"),
-  );
+export const rendercv_schema_models_design_classic_theme_Header_3 = z.lazy(() =>
+  z
+    .object({
+      alignment: Alignment.optional(),
+      photo_width: TypstDimension.optional(),
+      photo_position: z
+        .enum(["left", "right"] as const)
+        .describe(
+          "Photo position (left or right). The default value is `left`.",
+        )
+        .default("left")
+        .optional(),
+      photo_space_left: TypstDimension.optional(),
+      photo_space_right: TypstDimension.optional(),
+      space_below_name: TypstDimension.optional(),
+      space_below_headline: TypstDimension.optional(),
+      space_below_connections: TypstDimension.optional(),
+      connections:
+        rendercv_schema_models_design_classic_theme_Connections_2.optional(),
+    })
+    .strict()
+    .describe("Header"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Header_4: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        alignment: Alignment.optional(),
-        photo_width: TypstDimension.optional(),
-        photo_position: z
-          .enum(["left", "right"] as const)
-          .describe(
-            "Photo position (left or right). The default value is `left`.",
-          )
-          .default("left")
-          .optional(),
-        photo_space_left: TypstDimension.optional(),
-        photo_space_right: TypstDimension.optional(),
-        space_below_name: TypstDimension.optional(),
-        space_below_headline: TypstDimension.optional(),
-        space_below_connections: TypstDimension.optional(),
-        connections:
-          rendercv_schema_models_design_classic_theme_Connections_1.optional(),
-      })
-      .strict()
-      .describe("Header"),
-  );
+export const rendercv_schema_models_design_classic_theme_Header_4 = z.lazy(() =>
+  z
+    .object({
+      alignment: Alignment.optional(),
+      photo_width: TypstDimension.optional(),
+      photo_position: z
+        .enum(["left", "right"] as const)
+        .describe(
+          "Photo position (left or right). The default value is `left`.",
+        )
+        .default("left")
+        .optional(),
+      photo_space_left: TypstDimension.optional(),
+      photo_space_right: TypstDimension.optional(),
+      space_below_name: TypstDimension.optional(),
+      space_below_headline: TypstDimension.optional(),
+      space_below_connections: TypstDimension.optional(),
+      connections:
+        rendercv_schema_models_design_classic_theme_Connections_1.optional(),
+    })
+    .strict()
+    .describe("Header"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Header_5: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        alignment: Alignment.optional(),
-        photo_width: TypstDimension.optional(),
-        photo_position: z
-          .enum(["left", "right"] as const)
-          .describe(
-            "Photo position (left or right). The default value is `left`.",
-          )
-          .default("left")
-          .optional(),
-        photo_space_left: TypstDimension.optional(),
-        photo_space_right: TypstDimension.optional(),
-        space_below_name: TypstDimension.optional(),
-        space_below_headline: TypstDimension.optional(),
-        space_below_connections: TypstDimension.optional(),
-        connections:
-          rendercv_schema_models_design_classic_theme_Connections_3.optional(),
-      })
-      .strict()
-      .describe("Header"),
-  );
+export const rendercv_schema_models_design_classic_theme_Header_5 = z.lazy(() =>
+  z
+    .object({
+      alignment: Alignment.optional(),
+      photo_width: TypstDimension.optional(),
+      photo_position: z
+        .enum(["left", "right"] as const)
+        .describe(
+          "Photo position (left or right). The default value is `left`.",
+        )
+        .default("left")
+        .optional(),
+      photo_space_left: TypstDimension.optional(),
+      photo_space_right: TypstDimension.optional(),
+      space_below_name: TypstDimension.optional(),
+      space_below_headline: TypstDimension.optional(),
+      space_below_connections: TypstDimension.optional(),
+      connections:
+        rendercv_schema_models_design_classic_theme_Connections_3.optional(),
+    })
+    .strict()
+    .describe("Header"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Highlights_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Highlights_1 = z.lazy(
+  () =>
     z
       .object({
         bullet: Bullet.optional(),
@@ -3623,10 +3585,10 @@ export const rendercv_schema_models_design_classic_theme_Highlights_1: z.ZodType
       })
       .strict()
       .describe("Highlights"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Highlights_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Highlights_2 = z.lazy(
+  () =>
     z
       .object({
         bullet: Bullet.optional(),
@@ -3638,10 +3600,10 @@ export const rendercv_schema_models_design_classic_theme_Highlights_2: z.ZodType
       })
       .strict()
       .describe("Highlights"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Highlights_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Highlights_3 = z.lazy(
+  () =>
     z
       .object({
         bullet: Bullet.optional(),
@@ -3653,10 +3615,10 @@ export const rendercv_schema_models_design_classic_theme_Highlights_3: z.ZodType
       })
       .strict()
       .describe("Highlights"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Highlights_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Highlights_4 = z.lazy(
+  () =>
     z
       .object({
         bullet: Bullet.optional(),
@@ -3668,10 +3630,10 @@ export const rendercv_schema_models_design_classic_theme_Highlights_4: z.ZodType
       })
       .strict()
       .describe("Highlights"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Highlights_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Highlights_5 = z.lazy(
+  () =>
     z
       .object({
         bullet: Bullet.optional(),
@@ -3683,115 +3645,110 @@ export const rendercv_schema_models_design_classic_theme_Highlights_5: z.ZodType
       })
       .strict()
       .describe("Highlights"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Links_1: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        underline: z
-          .boolean()
-          .describe("Underline hyperlinks. The default value is `false`.")
-          .default(false)
-          .optional(),
-        show_external_link_icon: z
-          .boolean()
-          .describe(
-            "Show an external link icon next to URLs. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Links"),
-  );
+export const rendercv_schema_models_design_classic_theme_Links_1 = z.lazy(() =>
+  z
+    .object({
+      underline: z
+        .boolean()
+        .describe("Underline hyperlinks. The default value is `false`.")
+        .default(false)
+        .optional(),
+      show_external_link_icon: z
+        .boolean()
+        .describe(
+          "Show an external link icon next to URLs. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Links"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Links_2: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        underline: z
-          .boolean()
-          .describe("Underline hyperlinks. The default value is `false`.")
-          .default(false)
-          .optional(),
-        show_external_link_icon: z
-          .boolean()
-          .describe(
-            "Show an external link icon next to URLs. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Links"),
-  );
+export const rendercv_schema_models_design_classic_theme_Links_2 = z.lazy(() =>
+  z
+    .object({
+      underline: z
+        .boolean()
+        .describe("Underline hyperlinks. The default value is `false`.")
+        .default(false)
+        .optional(),
+      show_external_link_icon: z
+        .boolean()
+        .describe(
+          "Show an external link icon next to URLs. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Links"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Links_3: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        underline: z
-          .boolean()
-          .describe("Underline hyperlinks. The default value is `false`.")
-          .default(true)
-          .optional(),
-        show_external_link_icon: z
-          .boolean()
-          .describe(
-            "Show an external link icon next to URLs. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Links"),
-  );
+export const rendercv_schema_models_design_classic_theme_Links_3 = z.lazy(() =>
+  z
+    .object({
+      underline: z
+        .boolean()
+        .describe("Underline hyperlinks. The default value is `false`.")
+        .default(true)
+        .optional(),
+      show_external_link_icon: z
+        .boolean()
+        .describe(
+          "Show an external link icon next to URLs. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Links"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Links_4: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        underline: z
-          .boolean()
-          .describe("Underline hyperlinks. The default value is `false`.")
-          .default(true)
-          .optional(),
-        show_external_link_icon: z
-          .boolean()
-          .describe(
-            "Show an external link icon next to URLs. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Links"),
-  );
+export const rendercv_schema_models_design_classic_theme_Links_4 = z.lazy(() =>
+  z
+    .object({
+      underline: z
+        .boolean()
+        .describe("Underline hyperlinks. The default value is `false`.")
+        .default(true)
+        .optional(),
+      show_external_link_icon: z
+        .boolean()
+        .describe(
+          "Show an external link icon next to URLs. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Links"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Links_5: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        underline: z
-          .boolean()
-          .describe("Underline hyperlinks. The default value is `false`.")
-          .default(true)
-          .optional(),
-        show_external_link_icon: z
-          .boolean()
-          .describe(
-            "Show an external link icon next to URLs. The default value is `false`.",
-          )
-          .default(false)
-          .optional(),
-      })
-      .strict()
-      .describe("Links"),
-  );
+export const rendercv_schema_models_design_classic_theme_Links_5 = z.lazy(() =>
+  z
+    .object({
+      underline: z
+        .boolean()
+        .describe("Underline hyperlinks. The default value is `false`.")
+        .default(true)
+        .optional(),
+      show_external_link_icon: z
+        .boolean()
+        .describe(
+          "Show an external link icon next to URLs. The default value is `false`.",
+        )
+        .default(false)
+        .optional(),
+    })
+    .strict()
+    .describe("Links"),
+);
 
-export const rendercv_schema_models_design_classic_theme_NormalEntry_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_NormalEntry_1 = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3811,10 +3768,10 @@ export const rendercv_schema_models_design_classic_theme_NormalEntry_1: z.ZodTyp
       })
       .strict()
       .describe("NormalEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_NormalEntry_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_NormalEntry_2 = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3834,10 +3791,10 @@ export const rendercv_schema_models_design_classic_theme_NormalEntry_2: z.ZodTyp
       })
       .strict()
       .describe("NormalEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_NormalEntry_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_NormalEntry_3 = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3857,10 +3814,10 @@ export const rendercv_schema_models_design_classic_theme_NormalEntry_3: z.ZodTyp
       })
       .strict()
       .describe("NormalEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_NormalEntry_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_NormalEntry_4 = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3880,10 +3837,10 @@ export const rendercv_schema_models_design_classic_theme_NormalEntry_4: z.ZodTyp
       })
       .strict()
       .describe("NormalEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_NormalEntry_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_NormalEntry_5 = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3903,10 +3860,10 @@ export const rendercv_schema_models_design_classic_theme_NormalEntry_5: z.ZodTyp
       })
       .strict()
       .describe("NormalEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_OneLineEntry: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_OneLineEntry = z.lazy(
+  () =>
     z
       .object({
         main_column: z
@@ -3919,65 +3876,63 @@ export const rendercv_schema_models_design_classic_theme_OneLineEntry: z.ZodType
       })
       .strict()
       .describe("OneLineEntry"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Page_1: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        size: PageSize.optional(),
-        top_margin: TypstDimension.optional(),
-        bottom_margin: TypstDimension.optional(),
-        left_margin: TypstDimension.optional(),
-        right_margin: TypstDimension.optional(),
-        show_footer: z
-          .boolean()
-          .describe(
-            "Show the footer at the bottom of pages. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-        show_top_note: z
-          .boolean()
-          .describe(
-            "Show the top note at the top of the first page. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-      })
-      .strict()
-      .describe("Page"),
-  );
+export const rendercv_schema_models_design_classic_theme_Page_1 = z.lazy(() =>
+  z
+    .object({
+      size: PageSize.optional(),
+      top_margin: TypstDimension.optional(),
+      bottom_margin: TypstDimension.optional(),
+      left_margin: TypstDimension.optional(),
+      right_margin: TypstDimension.optional(),
+      show_footer: z
+        .boolean()
+        .describe(
+          "Show the footer at the bottom of pages. The default value is `true`.",
+        )
+        .default(true)
+        .optional(),
+      show_top_note: z
+        .boolean()
+        .describe(
+          "Show the top note at the top of the first page. The default value is `true`.",
+        )
+        .default(true)
+        .optional(),
+    })
+    .strict()
+    .describe("Page"),
+);
 
-export const rendercv_schema_models_design_classic_theme_Page_2: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        size: PageSize.optional(),
-        top_margin: TypstDimension.optional(),
-        bottom_margin: TypstDimension.optional(),
-        left_margin: TypstDimension.optional(),
-        right_margin: TypstDimension.optional(),
-        show_footer: z
-          .boolean()
-          .describe(
-            "Show the footer at the bottom of pages. The default value is `true`.",
-          )
-          .default(false)
-          .optional(),
-        show_top_note: z
-          .boolean()
-          .describe(
-            "Show the top note at the top of the first page. The default value is `true`.",
-          )
-          .default(true)
-          .optional(),
-      })
-      .strict()
-      .describe("Page"),
-  );
+export const rendercv_schema_models_design_classic_theme_Page_2 = z.lazy(() =>
+  z
+    .object({
+      size: PageSize.optional(),
+      top_margin: TypstDimension.optional(),
+      bottom_margin: TypstDimension.optional(),
+      left_margin: TypstDimension.optional(),
+      right_margin: TypstDimension.optional(),
+      show_footer: z
+        .boolean()
+        .describe(
+          "Show the footer at the bottom of pages. The default value is `true`.",
+        )
+        .default(false)
+        .optional(),
+      show_top_note: z
+        .boolean()
+        .describe(
+          "Show the top note at the top of the first page. The default value is `true`.",
+        )
+        .default(true)
+        .optional(),
+    })
+    .strict()
+    .describe("Page"),
+);
 
-export const rendercv_schema_models_design_classic_theme_PublicationEntry: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_PublicationEntry =
   z.lazy(() =>
     z
       .object({
@@ -4000,7 +3955,7 @@ export const rendercv_schema_models_design_classic_theme_PublicationEntry: z.Zod
       .describe("PublicationEntry"),
   );
 
-export const rendercv_schema_models_design_classic_theme_SectionTitles_1: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_SectionTitles_1 =
   z.lazy(() =>
     z
       .object({
@@ -4013,7 +3968,7 @@ export const rendercv_schema_models_design_classic_theme_SectionTitles_1: z.ZodT
       .describe("SectionTitles"),
   );
 
-export const rendercv_schema_models_design_classic_theme_SectionTitles_2: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_SectionTitles_2 =
   z.lazy(() =>
     z
       .object({
@@ -4026,7 +3981,7 @@ export const rendercv_schema_models_design_classic_theme_SectionTitles_2: z.ZodT
       .describe("SectionTitles"),
   );
 
-export const rendercv_schema_models_design_classic_theme_SectionTitles_3: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_SectionTitles_3 =
   z.lazy(() =>
     z
       .object({
@@ -4039,7 +3994,7 @@ export const rendercv_schema_models_design_classic_theme_SectionTitles_3: z.ZodT
       .describe("SectionTitles"),
   );
 
-export const rendercv_schema_models_design_classic_theme_SectionTitles_4: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_SectionTitles_4 =
   z.lazy(() =>
     z
       .object({
@@ -4052,7 +4007,7 @@ export const rendercv_schema_models_design_classic_theme_SectionTitles_4: z.ZodT
       .describe("SectionTitles"),
   );
 
-export const rendercv_schema_models_design_classic_theme_SectionTitles_5: z.ZodTypeAny =
+export const rendercv_schema_models_design_classic_theme_SectionTitles_5 =
   z.lazy(() =>
     z
       .object({
@@ -4065,8 +4020,8 @@ export const rendercv_schema_models_design_classic_theme_SectionTitles_5: z.ZodT
       .describe("SectionTitles"),
   );
 
-export const rendercv_schema_models_design_classic_theme_Sections_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Sections_1 = z.lazy(
+  () =>
     z
       .object({
         allow_page_break: z
@@ -4088,10 +4043,10 @@ export const rendercv_schema_models_design_classic_theme_Sections_1: z.ZodTypeAn
       })
       .strict()
       .describe("Sections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Sections_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Sections_2 = z.lazy(
+  () =>
     z
       .object({
         allow_page_break: z
@@ -4113,10 +4068,10 @@ export const rendercv_schema_models_design_classic_theme_Sections_2: z.ZodTypeAn
       })
       .strict()
       .describe("Sections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Sections_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Sections_3 = z.lazy(
+  () =>
     z
       .object({
         allow_page_break: z
@@ -4138,10 +4093,10 @@ export const rendercv_schema_models_design_classic_theme_Sections_3: z.ZodTypeAn
       })
       .strict()
       .describe("Sections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Sections_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Sections_4 = z.lazy(
+  () =>
     z
       .object({
         allow_page_break: z
@@ -4163,10 +4118,10 @@ export const rendercv_schema_models_design_classic_theme_Sections_4: z.ZodTypeAn
       })
       .strict()
       .describe("Sections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Sections_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Sections_5 = z.lazy(
+  () =>
     z
       .object({
         allow_page_break: z
@@ -4188,10 +4143,10 @@ export const rendercv_schema_models_design_classic_theme_Sections_5: z.ZodTypeAn
       })
       .strict()
       .describe("Sections"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Summary_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Summary_1 = z.lazy(
+  () =>
     z
       .object({
         space_above: TypstDimension.optional(),
@@ -4199,10 +4154,10 @@ export const rendercv_schema_models_design_classic_theme_Summary_1: z.ZodTypeAny
       })
       .strict()
       .describe("Summary"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Summary_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Summary_2 = z.lazy(
+  () =>
     z
       .object({
         space_above: TypstDimension.optional(),
@@ -4210,10 +4165,18 @@ export const rendercv_schema_models_design_classic_theme_Summary_2: z.ZodTypeAny
       })
       .strict()
       .describe("Summary"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Summary_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Summary_3 = z
+  .object({
+    space_above: TypstDimension.optional(),
+    space_left: TypstDimension.optional(),
+  })
+  .strict()
+  .describe("Summary");
+
+export const rendercv_schema_models_design_classic_theme_Summary_4 = z.lazy(
+  () =>
     z
       .object({
         space_above: TypstDimension.optional(),
@@ -4221,21 +4184,36 @@ export const rendercv_schema_models_design_classic_theme_Summary_3: z.ZodTypeAny
       })
       .strict()
       .describe("Summary"),
-  );
+);
+export const rendercv_schema_models_design_classic_theme_Entries_3 = z
+  .object({
+    date_and_location_width: TypstDimension.optional(),
+    side_space: TypstDimension.optional(),
+    space_between_columns: TypstDimension.optional(),
+    allow_page_break: z
+      .boolean()
+      .describe(
+        "Allow page breaks within entries. If false, entries that don't fit will move to a new page. The default value is `false`.",
+      )
+      .default(false)
+      .optional(),
+    short_second_row: z
+      .boolean()
+      .describe(
+        "Shorten the second row to align with the date/location column. The default value is `true`.",
+      )
+      .default(false)
+      .optional(),
+    degree_width: TypstDimension.optional(),
+    summary: rendercv_schema_models_design_classic_theme_Summary_3.optional(),
+    highlights:
+      rendercv_schema_models_design_classic_theme_Highlights_3.optional(),
+  })
+  .strict()
+  .describe("Entries");
 
-export const rendercv_schema_models_design_classic_theme_Summary_4: z.ZodTypeAny =
-  z.lazy(() =>
-    z
-      .object({
-        space_above: TypstDimension.optional(),
-        space_left: TypstDimension.optional(),
-      })
-      .strict()
-      .describe("Summary"),
-  );
-
-export const rendercv_schema_models_design_classic_theme_Templates_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Templates_1 = z.lazy(
+  () =>
     z
       .object({
         footer: z
@@ -4286,10 +4264,10 @@ export const rendercv_schema_models_design_classic_theme_Templates_1: z.ZodTypeA
       })
       .strict()
       .describe("Templates"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Templates_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Templates_2 = z.lazy(
+  () =>
     z
       .object({
         footer: z
@@ -4340,10 +4318,10 @@ export const rendercv_schema_models_design_classic_theme_Templates_2: z.ZodTypeA
       })
       .strict()
       .describe("Templates"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Templates_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Templates_3 = z.lazy(
+  () =>
     z
       .object({
         footer: z
@@ -4394,10 +4372,10 @@ export const rendercv_schema_models_design_classic_theme_Templates_3: z.ZodTypeA
       })
       .strict()
       .describe("Templates"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Templates_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Templates_4 = z.lazy(
+  () =>
     z
       .object({
         footer: z
@@ -4448,10 +4426,10 @@ export const rendercv_schema_models_design_classic_theme_Templates_4: z.ZodTypeA
       })
       .strict()
       .describe("Templates"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Templates_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Templates_5 = z.lazy(
+  () =>
     z
       .object({
         footer: z
@@ -4502,10 +4480,10 @@ export const rendercv_schema_models_design_classic_theme_Templates_5: z.ZodTypeA
       })
       .strict()
       .describe("Templates"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Typography_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Typography_1 = z.lazy(
+  () =>
     z
       .object({
         line_spacing: TypstDimension.optional(),
@@ -4533,10 +4511,10 @@ export const rendercv_schema_models_design_classic_theme_Typography_1: z.ZodType
       })
       .strict()
       .describe("Typography"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Typography_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Typography_2 = z.lazy(
+  () =>
     z
       .object({
         line_spacing: TypstDimension.optional(),
@@ -4564,10 +4542,10 @@ export const rendercv_schema_models_design_classic_theme_Typography_2: z.ZodType
       })
       .strict()
       .describe("Typography"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Typography_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Typography_3 = z.lazy(
+  () =>
     z
       .object({
         line_spacing: TypstDimension.optional(),
@@ -4595,10 +4573,10 @@ export const rendercv_schema_models_design_classic_theme_Typography_3: z.ZodType
       })
       .strict()
       .describe("Typography"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Typography_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Typography_4 = z.lazy(
+  () =>
     z
       .object({
         line_spacing: TypstDimension.optional(),
@@ -4626,10 +4604,10 @@ export const rendercv_schema_models_design_classic_theme_Typography_4: z.ZodType
       })
       .strict()
       .describe("Typography"),
-  );
+);
 
-export const rendercv_schema_models_design_classic_theme_Typography_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_design_classic_theme_Typography_5 = z.lazy(
+  () =>
     z
       .object({
         line_spacing: TypstDimension.optional(),
@@ -4657,51 +4635,50 @@ export const rendercv_schema_models_design_classic_theme_Typography_5: z.ZodType
       })
       .strict()
       .describe("Typography"),
-  );
+);
 
-export const rendercv_schema_models_design_font_family_FontFamily: z.ZodTypeAny =
-  z.lazy(() =>
-    z.enum([
-      "Aptos",
-      "Arial",
-      "Arial Rounded MT",
-      "Arial Unicode MS",
-      "Comic Sans MS",
-      "Courier New",
-      "DejaVu Sans Mono",
-      "Didot",
-      "EB Garamond",
-      "Fontin",
-      "Garamond",
-      "Gentium Book Plus",
-      "Georgia",
-      "Gill Sans",
-      "Helvetica",
-      "Impact",
-      "Inter",
-      "Lato",
-      "Libertinus Serif",
-      "Lucida Sans Unicode",
-      "Mukta",
-      "New Computer Modern",
-      "Noto Sans",
-      "Open Sans",
-      "Open Sauce Sans",
-      "Poppins",
-      "Raleway",
-      "Roboto",
-      "Source Sans 3",
-      "Tahoma",
-      "Times New Roman",
-      "Trebuchet MS",
-      "Ubuntu",
-      "Verdana",
-      "XCharter",
-    ] as const),
-  );
+export const rendercv_schema_models_design_font_family_FontFamily = z.lazy(() =>
+  z.enum([
+    "Aptos",
+    "Arial",
+    "Arial Rounded MT",
+    "Arial Unicode MS",
+    "Comic Sans MS",
+    "Courier New",
+    "DejaVu Sans Mono",
+    "Didot",
+    "EB Garamond",
+    "Fontin",
+    "Garamond",
+    "Gentium Book Plus",
+    "Georgia",
+    "Gill Sans",
+    "Helvetica",
+    "Impact",
+    "Inter",
+    "Lato",
+    "Libertinus Serif",
+    "Lucida Sans Unicode",
+    "Mukta",
+    "New Computer Modern",
+    "Noto Sans",
+    "Open Sans",
+    "Open Sauce Sans",
+    "Poppins",
+    "Raleway",
+    "Roboto",
+    "Source Sans 3",
+    "Tahoma",
+    "Times New Roman",
+    "Trebuchet MS",
+    "Ubuntu",
+    "Verdana",
+    "XCharter",
+  ] as const),
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_1: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_1 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4714,10 +4691,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_1: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_10: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_10 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4730,10 +4707,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_10: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_11: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_11 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4746,10 +4723,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_11: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_12: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_12 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4762,10 +4739,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_12: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_13: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_13 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4778,10 +4755,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_13: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_14: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_14 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4794,10 +4771,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_14: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_15: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_15 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4810,10 +4787,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_15: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_16: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_16 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4826,10 +4803,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_16: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_17: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_17 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4842,10 +4819,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_17: z.ZodTypeA
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_2: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_2 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4858,10 +4835,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_2: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_3: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_3 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4874,10 +4851,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_3: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_4: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_4 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4890,10 +4867,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_4: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_5: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_5 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4906,10 +4883,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_5: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_6: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_6 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4922,10 +4899,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_6: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_7: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_7 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4938,10 +4915,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_7: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_8: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_8 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4954,10 +4931,10 @@ export const rendercv_schema_models_locale_english_locale_Phrases_8: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
-export const rendercv_schema_models_locale_english_locale_Phrases_9: z.ZodTypeAny =
-  z.lazy(() =>
+export const rendercv_schema_models_locale_english_locale_Phrases_9 = z.lazy(
+  () =>
     z
       .object({
         degree_with_area: z
@@ -4970,7 +4947,7 @@ export const rendercv_schema_models_locale_english_locale_Phrases_9: z.ZodTypeAn
       })
       .strict()
       .describe("Phrases"),
-  );
+);
 
 export const RenderCvDocument = z
   .object({

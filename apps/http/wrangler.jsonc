@@ -15,6 +15,20 @@
       "type": "Text",
       "globs": [
         "**/*.html"
+      ],
+      "fallthrough": true,
+    },
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.j2.typ"
+      ],
+      "fallthrough": true,
+    },
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.typ"
       ]
     }
   ],
@@ -53,6 +67,10 @@
         "name": "DOCKER_RENDERCV_APP"
       },
       {
+        "class_name": "TypstCompilerDo",
+        "name": "TYPST_COMPILER"
+      },
+      {
         "class_name": "RendercvDo",
         "name": "MCP_OBJECT"
       }
@@ -70,6 +88,12 @@
         "RendercvDo"
       ],
       "tag": "v2"
+    },
+    {
+      "new_sqlite_classes": [
+        "TypstCompilerDo"
+      ],
+      "tag": "v3"
     }
   ],
   "ratelimits": [

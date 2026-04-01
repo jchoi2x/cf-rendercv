@@ -7,6 +7,7 @@ import {
   RendercvDo,
   DockerRendercvApp,
   RendercvOAuthProvider,
+  TypstCompilerDo,
 } from "./durable";
 import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
@@ -18,6 +19,27 @@ app.get("/health", (c) => c.json({ ok: true }));
 
 // rate limit the request
 app.use(rateLimiterMiddleware);
+
+app.post("/api/v2/generate", async (c) => {
+  const requestForStub = c.req.raw.clone();
+  const body = await c.req.json();
+  const { success, data, error } = RenderCvDocument.safeParse(body);
+
+  if (!success) {
+    const responseData = {
+      error,
+      success,
+      data,
+    };
+    return c.json(responseData, 400);
+  }
+
+  const key = c.get("key");
+  const id = c.env.TYPST_COMPILER.idFromName(key);
+  const stub = c.env.TYPST_COMPILER.get(id);
+  const subject = await stub.fetch(requestForStub);
+  return subject;
+});
 
 app.post("/api/v1/generate", async (c) => {
   const requestForStub = c.req.raw.clone();
@@ -60,4 +82,4 @@ app.use(async (c) => {
 
 showRoutes(app);
 export default app;
-export { RendercvDo, DockerRendercvApp };
+export { RendercvDo, DockerRendercvApp, TypstCompilerDo };
