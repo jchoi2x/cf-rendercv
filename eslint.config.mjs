@@ -120,6 +120,7 @@ export default tseslint.config(
       "**/*.config.js",
       "**/*.config.ts",
       "**/tsconfig.tsbuildinfo",
+      "apps/http/node-tests/**",
       "**/tests/**",
       "**/__tests__/**",
       "pnpm-lock.yaml",

@@ -1,15 +1,15 @@
-import { CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Connection, ConnectionContext } from "agents";
 import { McpAgent } from "agents/mcp";
 import { Hono, type Context } from "hono";
+import YAML from "yaml";
 
 import { callContainerService } from "../utils/call-container";
-import { s3 } from "../utils/s3";
 import { registerRenderscv } from "./mcp/rendercv/register";
 import { registerWidgetUi } from "./mcp/widget-ui/register";
 import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
+import { compileRenderCvTypstSource } from "./templating";
 
 const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
   return callContainerService({
@@ -82,6 +82,28 @@ export class RendercvDo
     `);
 
     this.app.post("/api/v1/generate", proxyToContainer);
+    this.app.post("/api/v3/rendercv/typst", async (c) => {
+      try {
+        const contentType = c.req.header("content-type") ?? "";
+        const rawBody =
+          contentType.includes("yaml") || contentType.includes("text/")
+            ? new TextDecoder().decode(await c.req.arrayBuffer())
+            : null;
+
+        const candidate: unknown =
+          rawBody !== null ? YAML.parse(rawBody) : await c.req.json();
+        const result = await compileRenderCvTypstSource(candidate as any);
+        return new Response(result.code.trimEnd(), {
+          headers: {
+            "content-type": "application/text; charset=utf-8",
+          },
+        });
+      } catch (error) {
+        console.error("[RendercvDO] /api/v3/rendercv/typst failed:", error);
+        const message = error instanceof Error ? error.message : String(error);
+        return c.json({ ok: false, error: message }, 500);
+      }
+    });
     this.app.get("/swagger-ui", proxyToContainer);
     this.app.get("/openapi.json", proxyToContainer);
     this.app.use("*", (c) => super.fetch(c.req.raw));
@@ -192,6 +214,9 @@ export class RendercvDo
     const prefix = lastSlash >= 0 ? existing.path.slice(0, lastSlash) : "";
     const newPath = prefix ? `${prefix}/${finalName}` : finalName;
 
+    const [{ s3 }, { CopyObjectCommand, DeleteObjectCommand }] =
+      await Promise.all([import("../utils/s3"), import("@aws-sdk/client-s3")]);
+
     // Move object in R2 by Copy + Delete.
     await s3.send(
       new CopyObjectCommand({
@@ -217,6 +242,11 @@ export class RendercvDo
   async deleteResumeById(id: number): Promise<boolean> {
     const existing = this.getResumeById(id);
     if (!existing) return false;
+
+    const [{ s3 }, { DeleteObjectCommand }] = await Promise.all([
+      import("../utils/s3"),
+      import("@aws-sdk/client-s3"),
+    ]);
 
     // Delete PDF object first (best effort).
     try {

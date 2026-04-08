@@ -8,6 +8,7 @@
   "include": [
     "./**/*.ts",
     "./worker-env.d.ts",
-    "../apps/http/worker-configuration.d.ts"
+    "../apps/http/worker-configuration.d.ts",
+    "../apps/http/src/typst.d.ts"
   ]
 }

@@ -11,10 +11,10 @@ export function runScheduled(
   num_days = 30,
   monthChunks = 4,
 ): { start_date: Date; end_date: Date } {
-  // const hour = currTime.getHours();
-  // const now = moment();
-  // const i = hour % monthChunks;
-  // const end_date = now.subtract("days", i * num_days);
-  // const start_date = end_date.subtract("days", num_days);
-  // return { start_date, end_date };
+  void currTime;
+  void num_days;
+  void monthChunks;
+  const end_date = new Date();
+  const start_date = new Date();
+  return { start_date, end_date };
 }

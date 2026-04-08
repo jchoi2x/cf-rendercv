@@ -19,7 +19,7 @@ Keep the architectural boundary clear:
 ## Prerequisites
 
 - Node.js >= 20
-- pnpm >= 10.30.3
+- Bun >= 1.1.0
 - Docker
 - Local `rendercv` installation for local PDF generation flows
 
@@ -27,16 +27,16 @@ Keep the architectural boundary clear:
 
 From repo root:
 
-- Install deps: `pnpm install`
-- Start Worker/MCP stack: `pnpm run dev:http`
-- Start Node render app: `pnpm run dev:api`
-- Build all: `pnpm run build`
-- Lint all: `pnpm run lint`
-- Unit tests (all): `pnpm run test`
-- Worker tests only: `pnpm run test:http`
-- Render app tests only: `pnpm run test:api`
-- Render app e2e tests: `pnpm run test:e2e:api`
-- Worker integration tests (workerd / Vitest pool): `pnpm run test:integration`
+- Install deps: `bun install`
+- Start Worker/MCP stack: `bun run dev:http`
+- Start Node render app: `bun run dev:api`
+- Build all: `bun run build`
+- Lint all: `bun run lint`
+- Unit tests (all): `bun run test`
+- Worker tests only: `bun run test:http`
+- Render app tests only: `bun run test:api`
+- Render app e2e tests: `bun run test:e2e:api`
+- Worker integration tests (workerd / Vitest pool): `bun run test:integration`
 
 ## File structure conventions
 
@@ -87,8 +87,8 @@ From repo root:
 
 Run targeted checks for touched areas:
 
-- Worker changes: `pnpm run test:http` and, when exercising full Worker routing/bindings: `pnpm run test:integration`
-- Render app changes: `pnpm run test:api`
+- Worker changes: `bun run test:http` and, when exercising full Worker routing/bindings: `bun run test:integration`
+- Render app changes: `bun run test:api`
 - Shared contracts changes: run affected app tests, typically both `test:http` and `test:api`
 
 When changing request/response behavior for `/api/v1/generate`, perform a smoke check:

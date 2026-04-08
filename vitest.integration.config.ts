@@ -29,6 +29,10 @@ export default defineConfig({
     conditions: ['workerd', 'browser', 'import'],
   },
   ssr: {
+    // Ensure conditional exports resolve to workerd-compatible entrypoints.
+    resolve: {
+      conditions: ["workerd", "browser", "import"],
+    },
     noExternal: ['@cloudflare/workers-oauth-provider'],
   },
   test: {

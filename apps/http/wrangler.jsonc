@@ -6,6 +6,9 @@
     "port": 8787
   },
   "compatibility_date": "2025-11-17",
+  "vars": {
+    "TYPST_COMPILER_WASM_URL": "https://github.com/jchoi2x/typst.ts/raw/refs/heads/main-bun/packages/compiler/pkg/typst_ts_web_compiler_bg.wasm"
+  },
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"

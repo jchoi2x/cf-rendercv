@@ -60,7 +60,7 @@ At a high level, you will:
 
 - `docker`
 - node >= 20
-- pnpm >= 10.30.3
+- bun >= 1.1.0
 
 ### Google OAuth (required for local MCP)
 
@@ -74,19 +74,19 @@ After creating the app, configure the resulting `GOOGLE_CLIENT_ID` and `GOOGLE_C
 1. Install dependencies at the repo root:
 
    ```bash
-   pnpm install
+   bun install
    ```
 
 2. Start the cloudflare worker and api locally from the repo root:
 
    ```bash
-   pnpm run dev:http
+   bun run dev:http
    ```
 
 3. Start the Node.js API locally from the repo root:
 
    ```bash
-   pnpm run dev:api
+   bun run dev:api
    ```
 
 4. Send a `POST` request to `http://localhost:<port>/api/v1/generate` with your RenderCV JSON payload and save the `application/pdf` response.
@@ -103,16 +103,16 @@ To develop or deploy the Cloudflare Worker in `./apps/http`, refer to that app�
 From the repo root:
 
 ```bash
-pnpm run test:integration
+bun run test:integration
 ```
 
 Watch mode:
 
 ```bash
-pnpm run test:integration:watch
+bun run test:integration:watch
 ```
 
-These tests do **not** replace container-backed PDF smoke checks; they validate routing and request handling in the Worker isolate without requiring `wrangler dev` in a separate terminal. The Vitest pool does **not** emulate [Cloudflare Containers](https://developers.cloudflare.com/containers/)—paths that need a live container (for example a successful `POST /api/v1/generate` with a full RenderCV document) still require `pnpm run dev:http` / Docker or a deployed environment.
+These tests do **not** replace container-backed PDF smoke checks; they validate routing and request handling in the Worker isolate without requiring `wrangler dev` in a separate terminal. The Vitest pool does **not** emulate [Cloudflare Containers](https://developers.cloudflare.com/containers/)—paths that need a live container (for example a successful `POST /api/v1/generate` with a full RenderCV document) still require `bun run dev:http` / Docker or a deployed environment.
 
 ## Debugging
 

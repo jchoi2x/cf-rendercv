@@ -105,13 +105,13 @@ await fs.writeFile('resume.pdf', buffer);
 1. Install dependencies at the repo root:
 
    ```bash
-   pnpm install
+   bun install
    ```
 
 2. From the repo root, start the Node.js API:
 
    ```bash
-   pnpm run dev:api
+   bun run dev:api
    ```
 
 3. Ensure **RenderCV** is installed on your local machine; this service shells out to RenderCV to generate the PDF. Follow the official installation instructions here: [Get Started - RenderCV](https://docs.rendercv.com/user_guide/#__tabbed_1_1).

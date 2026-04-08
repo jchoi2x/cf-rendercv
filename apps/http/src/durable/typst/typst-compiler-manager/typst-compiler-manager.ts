@@ -1,4 +1,3 @@
-import wasmModule from "@jchoi2x/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm";
 import { createTypstCompiler } from "@jchoi2x/typst.ts";
 import {
   CompileFormatEnum,
@@ -218,6 +217,14 @@ export class TypstCompilerManager {
     this.setFontFamilyMapping("font awesome 7 brands", sansFallback);
   }
 
+  /**
+   * Compiler WASM is fetched at runtime (see `wrangler.jsonc` → `vars.TYPST_COMPILER_WASM_URL`)
+   * so the deploy bundle does not embed the multi‑MB binary.
+   */
+  private getTypstCompilerWasmUrl(): string {
+    return this.env.TYPST_COMPILER_WASM_URL;
+  }
+
   private loadFontMapFromEnv(): void {
     const raw = (this.env as unknown as Record<string, unknown>)[
       "FONT_FAMILY_URLS_JSON"
@@ -316,7 +323,7 @@ export class TypstCompilerManager {
           await packageRegistry.preload(extraSpecs);
         }
         await compiler.init({
-          getModule: () => wasmModule,
+          getModule: () => this.getTypstCompilerWasmUrl(),
           // Avoid loadFonts(): it uses dynamic codegen (new Function), blocked in Workers.
           beforeBuild: [
             workerSafeFontLoader as any,

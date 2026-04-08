@@ -17,6 +17,9 @@
     "emitDecoratorMetadata": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "types": [
+      "node"
+    ],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

@@ -1,4 +1,6 @@
-export function parseMissingFontFamilies(diagnostics: unknown[] | undefined): string[] {
+export function parseMissingFontFamilies(
+  diagnostics: unknown[] | undefined,
+): string[] {
   if (!diagnostics) {
     return [];
   }
@@ -15,7 +17,7 @@ export function parseMissingFontFamilies(diagnostics: unknown[] | undefined): st
     if (!match?.[1]) {
       continue;
     }
-    const family = match[1].trim().replace(/^['"]|['"]$/g, '');
+    const family = match[1].trim().replace(/^['"]|['"]$/g, "");
     if (family) {
       out.add(family);
     }

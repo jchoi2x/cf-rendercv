@@ -1,4 +1,3 @@
-
 export async function fetchFontBytes(url: string): Promise<Uint8Array> {
   const res = await fetch(url);
   if (!res.ok) {

@@ -4,30 +4,34 @@
   "description": "",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev:http": "pnpm --filter @cf-rendercv/http dev",
-    "dev:api": "pnpm --filter @cf-rendercv/rendercv-app dev",
-    "build:http": "pnpm --filter @cf-rendercv/http build",
-    "build:api": "pnpm --filter @cf-rendercv/rendercv-app build",
-    "build": "pnpm -r build",
-    "deploy:http": "pnpm run --filter @cf-rendercv/http deploy",
-    "deploy": "pnpm run build:api && pnpm run deploy:http",
+    "dev:http": "cd apps/http && bun run dev",
+    "dev:api": "cd apps/rendercv-app && bun run dev",
+    "build:http": "cd apps/http && bun run build",
+    "build:api": "cd apps/rendercv-app && bun run build",
+    "build": "bun run build:http && bun run build:api",
+    "deploy:http": "cd apps/http && bun run deploy",
+    "deploy": "bun run build:api && bun run deploy:http",
     "format": "biome format --write",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:http": "eslint apps/http",
     "lint:api": "eslint apps/rendercv-app",
     "lint:biome": "biome lint --fix",
-    "start": "pnpm --filter @cf-rendercv/http start",
+    "start": "cd apps/http && bun run start",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:unit:watch": "vitest --config vitest.config.ts",
-    "test:unit:coverage": "pnpm --filter @cf-rendercv/http test:coverage && pnpm --filter @cf-rendercv/rendercv-app test:coverage",
-    "test:http": "pnpm --filter @cf-rendercv/http test",
-    "test:api": "pnpm --filter @cf-rendercv/rendercv-app test",
-    "test:e2e:api": "pnpm --filter @cf-rendercv/rendercv-app test:e2e",
+    "test:unit:coverage": "cd apps/http && bun run test:coverage && cd ../rendercv-app && bun run test:coverage",
+    "test:http": "cd apps/http && bun run test",
+    "test:api": "cd apps/rendercv-app && bun run test",
+    "test:e2e:api": "cd apps/rendercv-app && bun run test:e2e",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:integration:watch": "vitest --config vitest.integration.config.ts",
-    "test": "pnpm --filter @cf-rendercv/http test && pnpm --filter @cf-rendercv/rendercv-app test"
+    "test": "bun run test:http && bun run test:api"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.13.2",
@@ -52,5 +56,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.31.0+sha512.e3927388bfaa8078ceb79b748ffc1e8274e84d75163e67bc22e06c0d3aed43dd153151cbf11d7f8301ff4acb98c68bdc5cadf6989532801ffafe3b3e4a63c268"
+  "packageManager": "bun@1.1.0"
 }

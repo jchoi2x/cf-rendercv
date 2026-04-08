@@ -5047,3 +5047,46 @@ export const RenderCvDocument = z
   });
 
 export type RenderCvDocument = z.infer<typeof RenderCvDocument>;
+
+/**
+ * Validated RenderCV document with the same shape as {@link RenderCvDocument}.
+ * Use {@link RenderCvDocumentClass.parse} / {@link RenderCvDocumentClass.safeParse}
+ * to construct from unknown JSON (mirrors validating a Pydantic `RenderCVModel`).
+ */
+export class RenderCvDocumentClass implements RenderCvDocument {
+  readonly cv?: RenderCvDocument["cv"];
+  readonly design?: RenderCvDocument["design"];
+  readonly locale?: RenderCvDocument["locale"];
+  readonly settings?: RenderCvDocument["settings"];
+
+  constructor(data: RenderCvDocument) {
+    this.cv = data.cv;
+    this.design = data.design;
+    this.locale = data.locale;
+    this.settings = data.settings;
+  }
+
+  static parse(input: unknown): RenderCvDocumentClass {
+    return new RenderCvDocumentClass(RenderCvDocument.parse(input));
+  }
+
+  static safeParse(input: unknown) {
+    const result = RenderCvDocument.safeParse(input);
+    if (!result.success) {
+      return result;
+    }
+    return {
+      success: true as const,
+      data: new RenderCvDocumentClass(result.data),
+    };
+  }
+
+  toJSON(): RenderCvDocument {
+    return {
+      cv: this.cv,
+      design: this.design,
+      locale: this.locale,
+      settings: this.settings,
+    };
+  }
+}

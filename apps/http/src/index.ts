@@ -22,21 +22,30 @@ app.use(rateLimiterMiddleware);
 
 app.post("/api/v2/generate", async (c) => {
   const requestForStub = c.req.raw.clone();
-  const body = await c.req.json();
-  const { success, data, error } = RenderCvDocument.safeParse(body);
+  // const body = await c.req.json();
+  // const { success, data, error } = RenderCvDocument.safeParse(body);
 
-  if (!success) {
-    const responseData = {
-      error,
-      success,
-      data,
-    };
-    return c.json(responseData, 400);
-  }
+  // if (!success) {
+  //   const responseData = {
+  //     error,
+  //     success,
+  //     data,
+  //   };
+  //   return c.json(responseData, 400);
+  // }
 
   const key = c.get("key");
   const id = c.env.TYPST_COMPILER.idFromName(key);
   const stub = c.env.TYPST_COMPILER.get(id);
+  const subject = await stub.fetch(requestForStub);
+  return subject;
+});
+
+app.post("/api/v3/rendercv/typst", async (c) => {
+  const requestForStub = c.req.raw.clone();
+  const key = c.get("key");
+  const id = c.env.MCP_OBJECT.idFromName(key);
+  const stub = c.env.MCP_OBJECT.get(id);
   const subject = await stub.fetch(requestForStub);
   return subject;
 });

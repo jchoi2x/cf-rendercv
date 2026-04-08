@@ -13,6 +13,7 @@ const coverageEnabled = process.argv.some(
 );
 
 export default defineConfig({
+  assetsInclude: ['**/*.wasm'],
   plugins: coverageEnabled
     ? []
     : [
@@ -31,7 +32,7 @@ export default defineConfig({
     },
   },
   ssr: {
-    noExternal: ['@cloudflare/workers-oauth-provider'],
+    noExternal: ['@cloudflare/workers-oauth-provider', '@jchoi2x/minijinja'],
   },
   test: {
     globals: true,

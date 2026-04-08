@@ -43,7 +43,9 @@ describe('generateRoute.handler', () => {
     writeFileSyncMock.mockReset();
     createReadStreamMock.mockReset();
 
-    vi.spyOn(crypto, 'randomUUID').mockReturnValue('uuid-123');
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(
+      'uuid-123' as unknown as `${string}-${string}-${string}-${string}-${string}`,
+    );
 
     const { generateRoute } = await import('../generate');
     app = new OpenAPIHono();
@@ -150,7 +152,9 @@ describe('generateRoute.handler', () => {
     expect(res.headers.get('Content-Type')).toBe('application/pdf');
 
     expect(rimrafSyncMock).toHaveBeenCalledWith('/tmp/rendercv_output');
-    expect(mkdirSyncMock).toHaveBeenCalledWith('/tmp/rendercv_output/uuid-123', { recursive: true });
+    expect(mkdirSyncMock).toHaveBeenCalledWith('/tmp/rendercv_output/uuid-123', {
+      recursive: true,
+    });
     expect(writeFileSyncMock).toHaveBeenCalledWith(
       '/tmp/rendercv_output/uuid-123/resume.yaml',
       expect.any(String),
@@ -160,7 +164,9 @@ describe('generateRoute.handler', () => {
     expect(execArg).toMatch(/rendercv render/);
     expect(execArg).toMatch(/resume\.yaml/);
 
-    expect(createReadStreamMock).toHaveBeenCalledWith('/tmp/rendercv_output/uuid-123/resume.pdf');
+    expect(createReadStreamMock).toHaveBeenCalledWith(
+      '/tmp/rendercv_output/uuid-123/resume.pdf',
+    );
   });
 
   it('does not log debug output when execSync returns empty', async () => {

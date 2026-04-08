@@ -10,10 +10,10 @@ description: >-
 
 ## Prerequisites
 
-- **Docker** running locally (Docker Desktop or compatible daemon). **`pnpm run dev:http` requires Docker to be up** so Wrangler can use **Cloudflare Containers** for this Worker.
+- **Docker** running locally (Docker Desktop or compatible daemon). **`bun run dev:http` requires Docker to be up** so Wrangler can use **Cloudflare Containers** for this Worker.
 - **Node.js** >= 20
-- **pnpm** >= 10.30.x (repo pins a version in root `package.json`; use `corepack enable` if needed)
-- **`rendercv` CLI** on the host only if you use **`pnpm run dev:api`** or other host-side RenderCV workflows ([RenderCV get started](https://docs.rendercv.com/user_guide/#__tabbed_1_1)). **Worker only** (`dev:http`) uses the CLI inside the container image instead.
+- **Bun** >= 1.1.0
+- **`rendercv` CLI** on the host only if you use **`bun run dev:api`** or other host-side RenderCV workflows ([RenderCV get started](https://docs.rendercv.com/user_guide/#__tabbed_1_1)). **Worker only** (`dev:http`) uses the CLI inside the container image instead.
 
 ## Auth for local MCP / Worker
 
@@ -33,13 +33,13 @@ Use this when you only need the **Cloudflare Worker** (Hono routes, MCP, Durable
 1. **Install**
 
    ```bash
-   pnpm install
+   bun install
    ```
 
 2. **Worker** (Wrangler) — start Docker first, then:
 
    ```bash
-   pnpm run dev:http
+   bun run dev:http
    ```
 
 The Worker proxies PDF work to **Cloudflare Containers**, which runs the `rendercv`-app **inside the container image**, not the separate `@cf-rendercv/rendercv-app` dev process.
@@ -51,7 +51,7 @@ The Worker proxies PDF work to **Cloudflare Containers**, which runs the `render
 If you explicitly want the render app as a **second local process** (in addition to Wrangler), use a **second terminal**:
 
 ```bash
-pnpm run dev:api
+bun run dev:api
 ```
 
 ## Quick validation
@@ -66,8 +66,8 @@ pnpm run dev:api
   ```
 
 - **Unit tests** (scope to what you touched):
-  - Worker: `pnpm run test:http`
-  - Render app: `pnpm run test:api`
+  - Worker: `bun run test:http`
+  - Render app: `bun run test:api`
 
 - **MCP debugging (manual launch)**: `npx @modelcontextprotocol/inspector@latest`
 
@@ -96,7 +96,7 @@ This skill is basically two things:
 
 - **Worker — only if needed**
   - Preflight `8787`: `lsof -nP -iTCP:8787 -sTCP:LISTEN` — if a **wrong** process holds the port, `kill -9 <PID>` and re-check.
-  - In **its own** terminal: `pnpm run dev:http` — wait for e.g. `Ready on http://localhost:8787`.
+  - In **its own** terminal: `bun run dev:http` — wait for e.g. `Ready on http://localhost:8787`.
 
 - **Health** (always before browser):
 

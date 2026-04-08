@@ -17,19 +17,18 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
 
 
 
-# Install pnpm (update corepack first to fix signature verification issues)
-RUN npm install -g corepack@latest && corepack enable && corepack prepare pnpm@10.30.3 --activate
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 # Copy package files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY package.json bun.lockb ./
 COPY apps/rendercv-app/package.json apps/rendercv-app/
 COPY packages/contracts/package.json packages/contracts/
 
-# Install only production dependencies and Chromium
-RUN pnpm install --prod && \
-    # Clean up npm/pnpm cache and temporary files
-    pnpm store prune && \
-    rm -rf /root/.npm /root/.pnpm-store /tmp/* /var/tmp/*
+# Install only production dependencies
+RUN bun install --production && \
+    rm -rf /root/.bun/install/cache /tmp/* /var/tmp/*
 
 # Copy the built file from builder stage
 # COPY --from=builder /src/apps/rendercv-app/dist/index.js apps/rendercv-app/dist/index.js
@@ -45,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=5s \
 CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["bun", "start"]

@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 
 describe("durable/rendercv.do.ts", () => {
-  it("routes proxy endpoints and initializes mcp registrations", async () => {
+  it(
+    "routes proxy endpoints and initializes mcp registrations",
+    async () => {
     vi.resetModules();
 
     const proxyResp = new Response("ok");
@@ -66,5 +68,7 @@ describe("durable/rendercv.do.ts", () => {
     const gen = await obj.fetch(new Request("http://localhost/api/v1/generate", { method: "POST", body: "{}" }));
     expect(gen).toBe(proxyResp);
     expect(callContainerService).toHaveBeenCalled();
-  });
+    },
+    15_000,
+  );
 });

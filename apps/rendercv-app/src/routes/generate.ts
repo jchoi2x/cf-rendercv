@@ -56,7 +56,7 @@ const route = createRoute({
 
 const outputDir = `/tmp/rendercv_output`;
 
-const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
+const handler: RouteHandler<typeof route, Env> = async (c) => {
   const contentType = (c.req.header('content-type') ?? '').toLowerCase();
 
   const isJson = contentType.includes('application/json');
@@ -138,7 +138,7 @@ const handler: RouteHandler<typeof route, { Bindings: Env }> = async (c) => {
     return c.json(
       {
         success: false,
-        error: (err as any).message ?? 'RenderCV render failed failed to run',
+        error: (err as any).message ?? 'RenderCV render failed',
         details: stdout
       },
       statusCode
