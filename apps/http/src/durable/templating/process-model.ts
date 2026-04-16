@@ -1,6 +1,7 @@
 import moment from "moment";
 
 import { computeConnections } from "./compute-connections";
+import { getPreambleContextForTheme } from "./defaults/theme-defaults";
 import { inferEntryType } from "./infer-entry-type";
 import {
   applyStringProcessors,
@@ -17,7 +18,6 @@ import type {
   RenderCvDocumentPayload,
   RenderCvJinjaRootContext,
 } from "./types";
-import { getPreambleContextForTheme } from "../typst/defaults/theme-defaults";
 
 type RenderFileType = "typst" | "markdown";
 
@@ -115,10 +115,18 @@ export function processModel(
     month_abbreviations?: string[];
     month_names?: string[];
   };
-  const templates = (data.design.templates ?? {}) as {
+  const designRecord = data.design as {
+    theme?: string;
+    templates?: unknown;
+  };
+  const templates = (designRecord.templates ?? {}) as {
     top_note?: string;
     footer?: string;
     single_date?: string;
+    education_entry?: {
+      main_column?: string;
+      degree_column?: boolean;
+    };
   };
   const singleDateTemplate = templates.single_date ?? "MONTH_ABBREVIATION YEAR";
 
@@ -221,7 +229,22 @@ export function processModel(
               .join(" ")
           : title;
       const processedEntries = rawEntries.map((entry) =>
-        processFields(renderEntryTemplates(entry), stringProcessors),
+        processFields(
+          renderEntryTemplates(entry, {
+            educationStyle:
+              templates.education_entry?.degree_column === false &&
+              typeof templates.education_entry?.main_column === "string" &&
+              templates.education_entry.main_column.includes("DEGREE") &&
+              templates.education_entry.main_column.includes("AREA")
+                ? "separate-degree-line"
+                : "default",
+            theme:
+              typeof designRecord.theme === "string"
+                ? designRecord.theme
+                : undefined,
+          }),
+          stringProcessors,
+        ),
       );
       return {
         title: applyStringProcessors(prettyTitle, stringProcessors),

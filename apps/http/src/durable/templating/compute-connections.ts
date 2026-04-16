@@ -47,7 +47,7 @@ function cleanUrl(url: string): string {
 }
 
 function markdownToTypst(value: string): string {
-  return value.replaceAll("@", "\\@");
+  return value.replaceAll("@", "\\@").replaceAll("/", "\\/");
 }
 
 function socialNetworkUrl(network: string, username: string): string | null {
@@ -61,6 +61,28 @@ function socialNetworkUrl(network: string, username: string): string | null {
     default:
       return null;
   }
+}
+
+function formatPhoneConnection(phone: string): { url: string; body: string } {
+  const trimmed = phone.trim();
+  const digits = trimmed.replace(/\D/g, "");
+
+  // RenderCV defaults to US national display when a +1 style number is provided.
+  if (digits.length === 11 && digits.startsWith("1")) {
+    const area = digits.slice(1, 4);
+    const exchange = digits.slice(4, 7);
+    const line = digits.slice(7, 11);
+    return {
+      url: `tel:+1-${area}-${exchange}-${line}`,
+      body: `(${area}) ${exchange}-${line}`,
+    };
+  }
+
+  const canonical = trimmed.replace(/[()\s]+/g, "-").replace(/-+/g, "-");
+  return {
+    url: `tel:${canonical}`,
+    body: trimmed,
+  };
 }
 
 function parseConnections(payload: ComputeConnectionsPayload): Connection[] {
@@ -83,6 +105,15 @@ function parseConnections(payload: ComputeConnectionsPayload): Connection[] {
       fontawesomeIcon: FONT_AWESOME_ICONS.email,
       url: `mailto:${cv.email}`,
       body: cv.email,
+    });
+  }
+
+  if (cv.phone) {
+    const formattedPhone = formatPhoneConnection(cv.phone);
+    connections.push({
+      fontawesomeIcon: FONT_AWESOME_ICONS.phone,
+      url: formattedPhone.url,
+      body: formattedPhone.body,
     });
   }
 

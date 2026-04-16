@@ -1,18 +1,15 @@
 import { DurableObject } from "cloudflare:workers";
 import { Hono } from "hono";
-import type { z } from "zod";
 
-import type { RenderCvDocument } from "@cf-rendercv/contracts";
-
-import { compileRenderCvTypstSource } from "../templating";
+import { Templater } from "../templating/templater";
+import { TypstCompilerManager } from "./typst-compiler-manager/typst-compiler-manager";
 
 export class TypstCompilerDo extends DurableObject<Env> {
+  private readonly templater = new Templater();
+  private readonly compilerManager = new TypstCompilerManager();
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    this.initServer();
-  }
 
-  private initServer() {
     this.app.onError((error, c) => {
       console.error("[TypstCompilerDO] unhandled route error:", error);
       const message = error instanceof Error ? error.message : String(error);
@@ -21,10 +18,10 @@ export class TypstCompilerDo extends DurableObject<Env> {
 
     this.app.post("/api/v2/generate", async (c) => {
       try {
-        const payload =
-          await c.req.json<Required<z.infer<typeof RenderCvDocument>>>();
-        const result = await compileRenderCvTypstSource(payload);
-        return c.json(result);
+        const payload = await c.req.json();
+        const source = await this.templater.buildTypstSource(payload);
+        // return c.json({ ok: true, source });
+        return await this.compilerManager.compilePdfResponse(5, source);
       } catch (error) {
         console.error("[TypstCompilerDO] /api/v2/generate failed:", error);
         const message = error instanceof Error ? error.message : String(error);

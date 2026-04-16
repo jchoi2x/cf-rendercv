@@ -61,10 +61,14 @@ export const preambleContext = {
     header: {
       alignment: "left",
       photo_width: "4.15cm",
+      photo_position: "left",
+      photo_space_left: "0cm",
+      photo_space_right: "0.3cm",
       space_below_name: "0.7cm",
       space_below_headline: "0.7cm",
       space_below_connections: "0.7cm",
       connections: {
+        phone_number_format: "national",
         hyperlink: true,
         show_icons: true,
         display_urls_instead_of_usernames: false,
@@ -82,6 +86,7 @@ export const preambleContext = {
       allow_page_break: true,
       space_between_text_based_entries: "0.3em",
       space_between_regular_entries: "1.2em",
+      show_time_spans_in: [],
     },
     templates: {
       education_entry: {

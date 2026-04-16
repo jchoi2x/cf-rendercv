@@ -164,7 +164,13 @@ export function renderFooterTemplate({
   return `context { [${processed}] }`;
 }
 
-export function renderEntryTemplates<T>(entry: T): T {
+export function renderEntryTemplates<T>(
+  entry: T,
+  options?: {
+    theme?: string;
+    educationStyle?: "default" | "separate-degree-line";
+  },
+): T {
   if (!entry || typeof entry !== "object") return entry;
   const data = { ...(entry as Record<string, unknown>) };
 
@@ -180,6 +186,26 @@ export function renderEntryTemplates<T>(entry: T): T {
     const institution = asText(data.institution);
     const location = asText(data.location);
     const highlights = processHighlights(data.highlights);
+    const useSeparateDegreeLine =
+      options?.educationStyle === "separate-degree-line" ||
+      options?.theme === "sb2nov";
+
+    if (useSeparateDegreeLine) {
+      const degreeLine = [degree, degree && area ? "in" : "", area]
+        .filter(Boolean)
+        .map((part) => emph(part))
+        .join(" ");
+      data.date_and_location_column = [location, date]
+        .filter(Boolean)
+        .map((part) => emph(part))
+        .join("\n");
+      data.degree_column = "";
+      data.main_column = [strong(institution), degreeLine, highlights]
+        .filter(Boolean)
+        .join("\n");
+      return data as T;
+    }
+
     const head = `${strong(institution)}, ${degreeWithArea(degree, area)}${
       location ? ` -- ${location}` : ""
     }`;
@@ -193,11 +219,23 @@ export function renderEntryTemplates<T>(entry: T): T {
     const position = asText(data.position);
     const company = asText(data.company);
     const location = asText(data.location);
+    const summary = processSummary(asText(data.summary));
+    const highlights = processHighlights(data.highlights);
+
+    if (options?.theme === "sb2nov") {
+      data.date_and_location_column = [location, date]
+        .filter(Boolean)
+        .map((part) => emph(part))
+        .join("\n");
+      data.main_column = [strong(position), emph(company), summary, highlights]
+        .filter(Boolean)
+        .join("\n");
+      return data as T;
+    }
+
     const head = `${strong(position)}, ${company}${location ? ` -- ${location}` : ""}`;
     data.date_and_location_column = date;
-    data.main_column = [head, processHighlights(data.highlights)]
-      .filter(Boolean)
-      .join("\n");
+    data.main_column = [head, highlights].filter(Boolean).join("\n");
     return data as T;
   }
 
@@ -230,12 +268,11 @@ export function renderEntryTemplates<T>(entry: T): T {
   if (data.name || data.summary || data.highlights) {
     const summary = processSummary(asText(data.summary));
     const highlights = processHighlights(data.highlights);
-    data.main_column = strong(asText(data.name));
-    data.date_and_location_column = date;
     data.main_column = [strongOrLinked(asText(data.name)), summary, highlights]
       .filter(Boolean)
       .join("\n");
-    data.date_and_location_column = date;
+    data.date_and_location_column =
+      options?.theme === "sb2nov" && date ? emph(date) : date;
     return data as T;
   }
 
@@ -287,6 +324,10 @@ function asText(value: unknown): string {
 
 function strong(text: string): string {
   return text ? `#strong[${text}]` : "";
+}
+
+function emph(text: string): string {
+  return text ? `#emph[${text}]` : "";
 }
 
 function degreeWithArea(degree: string, area: string): string {

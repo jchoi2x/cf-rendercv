@@ -67,7 +67,7 @@ export interface NormalizedEntry {
  */
 export type RenderCvJinjaRootContext = {
   cv: Record<string, unknown>;
-  design: Record<string, unknown>;
+  design: { theme?: string } | Record<string, unknown>;
   locale: Record<string, unknown>;
   settings: Record<string, unknown>;
 };

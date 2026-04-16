@@ -1,25 +1,8 @@
 export const preambleContext = {
-  cv: {
-    _plain_name: "James Choi",
-    _footer:
-      "context { [#emph[James Choi -- #str(here().page())\\/#str(counter(page).final().first())]] }",
-    _top_note: "#emph[Last updated in Mar 2026]",
-  },
-
-  settings: {
-    pdf_title: "James Choi - CV",
-    _resolved_current_date: {
-      year: 2026,
-      month: 3,
-      day: 31,
-    },
-  },
-
   locale: {
     language_iso_639_1: "en",
     is_rtl: false,
   },
-
   design: {
     page: {
       size: "us-letter",
@@ -30,28 +13,26 @@ export const preambleContext = {
       show_footer: true,
       show_top_note: true,
     },
-
     colors: {
       body: "#000000",
-      name: "#000000",
-      headline: "#000000",
-      connections: "#000000",
-      section_titles: "#000000",
-      links: "#000000",
+      name: "#004f90",
+      headline: "#004f90",
+      connections: "#004f90",
+      section_titles: "#004f90",
+      links: "#004f90",
       footer: "#808080",
       top_note: "#808080",
     },
-
     typography: {
       line_spacing: "0.6em",
       alignment: "justified",
       date_and_location_column_alignment: "right",
       font_family: {
-        body: "New Computer Modern",
-        name: "New Computer Modern",
-        headline: "New Computer Modern",
-        connections: "New Computer Modern",
-        section_titles: "New Computer Modern",
+        body: "Raleway",
+        name: "Raleway",
+        headline: "Raleway",
+        connections: "Raleway",
+        section_titles: "Raleway",
       },
       font_size: {
         body: "10pt",
@@ -67,51 +48,51 @@ export const preambleContext = {
         section_titles: false,
       },
       bold: {
-        name: true,
+        name: false,
         headline: false,
         connections: false,
-        section_titles: true,
+        section_titles: false,
       },
     },
-
     links: {
-      underline: true,
+      underline: false,
       show_external_link_icon: false,
     },
-
     header: {
-      alignment: "center",
+      alignment: "left",
       photo_width: "3.5cm",
+      photo_position: "left",
+      photo_space_left: "0.4cm",
+      photo_space_right: "0.4cm",
       space_below_name: "0.7cm",
       space_below_headline: "0.7cm",
       space_below_connections: "0.7cm",
       connections: {
+        phone_number_format: "national",
         hyperlink: true,
-        show_icons: false,
-        display_urls_instead_of_usernames: true,
-        separator: "•",
+        show_icons: true,
+        display_urls_instead_of_usernames: false,
+        separator: "",
         space_between_connections: "0.5cm",
       },
     },
-
     section_titles: {
       type: "with_full_line",
       line_thickness: "0.5pt",
       space_above: "0.5cm",
       space_below: "0.3cm",
     },
-
     sections: {
       allow_page_break: true,
-      space_between_text_based_entries: "0.3em",
       space_between_regular_entries: "1.2em",
+      space_between_text_based_entries: "0.3em",
+      show_time_spans_in: [],
     },
     templates: {
       education_entry: {
-        degree_column: true,
+        degree_column: false,
       },
     },
-
     entries: {
       date_and_location_width: "4.15cm",
       side_space: "0.2cm",
@@ -120,17 +101,19 @@ export const preambleContext = {
       short_second_row: false,
       degree_width: "1cm",
       summary: {
+        space_above: "0.12cm",
         space_left: "0cm",
-        space_above: "0cm",
       },
       highlights: {
-        bullet: "◦",
-        nested_bullet: "◦",
-        space_left: "0.15cm",
-        space_above: "0cm",
-        space_between_items: "0cm",
+        bullet: "•",
+        nested_bullet: "•",
+        space_left: "0cm",
+        space_above: "0.12cm",
+        space_between_items: "0.12cm",
         space_between_bullet_and_text: "0.5em",
       },
     },
   },
-};
+  cv: {},
+  settings: {},
+} as const;

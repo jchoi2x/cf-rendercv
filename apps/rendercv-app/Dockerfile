@@ -5,7 +5,7 @@ FROM ghcr.io/rendercv/rendercv:latest
 USER root
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg unzip \
     && mkdir -p /etc/apt/keyrings \
 # 2. Download the CORRECT GPG key (note the -repo in the name)
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -18,16 +18,17 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
 
 
 # Install Bun
-RUN curl -fsSL https://bun.sh/install | bash && \
+RUN curl -fsSL https://bun.sh/install | bash -s -- bun-v1.3.10 && \
     ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
+COPY apps/http/package.json apps/http/
 COPY apps/rendercv-app/package.json apps/rendercv-app/
 COPY packages/contracts/package.json packages/contracts/
 
 # Install only production dependencies
-RUN bun install --production && \
+RUN bun install --production --frozen-lockfile --filter ./apps/rendercv-app && \
     rm -rf /root/.bun/install/cache /tmp/* /var/tmp/*
 
 # Copy the built file from builder stage

@@ -61,9 +61,10 @@ export class TypstCompilerManager {
 
   private setFontFamilyMapping(name: string, urls: string[]): void {
     const { normalized, filtered } = getFontFamilyMapping(name, urls);
-    if (filtered && !filtered.length) {
-      this.fontFamilyUrlMap.set(normalized, filtered);
+    if (filtered.length === 0) {
+      return;
     }
+    this.fontFamilyUrlMap.set(normalized, filtered);
   }
 
   private mapFamilyToRenderCvDir(family: string): string {
@@ -317,7 +318,7 @@ export class TypstCompilerManager {
         await packageRegistry.preloadFromSource(sample_type);
         const extraSpecs = [...this.extraPreloadPackages.values()];
         if (extraSpecs.length > 0) {
-          console.log(
+          console.info(
             `[WorkerPackageRegistry] preloading ${extraSpecs.length} discovered dependency package(s): ${extraSpecs.map(packageKey).join(", ")}`,
           );
           await packageRegistry.preload(extraSpecs);
@@ -360,7 +361,7 @@ export class TypstCompilerManager {
 
       let changed = false;
       if (missingPackages.length > 0) {
-        console.log(
+        console.info(
           `[WorkerPackageRegistry] compile retry ${i + 1}: discovered missing package(s): ${missingPackages.map(packageKey).join(", ")}`,
         );
         for (const spec of missingPackages) {
@@ -376,7 +377,7 @@ export class TypstCompilerManager {
           (url) => !this.dynamicFontUrls.has(url),
         );
         if (newUrls.length > 0) {
-          console.log(
+          console.info(
             `[TypstCompilerManager] compile retry ${i + 1}: discovered missing font(s): ${missingFamilies.join(", ")}; loading ${newUrls.length} mapped font file(s)`,
           );
           for (const url of newUrls) {

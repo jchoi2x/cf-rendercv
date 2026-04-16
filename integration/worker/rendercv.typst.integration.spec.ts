@@ -1,8 +1,8 @@
 import { exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
-import TYPST_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.typ?raw";
-import YAML_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.yaml?raw";
+import TYPST_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.typ";
+import YAML_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.yaml";
 
 describe("POST /api/v3/rendercv/typst (integration)", () => {
   it("renders Typst source from YAML payload via jinja templates", async () => {
@@ -18,6 +18,11 @@ describe("POST /api/v3/rendercv/typst (integration)", () => {
     expect(res.headers.get("content-type")).toContain("application/text");
 
     const body = await res.text();
-    expect(body.trimEnd()).toBe(TYPST_FIXTURE.trimEnd());
+    const fixture = TYPST_FIXTURE.trimEnd()
+      .replace(`year: 2026`, `year: ${new Date().getFullYear()}`)
+      .replace(`month: 4`, `month: ${new Date().getMonth() + 1}`)
+      .replace(`day: 8`, `day: ${new Date().getDate()}`);
+
+    expect(body.trimEnd()).toBe(fixture);
   });
 });
