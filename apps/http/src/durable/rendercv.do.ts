@@ -10,13 +10,38 @@ import { registerWidgetUi } from "./mcp/widget-ui/register";
 import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
 import { compileRenderCvTypstSource } from "./templating";
+import { TypstCompilerManager } from "./typst/typst-compiler-manager/typst-compiler-manager";
+
+const TYPST_FONT_STORAGE_PREFIX = "typst-font:";
+
+async function typstFontStorageKey(url: string): Promise<string> {
+  const data = new TextEncoder().encode(url);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  const hex = [...new Uint8Array(digest)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `${TYPST_FONT_STORAGE_PREFIX}${hex}`;
+}
+
+async function parseRendercvDocumentBody(
+  c: Context<{ Bindings: Env }>,
+): Promise<unknown> {
+  const contentType = c.req.header("content-type") ?? "";
+  const rawBody =
+    contentType.includes("yaml") || contentType.includes("text/")
+      ? new TextDecoder().decode(await c.req.arrayBuffer())
+      : null;
+  return rawBody !== null ? YAML.parse(rawBody) : await c.req.json();
+}
 
 const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
+  // check if content-type is yaml and if it is convert to json and pass as the body
   return callContainerService({
     path: c.req.path,
     method: c.req.method,
     name: "rendercv-app",
-    body: c.req.method === "POST" ? await c.req.json() : undefined,
+    body:
+      c.req.method === "POST" ? await parseRendercvDocumentBody(c) : undefined,
   });
 };
 
@@ -63,6 +88,7 @@ export class RendercvDo
   doSql: SqlStorage;
   private workerEnv: Env;
   private _storage: DurableObjectStorage;
+  private readonly typstCompilerManager: TypstCompilerManager;
 
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
@@ -70,6 +96,30 @@ export class RendercvDo
 
     this.doSql = state.storage.sql;
     this._storage = state.storage;
+
+    this.typstCompilerManager = new TypstCompilerManager({
+      fontPersistence: {
+        loadFont: async (url) => {
+          const key = await typstFontStorageKey(url);
+          const raw = await this._storage.get<ArrayBuffer | string>(key);
+          if (raw == null) {
+            return undefined;
+          }
+          if (typeof raw === "string") {
+            return undefined;
+          }
+          return new Uint8Array(raw);
+        },
+        onFontLoaded: (url, bytes) => {
+          this.ctx.waitUntil(
+            (async () => {
+              const key = await typstFontStorageKey(url);
+              await this._storage.put(key, bytes);
+            })(),
+          );
+        },
+      },
+    });
 
     this.doSql.exec(`
       CREATE TABLE IF NOT EXISTS documents (
@@ -84,14 +134,7 @@ export class RendercvDo
     this.app.post("/api/v1/generate", proxyToContainer);
     this.app.post("/api/v3/rendercv/typst", async (c) => {
       try {
-        const contentType = c.req.header("content-type") ?? "";
-        const rawBody =
-          contentType.includes("yaml") || contentType.includes("text/")
-            ? new TextDecoder().decode(await c.req.arrayBuffer())
-            : null;
-
-        const candidate: unknown =
-          rawBody !== null ? YAML.parse(rawBody) : await c.req.json();
+        const candidate = await parseRendercvDocumentBody(c);
         const result = await compileRenderCvTypstSource(candidate as any);
         return new Response(result.code.trimEnd(), {
           headers: {
@@ -100,6 +143,23 @@ export class RendercvDo
         });
       } catch (error) {
         console.error("[RendercvDO] /api/v3/rendercv/typst failed:", error);
+        const message = error instanceof Error ? error.message : String(error);
+        return c.json({ ok: false, error: message }, 500);
+      }
+    });
+    this.app.post("/api/v3/rendercv/typst-compile", async (c) => {
+      try {
+        const candidate = await parseRendercvDocumentBody(c);
+        const result = await compileRenderCvTypstSource(candidate as any);
+        return await this.typstCompilerManager.compilePdfResponse(
+          5,
+          result.code.trimEnd(),
+        );
+      } catch (error) {
+        console.error(
+          "[RendercvDO] /api/v3/rendercv/typst-compile failed:",
+          error,
+        );
         const message = error instanceof Error ? error.message : String(error);
         return c.json({ ok: false, error: message }, 500);
       }

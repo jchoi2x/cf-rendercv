@@ -34,9 +34,9 @@
         "@cf-rendercv/contracts": "workspace:*",
         "@cloudflare/containers": "^0.0.30",
         "@cloudflare/workers-oauth-provider": "^0.3.0",
-        "@jchoi2x/minijinja": "0.0.8",
+        "@jchoi2x/minijinja": "^0.0.13",
         "@jchoi2x/typst-ts-renderer": "0.7.5",
-        "@jchoi2x/typst-ts-web-compiler": "0.7.4",
+        "@jchoi2x/typst-ts-web-compiler": "^0.7.11",
         "@jchoi2x/typst.ts": "0.7.4",
         "@mcp-ui/server": "^6.1.0",
         "@modelcontextprotocol/ext-apps": "^1.2.2",
@@ -440,11 +440,11 @@
 
     "@istanbuljs/schema": ["@istanbuljs/schema@0.1.6", "", {}, "sha512-+Sg6GCR/wy1oSmQDFq4LQDAhm3ETKnorxN+y5nbLULOR3P0c14f2Wurzj3/xqPXtasLFfHd5iRFQ7AJt4KH2cw=="],
 
-    "@jchoi2x/minijinja": ["@jchoi2x/minijinja@0.0.8", "https://npm.pkg.github.com/download/@jchoi2x/minijinja/0.0.8/b0217f5ecc855a297098f3bb6d3c8e49d988c0e1", {}, "sha512-eRINb0Wq6XDvZnh4jKqjx5yMdYyF4pQlEbgUISUgx850+tUIfvKYnyMAf5UbeVTHKvgZhsHMhTQ8K7RFm4n8Bw=="],
+    "@jchoi2x/minijinja": ["@jchoi2x/minijinja@0.0.13", "https://npm.pkg.github.com/download/@jchoi2x/minijinja/0.0.13/47f5f1c6977405483cf15ba8fb4e0fb28d41fb8b", {}, "sha512-zrOz/Ca+i6L7mtlqwb4aU2KMr1O63sy0vC74FvBIJVhxaa6yK0086Ywx59dtu5mgSlIxKd8nM3c9KGVDLRFmaw=="],
 
     "@jchoi2x/typst-ts-renderer": ["@jchoi2x/typst-ts-renderer@0.7.5", "https://npm.pkg.github.com/download/@jchoi2x/typst-ts-renderer/0.7.5/351a5081168d483d3f946d6d972776a6c73fbd88", {}, "sha512-TQHi5GPcm0uD3wWlnpu1qv81Bvdna4jwO/ksFvneRbdUvLxMEhxUESfZHoj5XyFYqsQSlwMz/mEhxqCHLiS23A=="],
 
-    "@jchoi2x/typst-ts-web-compiler": ["@jchoi2x/typst-ts-web-compiler@0.7.4", "https://npm.pkg.github.com/download/@jchoi2x/typst-ts-web-compiler/0.7.4/a490daac7f3163f1676fd1ed76cd961cd493076b", {}, "sha512-HhbZ/zpaghoLN3hFxzlE+sTeEbO+caxxCyu1Nrf7T8yv2STKWxFu8UWStc+OeIbMXumrCxMCqtFAaMq1MQpnfQ=="],
+    "@jchoi2x/typst-ts-web-compiler": ["@jchoi2x/typst-ts-web-compiler@0.7.11", "https://npm.pkg.github.com/download/@jchoi2x/typst-ts-web-compiler/0.7.11/8adf629f0f5b23b938e2d587b2718451a3fe4982", {}, "sha512-XW1Yr9Y2mtgvV58oqNLmkzMOZs4cEAiW6A/eTPnU2qsOGlvIrdwMDJuyVtyIs+SHr1VL/6A0rB3krRSWnOIg2A=="],
 
     "@jchoi2x/typst.ts": ["@jchoi2x/typst.ts@0.7.4", "https://npm.pkg.github.com/download/@jchoi2x/typst.ts/0.7.4/55b0e6f61a870807a945afb618bc28fee3c9ffcf", { "dependencies": { "idb": "^7.1.1" }, "peerDependencies": { "@jchoi2x/typst-ts-renderer": "^0.7.0", "@jchoi2x/typst-ts-web-compiler": "^0.7.2" } }, "sha512-WQ2d4Wvj8Jjlb/FbFK2YW0iLFgmUP4nMJJcwLlSbqPpUZa4XYnGf5gMeDY6/QoXI4zynbdw7Kw6twr3a4w2crQ=="],
 

@@ -1,3 +1,6 @@
+import { EventEmitter } from "events";
+
+import wasmModule from "@jchoi2x/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm";
 import { createTypstCompiler } from "@jchoi2x/typst.ts";
 import {
   CompileFormatEnum,
@@ -36,11 +39,23 @@ type CompilerRuntime = {
   packageRegistry: WorkerPackageRegistry;
 };
 
+/** Optional hooks so a Durable Object (or host) can cache font bytes across restarts. */
+export type TypstFontPersistence = {
+  /** Return cached bytes for a font URL, or null/undefined to fetch from the network. */
+  loadFont?: (url: string) => Promise<Uint8Array | null | undefined>;
+  /** Invoked after bytes were loaded from the network; persist for {@link TypstFontPersistence.loadFont}. */
+  onFontLoaded?: (url: string, bytes: Uint8Array) => void;
+};
+
+type EventMap = {
+  "font-loaded": [url: string, bytes: Uint8Array];
+};
+
 /**
  * Owns Typst compiler lifecycle, font/package resolution, and PDF compilation retries.
  * Intended for use inside a Durable Object (or other long-lived isolate) so state persists.
  */
-export class TypstCompilerManager {
+export class TypstCompilerManager extends EventEmitter<EventMap> {
   private compilerPromise: Promise<CompilerRuntime> | null = null;
   private readonly extraPreloadPackages = new Map<string, PreviewPackageSpec>();
   private readonly dynamicFontUrls = new Set<string>();
@@ -53,8 +68,16 @@ export class TypstCompilerManager {
       fetchFontBytes(LIBERTINUS_BOLD),
     ]);
   private readonly env: Env = env;
+  private readonly fontPersistence: TypstFontPersistence | undefined;
 
-  constructor() {
+  constructor(
+    options?: {
+      fontPersistence?: TypstFontPersistence;
+    },
+    ...emitterArgs: ConstructorParameters<typeof EventEmitter<EventMap>>
+  ) {
+    super(...emitterArgs);
+    this.fontPersistence = options?.fontPersistence;
     this.loadDefaultFontFamilyMap();
     this.loadFontMapFromEnv();
   }
@@ -218,14 +241,6 @@ export class TypstCompilerManager {
     this.setFontFamilyMapping("font awesome 7 brands", sansFallback);
   }
 
-  /**
-   * Compiler WASM is fetched at runtime (see `wrangler.jsonc` → `vars.TYPST_COMPILER_WASM_URL`)
-   * so the deploy bundle does not embed the multi‑MB binary.
-   */
-  private getTypstCompilerWasmUrl(): string {
-    return this.env.TYPST_COMPILER_WASM_URL;
-  }
-
   private loadFontMapFromEnv(): void {
     const raw = (this.env as unknown as Record<string, unknown>)[
       "FONT_FAMILY_URLS_JSON"
@@ -283,7 +298,14 @@ export class TypstCompilerManager {
         const dynamicFontBytes: Uint8Array[] = [];
         for (const url of this.dynamicFontUrls.values()) {
           try {
-            dynamicFontBytes.push(await fetchFontBytes(url));
+            let bytes =
+              (await this.fontPersistence?.loadFont?.(url)) ?? undefined;
+            if (!bytes || bytes.byteLength === 0) {
+              bytes = await fetchFontBytes(url);
+              this.fontPersistence?.onFontLoaded?.(url, bytes);
+              this.emit("font-loaded", url, bytes);
+            }
+            dynamicFontBytes.push(bytes);
           } catch (error) {
             const message =
               error instanceof Error ? error.message : String(error);
@@ -324,7 +346,7 @@ export class TypstCompilerManager {
           await packageRegistry.preload(extraSpecs);
         }
         await compiler.init({
-          getModule: () => this.getTypstCompilerWasmUrl(),
+          getModule: () => wasmModule,
           // Avoid loadFonts(): it uses dynamic codegen (new Function), blocked in Workers.
           beforeBuild: [
             workerSafeFontLoader as any,

@@ -1,7 +1,6 @@
+import type { Handler } from "hono";
 import { Hono } from "hono";
 import { showRoutes } from "hono/dev";
-
-import { RenderCvDocument } from "@cf-rendercv/contracts/entities";
 
 import {
   RendercvDo,
@@ -20,55 +19,25 @@ app.get("/health", (c) => c.json({ ok: true }));
 // rate limit the request
 app.use(rateLimiterMiddleware);
 
-app.post("/api/v2/generate", async (c) => {
+const proxyToDurable: Handler<
+  { Bindings: Env; Variables: { key: string } },
+  any,
+  any
+> = async (c) => {
   const requestForStub = c.req.raw.clone();
-  // const body = await c.req.json();
-  // const { success, data, error } = RenderCvDocument.safeParse(body);
-
-  // if (!success) {
-  //   const responseData = {
-  //     error,
-  //     success,
-  //     data,
-  //   };
-  //   return c.json(responseData, 400);
-  // }
-
-  const key = c.get("key");
-  const id = c.env.TYPST_COMPILER.idFromName(key);
-  const stub = c.env.TYPST_COMPILER.get(id);
-  const subject = await stub.fetch(requestForStub);
-  return subject;
-});
-
-app.post("/api/v3/rendercv/typst", async (c) => {
-  const requestForStub = c.req.raw.clone();
-  const key = c.get("key");
-  const id = c.env.MCP_OBJECT.idFromName(key);
-  const stub = c.env.MCP_OBJECT.get(id);
-  const subject = await stub.fetch(requestForStub);
-  return subject;
-});
-
-app.post("/api/v1/generate", async (c) => {
-  const requestForStub = c.req.raw.clone();
-  const body = await c.req.json();
-  const { success, data, error } = RenderCvDocument.safeParse(body);
-  if (!success) {
-    const responseData = {
-      error,
-      success,
-      data,
-    };
-    return c.json(responseData, 400);
-  }
 
   const key = c.get("key");
   const id = c.env.MCP_OBJECT.idFromName(key);
   const stub = c.env.MCP_OBJECT.get(id);
   const subject = await stub.fetch(requestForStub);
   return subject;
-});
+};
+
+app.post("/api/v2/generate", proxyToDurable);
+app.post("/api/v3/rendercv/typst", proxyToDurable);
+app.post("/api/v3/generate", proxyToDurable);
+app.post("/api/v3/rendercv/typst-compile", proxyToDurable);
+app.post("/api/v1/generate", proxyToDurable);
 
 for (const i of pathMathes) {
   app.get(i, async (c) => {

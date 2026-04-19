@@ -1,4 +1,6 @@
 import type { JsExposedEnv } from "@jchoi2x/minijinja";
+import init from "@jchoi2x/minijinja";
+import wasm from "@jchoi2x/minijinja/minijinja_bg.wasm";
 
 import { TEMPLATE_SOURCES } from "./template-sources";
 
@@ -25,11 +27,6 @@ export function getTemplateEnv(): Promise<JsExposedEnv> {
       // The node bundle auto-initializes its embedded WASM at import time.
       // The workerd/web bundles require explicit initialization.
       if (isWorkerd) {
-        const wasm = (await import("@jchoi2x/minijinja/minijinja_bg.wasm"))
-          .default;
-        const init = miniJinja.default ?? miniJinja;
-        if (typeof init !== "function")
-          throw new TypeError("@jchoi2x/minijinja init export is not callable");
         await init(wasm);
       }
       const preparedTemplates: Record<string, string> = {};

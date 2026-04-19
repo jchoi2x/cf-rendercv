@@ -172,26 +172,26 @@ export const Cv = z.lazy(() =>
         .describe("Name")
         .default(null)
         .optional(),
-      _plain_name: z
-        .union([z.string(), z.null()])
-        .describe("Plain Name")
-        .default(null)
-        .optional(),
-      _footer: z
-        .union([z.string(), z.null()])
-        .describe("Footer text")
-        .default(null)
-        .optional(),
-      _top_note: z
-        .union([z.string(), z.null()])
-        .describe("Top note text")
-        .default(null)
-        .optional(),
-      _connections: z
-        .union([z.array(CustomConnection), z.null()])
-        .describe("Connections")
-        .default(null)
-        .optional(),
+      // _plain_name: z
+      //   .union([z.string(), z.null()])
+      //   .describe("Plain Name")
+      //   .default(null)
+      //   .optional(),
+      // _footer: z
+      //   .union([z.string(), z.null()])
+      //   .describe("Footer text")
+      //   .default(null)
+      //   .optional(),
+      // _top_note: z
+      //   .union([z.string(), z.null()])
+      //   .describe("Top note text")
+      //   .default(null)
+      //   .optional(),
+      // _connections: z
+      //   .union([z.array(CustomConnection), z.null()])
+      //   .describe("Connections")
+      //   .default(null)
+      //   .optional(),
       headline: z
         .union([z.string(), z.null()])
         .describe("Headline")
@@ -1325,20 +1325,6 @@ export const KoreanLocale = z.lazy(() =>
     })
     .strict()
     .describe("KoreanLocale"),
-);
-
-export const ListOfEntries = z.lazy(() =>
-  z.union([
-    z.array(z.string()),
-    z.array(rendercv_schema_models_cv_entries_one_line_OneLineEntry),
-    z.array(rendercv_schema_models_cv_entries_normal_NormalEntry),
-    z.array(rendercv_schema_models_cv_entries_experience_ExperienceEntry),
-    z.array(rendercv_schema_models_cv_entries_education_EducationEntry),
-    z.array(rendercv_schema_models_cv_entries_publication_PublicationEntry),
-    z.array(BulletEntry),
-    z.array(NumberedEntry),
-    z.array(ReversedNumberedEntry),
-  ]),
 );
 
 export const Locale = z.lazy(() =>
@@ -4947,6 +4933,19 @@ export const rendercv_schema_models_locale_english_locale_Phrases_9 = z.lazy(
       })
       .strict()
       .describe("Phrases"),
+);
+export const ListOfEntries = z.lazy(() =>
+  z.union([
+    z.array(z.string()),
+    z.array(rendercv_schema_models_cv_entries_one_line_OneLineEntry),
+    z.array(rendercv_schema_models_cv_entries_normal_NormalEntry),
+    z.array(rendercv_schema_models_cv_entries_experience_ExperienceEntry),
+    z.array(rendercv_schema_models_cv_entries_education_EducationEntry),
+    z.array(rendercv_schema_models_cv_entries_publication_PublicationEntry),
+    z.array(BulletEntry),
+    z.array(NumberedEntry),
+    z.array(ReversedNumberedEntry),
+  ]),
 );
 
 export const RenderCvDocument = z

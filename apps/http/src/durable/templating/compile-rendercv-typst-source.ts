@@ -52,7 +52,7 @@ export async function compileRenderCvTypstSource(
 
     const entryCodes = await Promise.all(
       section.entries.map((entry: unknown) => {
-        const design = model.design as Record<string, unknown>;
+        const design = model.design;
         const designEntries = (design.entries ?? {}) as Record<string, unknown>;
         const entryContext: Record<string, unknown> = {
           cv: model.cv,

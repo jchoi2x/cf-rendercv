@@ -5,17 +5,25 @@ export type CallContainerServiceOptions = {
   path: string;
   body?: unknown;
   method?: string;
+  headers?: Record<string, string>;
   name?: string;
 };
 
 export async function callContainerService(
   opts: CallContainerServiceOptions,
 ): Promise<Response> {
-  const { path, body, method = "POST", name = "rendercv-http" } = opts;
+  const {
+    path,
+    headers: _headers = {},
+    body,
+    method = "POST",
+    name = "rendercv-http",
+  } = opts;
   const container = getContainer(env.DOCKER_RENDERCV_APP, name);
 
   const headers = new Headers({
     "Content-Type": "application/json",
+    ..._headers,
   });
 
   const options: RequestInit = {

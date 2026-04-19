@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rendercv-http",
   "main": "src/index.ts",
+  "minify": true,
   "dev": {
     "port": 8787
   },
