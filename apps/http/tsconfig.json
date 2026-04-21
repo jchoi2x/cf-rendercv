@@ -1,5 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
+  "files": ["src/durable/rendercv/index.d.ts"],
   "compilerOptions": {
     "target": "es2021",
     "lib": ["es2021"],
@@ -29,6 +30,8 @@
   "include": [
     "worker-configuration.d.ts",
     "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/durable/rendercv/index.d.ts",
     ".vitest/**/*.ts"
   ]
 }

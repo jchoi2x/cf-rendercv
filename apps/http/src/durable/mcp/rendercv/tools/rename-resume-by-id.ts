@@ -20,7 +20,7 @@ export const registerRenameResumeByIdTool = (agent: RenderCvMcpAgent) => {
       _meta: {},
     },
     async ({ id, newName }) => {
-      const resume = await agent.renameResumeById(id, newName);
+      const resume = agent.renameResumeById(id, newName);
       if (!resume) {
         return {
           isError: true,

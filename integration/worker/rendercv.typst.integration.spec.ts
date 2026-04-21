@@ -1,8 +1,8 @@
 import { exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
-import TYPST_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.typ";
-import YAML_FIXTURE from "../../apps/http/src/durable/templating/__mocks__/John_Doe_ModerncvTheme_CV.yaml";
+import TYPST_FIXTURE from "../../apps/http/src/durable/rendercv/__fixtures__/moderncv/moderncv.typ";
+import YAML_FIXTURE from "../../apps/http/src/durable/rendercv/__fixtures__/moderncv/moderncv.yaml";
 
 describe("POST /api/v3/rendercv/typst (integration)", () => {
   // Vitest workerd still blocks non-streaming WASM instantiation; remote MiniJinja init

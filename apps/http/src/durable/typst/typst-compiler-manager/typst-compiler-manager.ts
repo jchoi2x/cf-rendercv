@@ -38,6 +38,20 @@ type CompilerRuntime = {
   compiler: TypstCompiler;
   packageRegistry: WorkerPackageRegistry;
 };
+type CompilePdfResponse = CompilePdfResponseSuccess | CompilePdfError;
+type CompilePdfResponseSuccess = {
+  ok: true;
+  status: number;
+  data: Uint8Array<ArrayBufferLike>;
+  headers: Record<string, string>;
+};
+
+type CompilePdfError = {
+  ok: false;
+  error: string;
+  status: number;
+  diagnostics: unknown[];
+};
 
 /** Optional hooks so a Durable Object (or host) can cache font bytes across restarts. */
 export type TypstFontPersistence = {
@@ -64,8 +78,14 @@ export class TypstCompilerManager extends EventEmitter<EventMap> {
   private renderCvDirMapPromise: Promise<Map<string, string>> | null = null;
   private readonly fontBytesPromise: Promise<[Uint8Array, Uint8Array]> =
     Promise.all([
-      fetchFontBytes(LIBERTINUS_REGULAR),
-      fetchFontBytes(LIBERTINUS_BOLD),
+      fetchFontBytes(LIBERTINUS_REGULAR).then((bytes) => {
+        this.fontPersistence?.onFontLoaded?.(LIBERTINUS_REGULAR, bytes);
+        return bytes;
+      }),
+      fetchFontBytes(LIBERTINUS_BOLD).then((bytes) => {
+        this.fontPersistence?.onFontLoaded?.(LIBERTINUS_BOLD, bytes);
+        return bytes;
+      }),
     ]);
   private readonly env: Env = env;
   private readonly fontPersistence: TypstFontPersistence | undefined;
@@ -337,6 +357,7 @@ export class TypstCompilerManager extends EventEmitter<EventMap> {
         const compiler = createTypstCompiler();
         const accessModel = new MemoryAccessModel();
         const packageRegistry = new WorkerPackageRegistry(accessModel);
+
         await packageRegistry.preloadFromSource(sample_type);
         const extraSpecs = [...this.extraPreloadPackages.values()];
         if (extraSpecs.length > 0) {
@@ -365,6 +386,28 @@ export class TypstCompilerManager extends EventEmitter<EventMap> {
     maxRetries: number,
     typ_src: string,
   ): Promise<Response> {
+    const result = await this.compilePdf(maxRetries, typ_src);
+
+    if (result.ok) {
+      return new Response(result.data, {
+        headers: result.headers,
+      });
+    }
+
+    return Response.json(
+      {
+        ok: result.ok,
+        error: result.error,
+        diagnostics: result.diagnostics,
+      },
+      { status: 500 },
+    );
+  }
+
+  async compilePdf(
+    maxRetries: number,
+    typ_src: string,
+  ): Promise<CompilePdfResponse> {
     let runtime = await this.getCompilerRuntime(typ_src);
 
     let out = await runtime.compiler.compile({
@@ -428,23 +471,23 @@ export class TypstCompilerManager extends EventEmitter<EventMap> {
     }
 
     if (!out.result) {
-      return Response.json(
-        {
-          ok: false,
-          error: "Compilation produced no PDF",
-          diagnostics: out.diagnostics ?? [],
-        },
-        { status: 500 },
-      );
+      return {
+        ok: false,
+        status: 500,
+        error: "Compilation produced no PDF",
+        diagnostics: out.diagnostics ?? [],
+      };
     }
 
-    return new Response(out.result as BodyInit, {
+    return {
       status: 200,
+      data: out.result,
+      ok: true,
       headers: {
         "content-type": "application/pdf",
         "content-disposition": 'inline; filename="sample.pdf"',
         "cache-control": "no-store",
       },
-    });
+    };
   }
 }

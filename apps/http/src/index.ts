@@ -2,12 +2,7 @@ import type { Handler } from "hono";
 import { Hono } from "hono";
 import { showRoutes } from "hono/dev";
 
-import {
-  RendercvDo,
-  DockerRendercvApp,
-  RendercvOAuthProvider,
-  TypstCompilerDo,
-} from "./durable";
+import { RendercvDo, RendercvOAuthProvider } from "./durable";
 import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
 const app = new Hono<{ Bindings: Env; Variables: { key: string } }>();
@@ -60,4 +55,4 @@ app.use(async (c) => {
 
 showRoutes(app);
 export default app;
-export { RendercvDo, DockerRendercvApp, TypstCompilerDo };
+export { RendercvDo };

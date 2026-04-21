@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 
-import { callContainerService } from "../../utils/call-container";
+import { uploadPdfToS3 } from "../../utils/s3";
 
 // define a type for a function where the return type is a string unless the format is 'response'
 type GenerateCvOpts = {
@@ -18,25 +18,30 @@ type IGenerateCv = <O extends GenerateCvOpts = GenerateCvOpts>(
     : Promise<{ url: string; path: string }>;
 
 export const generateCV: IGenerateCv = (async (opts: GenerateCvOpts) => {
-  const { content, format = "url" } = opts;
+  const { content } = opts;
 
-  const response = await callContainerService({
-    path: "/api/v1/generate",
-    body: content,
-    method: "POST",
-    name: "rendercv-app",
-  });
+  const stubId = env.MCP_OBJECT.idFromString(opts.prefix ?? "anonymous");
+  const stub = env.MCP_OBJECT.get(stubId);
 
-  if (format === "response") {
-    return response;
+  const result = await stub.renderCvTypstPdf(JSON.stringify(content));
+
+  if (!result.ok) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: result.error,
+        },
+      ],
+    };
   }
 
-  const pdfBuffer = await response.arrayBuffer();
+  const pdfBuffer = result.pdf;
   const base64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
-  const { uploadPdfToS3 } = await import("../../utils/s3");
-  const { url, path } = await uploadPdfToS3(env.S3_BUCKET, pdfBuffer, {
+  const { url, path } = await uploadPdfToS3(env.S3_BUCKET, pdfBuffer.buffer, {
     prefix: opts.prefix,
   });
+
   return {
     url: url,
     pdfUrl: url,

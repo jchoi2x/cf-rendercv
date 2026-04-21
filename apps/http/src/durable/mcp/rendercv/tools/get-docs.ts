@@ -18,7 +18,7 @@ export const registerGetDocsTool = (agent: RenderCvMcpAgent) => {
       //   ? props.claims.sub.split("|").join("_")
       //   : "anonymous";
 
-      const documents = await agent.getDocuments();
+      const documents = agent.getDocuments();
 
       // Some MCP hosts/sandboxes don't reliably render `blob:` / inline base64 inside iframes.
       // Including a normal URL lets the UI preview reliably.

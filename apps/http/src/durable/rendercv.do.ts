@@ -2,51 +2,17 @@ import { DeleteObjectCommand, CopyObjectCommand } from "@aws-sdk/client-s3";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Connection, ConnectionContext } from "agents";
 import { McpAgent } from "agents/mcp";
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import YAML from "yaml";
 
-import { callContainerService } from "../utils/call-container";
+import { s3 } from "../utils/s3";
 import { registerRenderscv } from "./mcp/rendercv/register";
 import { registerWidgetUi } from "./mcp/widget-ui/register";
 import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
 import { Renderer } from "./rendercv/renderer/renderer";
-import type { RenderCvDocumentPayload } from "./templating/types";
-import { s3 } from "../utils/s3";
-import { TypstCompilerManager } from "./typst/typst-compiler-manager/typst-compiler-manager";
-const TYPST_FONT_STORAGE_PREFIX = "typst-font:";
-
-async function typstFontStorageKey(url: string): Promise<string> {
-  const data = new TextEncoder().encode(url);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  const hex = [...new Uint8Array(digest)]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return `${TYPST_FONT_STORAGE_PREFIX}${hex}`;
-}
-
-async function parseRendercvDocumentBody(
-  c: Context<{ Bindings: Env }>,
-): Promise<RenderCvDocumentPayload> {
-  const contentType = c.req.header("content-type") ?? "";
-  const rawBody =
-    contentType.includes("yaml") || contentType.includes("text/")
-      ? new TextDecoder().decode(await c.req.arrayBuffer())
-      : null;
-
-  return rawBody !== null ? YAML.parse(rawBody) : await c.req.json();
-}
-
-const proxyToContainer = async (c: Context<{ Bindings: Env }>) => {
-  // check if content-type is yaml and if it is convert to json and pass as the body
-  return callContainerService({
-    path: c.req.path,
-    method: c.req.method,
-    name: "rendercv-app",
-    body:
-      c.req.method === "POST" ? await parseRendercvDocumentBody(c) : undefined,
-  });
-};
+import type { RenderCvDocumentPayload } from "./rendercv/templater/types";
+import { TypstCompilerManager } from "./typst/typst-compiler-manager";
 
 type DocumentInput = {
   path: string;
@@ -64,6 +30,7 @@ export interface ResumeRecord {
   pdfUrl: string;
   dataParsed?: unknown;
 }
+
 export interface RenderCvMcpAgent extends Omit<
   McpAgent<Env, unknown, AuthContext>,
   "server"
@@ -77,10 +44,45 @@ export interface RenderCvMcpAgent extends Omit<
   deleteResumeById(id: number): boolean;
 }
 
+const TYPST_FONT_STORAGE_PREFIX = "typst-font:";
+async function typstFontStorageKey(url: string): Promise<string> {
+  const data = new TextEncoder().encode(url);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  const hex = [...new Uint8Array(digest)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `${TYPST_FONT_STORAGE_PREFIX}${hex}`;
+}
+
 export class RendercvDo
   extends McpAgent<Env, unknown, AuthContext>
   implements RenderCvMcpAgent
 {
+  private readonly renderer = new Renderer();
+  private readonly compilerManager = new TypstCompilerManager({
+    fontPersistence: {
+      loadFont: async (url) => {
+        const key = await typstFontStorageKey(url);
+        const raw = await this._storage.get<ArrayBuffer | string>(key);
+        if (raw == null) {
+          return undefined;
+        }
+        if (typeof raw === "string") {
+          return undefined;
+        }
+        return new Uint8Array(raw);
+      },
+      onFontLoaded: (url, bytes) => {
+        this.ctx.waitUntil(
+          (async () => {
+            const key = await typstFontStorageKey(url);
+            await this._storage.put(key, bytes);
+          })(),
+        );
+      },
+    },
+  });
+
   app = new Hono<{ Bindings: Env }>();
 
   server = new McpServer({
@@ -91,8 +93,6 @@ export class RendercvDo
   doSql: SqlStorage;
   private workerEnv: Env;
   private _storage: DurableObjectStorage;
-  private readonly typstCompilerManager: TypstCompilerManager;
-  private readonly typstSrcRenderer = new Renderer();
 
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
@@ -100,30 +100,6 @@ export class RendercvDo
 
     this.doSql = state.storage.sql;
     this._storage = state.storage;
-
-    this.typstCompilerManager = new TypstCompilerManager({
-      fontPersistence: {
-        loadFont: async (url) => {
-          const key = await typstFontStorageKey(url);
-          const raw = await this._storage.get<ArrayBuffer | string>(key);
-          if (raw == null) {
-            return undefined;
-          }
-          if (typeof raw === "string") {
-            return undefined;
-          }
-          return new Uint8Array(raw);
-        },
-        onFontLoaded: (url, bytes) => {
-          this.ctx.waitUntil(
-            (async () => {
-              const key = await typstFontStorageKey(url);
-              await this._storage.put(key, bytes);
-            })(),
-          );
-        },
-      },
-    });
 
     this.doSql.exec(`
       CREATE TABLE IF NOT EXISTS documents (
@@ -137,13 +113,13 @@ export class RendercvDo
 
     this.app.post("/api/v3/rendercv/typst", async (c) => {
       try {
-        const candidate = await parseRendercvDocumentBody(c);
-        // const result = await compileRenderCvTypstSource(candidate as any);
-        const result = await this.typstSrcRenderer.buildTypstSource(
-          candidate as any,
-        );
+        const result = await this.renderCvTypstSource(await c.req.text());
 
-        return new Response(result.trimEnd(), {
+        if (!result.ok) {
+          return c.json({ ok: false, error: result.error }, 500);
+        }
+
+        return new Response(result.source.trimEnd(), {
           headers: {
             "content-type": "application/text; charset=utf-8",
           },
@@ -157,28 +133,24 @@ export class RendercvDo
 
     this.app.post("/api/v3/rendercv/render", async (c) => {
       try {
-        const candidate = await parseRendercvDocumentBody(c);
-        // const result = await compileRenderCvTypstSource(candidate as any);
-        const result = await this.typstSrcRenderer.buildTypstSource(
-          candidate as any,
-        );
-        return await this.typstCompilerManager.compilePdfResponse(
-          5,
-          result.trimEnd(),
-        );
+        const result = await this.renderCvTypstPdf(await c.req.text());
+
+        if (!result.ok) {
+          return c.json({ ok: false, error: result.error }, 500);
+        }
+
+        return new Response(result.pdf, {
+          headers: {
+            "content-type": "application/pdf",
+          },
+        });
       } catch (error) {
-        console.error(
-          "[RendercvDO] /api/v3/rendercv/typst-compile failed:",
-          error,
-        );
+        console.error("[RendercvDO] /api/v3/rendercv/render failed:", error);
         const message = error instanceof Error ? error.message : String(error);
         return c.json({ ok: false, error: message }, 500);
       }
     });
 
-    this.app.post("/api/v1/generate", proxyToContainer);
-    this.app.get("/swagger-ui", proxyToContainer);
-    this.app.get("/openapi.json", proxyToContainer);
     this.app.use("*", (c) => super.fetch(c.req.raw));
   }
 
@@ -205,6 +177,79 @@ export class RendercvDo
       pdfUrl: `${this.workerEnv.S3_PUBLIC_URL}/${row.path}`,
       dataParsed,
     };
+  }
+
+  parseBody(body: string) {
+    try {
+      return YAML.parse(body);
+    } catch {
+      try {
+        return JSON.parse(body);
+      } catch {
+        throw new Error("Invalid body");
+      }
+    }
+  }
+
+  async renderCvTypstSource(
+    payload: string,
+  ): Promise<{ ok: true; source: string } | { ok: false; error: string }> {
+    try {
+      const obj = this.parseBody(payload);
+      const result = await this.renderer.buildTypstSource(
+        obj as RenderCvDocumentPayload,
+      );
+
+      return {
+        ok: true,
+        source: result.trimEnd(),
+      };
+    } catch (error) {
+      console.error("[RendercvDO] compilation of typst sourcefailed:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        ok: false,
+        error: message,
+      };
+    }
+  }
+
+  async renderCvTypstPdf(
+    payload: string,
+  ): Promise<
+    | { ok: true; pdf: Uint8Array<ArrayBufferLike> }
+    | { ok: false; error: string }
+  > {
+    try {
+      const src = await this.renderCvTypstSource(payload);
+      if (!src.ok) {
+        return {
+          ok: false,
+          error: src.error,
+        };
+      }
+
+      const { source } = src;
+      const result = await this.compilerManager.compilePdf(5, source);
+      if (result.ok) {
+        return {
+          ok: true,
+          pdf: result.data,
+        };
+      } else {
+        return {
+          ok: false,
+          error: result.error,
+        };
+      }
+    } catch (error) {
+      console.error("[RendercvDO] compilation of typst pdf failed:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        ok: false,
+        error: message,
+      };
+    }
   }
 
   addDocument(document: DocumentInput) {

@@ -18,7 +18,7 @@ export const registerDeleteResumeByIdTool = (agent: RenderCvMcpAgent) => {
       _meta: {},
     },
     async ({ id }) => {
-      const deleted = await agent.deleteResumeById(id);
+      const deleted = agent.deleteResumeById(id);
       if (!deleted) {
         return {
           isError: true,

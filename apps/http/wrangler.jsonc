@@ -57,25 +57,8 @@
       "persist": false
     }
   },
-  "containers": [
-    {
-      "class_name": "DockerRendercvApp",
-      "image": "../rendercv-app/Dockerfile",
-      "name": "rendercv-app",
-      "image_build_context": "../..",
-      "max_instances": 10
-    }
-  ],
   "durable_objects": {
     "bindings": [
-      {
-        "class_name": "DockerRendercvApp",
-        "name": "DOCKER_RENDERCV_APP"
-      },
-      {
-        "class_name": "TypstCompilerDo",
-        "name": "TYPST_COMPILER"
-      },
       {
         "class_name": "RendercvDo",
         "name": "MCP_OBJECT"
@@ -100,6 +83,18 @@
         "TypstCompilerDo"
       ],
       "tag": "v3"
+    },
+    {
+      "deleted_classes": [
+        "TypstCompilerDo"
+      ],
+      "tag": "v4"
+    },
+    {
+      "deleted_classes": [
+        "DockerRendercvApp"
+      ],
+      "tag": "v5"
     }
   ],
   "ratelimits": [

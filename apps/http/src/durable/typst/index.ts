@@ -1,1 +1,1 @@
-export * from "./typst.do";
+export * from "./typst-compiler-manager";
