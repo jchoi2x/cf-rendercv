@@ -2,16 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 
 describe("src/index.ts app wiring", () => {
 
-  it("proxies matched paths to MCP durable object and validates JSON", async () => {
+  it("proxies matched POST routes to MCP durable object stub", async () => {
     vi.resetModules();
 
     const showRoutesMock = vi.fn();
     vi.doMock("hono/dev", () => ({ showRoutes: showRoutesMock }));
-
-    vi.doMock("@cf-rendercv/contracts/entities", async () => {
-      const { z } = await import("zod");
-      return { RenderCvDocument: z.object({ ok: z.literal(true) }) };
-    });
 
     const providerFetch = vi.fn().mockResolvedValue(new Response("oauth"));
     vi.doMock("../durable", () => ({
@@ -34,7 +29,7 @@ describe("src/index.ts app wiring", () => {
     } as any;
 
     const ok = await app.fetch(
-      new Request("http://localhost/api/v1/generate", {
+      new Request("http://localhost/api/v3/rendercv/render", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ok: true }),
@@ -47,17 +42,6 @@ describe("src/index.ts app wiring", () => {
     expect(txt).toBe("do");
 
     expect(stubFetch).toHaveBeenCalledTimes(1);
-
-    const bad = await app.fetch(
-      new Request("http://localhost/api/v1/generate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ok: false }),
-      }),
-      env,
-      {} as any,
-    );
-    expect(bad.status).toBe(400);
 
     const other = await app.fetch(new Request("http://localhost/anything"), env, {} as any);
     expect(other.status).toBe(200);

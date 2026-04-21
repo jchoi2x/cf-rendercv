@@ -18,7 +18,7 @@ describe("durable/mcp/rendercv/tools/delete-resume-by-id", () => {
 
     const agent = {
       server: {},
-      deleteResumeById: vi.fn().mockResolvedValue(true),
+      deleteResumeById: vi.fn().mockReturnValue(true),
     } as any;
 
     const { registerDeleteResumeByIdTool } = await import("../delete-resume-by-id");
@@ -41,7 +41,7 @@ describe("durable/mcp/rendercv/tools/delete-resume-by-id", () => {
 
     const agent = {
       server: {},
-      deleteResumeById: vi.fn().mockResolvedValue(false),
+      deleteResumeById: vi.fn().mockReturnValue(false),
     } as any;
 
     const { registerDeleteResumeByIdTool } = await import("../delete-resume-by-id");
