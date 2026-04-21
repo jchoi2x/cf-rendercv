@@ -15,7 +15,7 @@ Whenever an agent **changes code** in this repository (adds, edits, or deletes i
 pnpm run lint
 ```
 
-- **Typecheck** (project references in root `tsconfig.json` — `contracts`, `apps/http`, `apps/rendercv-app`):
+- **Typecheck** (project references in root `tsconfig.json` — `contracts`, `apps/http`):
 
 ```bash
 pnpm exec tsc -b

@@ -1,6 +1,6 @@
 # cf-rendercv
 
-cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the [`rendercv`](https://github.com/rendercv/rendercv) **CLI**.
+cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the [`rendercv`](https://github.com/rendercv/rendercv) **CLI** implemented in TypeScript.
 
 <p>
   <a href="https://cursor.com/en-US/install-mcp?name=rendercv&config=eyJ1cmwiOiJodHRwczovL3JlbmRlcmN2LWh0dHAueHZ6Zi53b3JrZXJzLmRldi9tY3AifQ%3D%3D">
@@ -8,7 +8,14 @@ cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the
   </a>
 </p>
 
-`rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the [`rendercv`](https://github.com/rendercv/rendercv) CLI available. A Node.js server wraps the CLI and exposes an HTTP endpoint; the Cloudflare Worker proxies requests to it.
+`rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the [`rendercv`](https://github.com/rendercv/rendercv) CLI available. The Cloudflare Worker proxies requests to the containerized API endpoint.
+
+This repo also depends on WebAssembly npm packages that are optimized for Cloudflare's `workerd` runtime:
+
+- [`@jchoi2x/minijinja` (`^0.0.13`)](https://github.com/jchoi2x/minijinja)
+- [`@jchoi2x/typst.ts` (`0.7.4`)](https://github.com/jchoi2x/typst.ts.git)
+- [`@jchoi2x/typst-ts-renderer` (`0.7.5`)](https://github.com/jchoi2x/typst.ts.git)
+- [`@jchoi2x/typst-ts-web-compiler` (`^0.7.11`)](https://github.com/jchoi2x/typst.ts.git)
 
 ## Projects
 
@@ -20,23 +27,13 @@ The apps are:
   - hosts an MCP server that registers the `rendercv` tool, plus a prompt and a JSON schema resource (see `./apps/http/src/mcp/rendercv.mcp.ts`)
   - handles MCP tool calls by routing them to the container-backed PDF generator
   - Cloudflare Container ([`docker run`](https://docs.docker.com/engine/reference/commandline/run/)) (starts/manages the Docker container lifecycle)
-- `./apps/rendercv-app` (lives inside the Docker container)
-  - Node.js HTTP server
-  - [Hono](https://hono.dev) + Swagger routes
-  - Executes `rendercv` to generate the returned `application/pdf`
 
 ## Architecture
 
 - **Cloudflare Worker (`./apps/http`)**
   - Boots a Docker container when needed.
-  - Proxies incoming HTTP traffic to the Node.js app running inside the container.
-
-- **Node.js API (`./apps/rendercv-app`)**
-  - **Endpoint**: `POST /api/v1/generate`
-  - **Request Body**: RenderCV configuration provided as JSON or yaml (a JSON equivalent of the `rendercv` YAML file).
-  - **Response**:
-    - `Content-Type: application/pdf`
-    - Body is the generated PDF.
+  - Proxies incoming HTTP traffic to the API running inside the container.
+  - Exposes `POST /api/v1/generate` where request content is RenderCV configuration as JSON.
 
 ## Rendering via HTTP and MCP
 
@@ -49,8 +46,6 @@ The Worker also registers:
 
 - a prompt named `rendercv`
 - a resource at `rendercv://schema-and-prompt` containing the RenderCV JSON schema
-
-See `./apps/rendercv-app/README.md` for detailed API docs and examples.
 
 ## Development
 
@@ -77,19 +72,13 @@ After creating the app, configure the resulting `GOOGLE_CLIENT_ID` and `GOOGLE_C
    bun install
    ```
 
-2. Start the cloudflare worker and api locally from the repo root:
+2. Start the cloudflare worker locally from the repo root:
 
    ```bash
    bun run dev:http
    ```
 
-3. Start the Node.js API locally from the repo root:
-
-   ```bash
-   bun run dev:api
-   ```
-
-4. Send a `POST` request to `http://localhost:<port>/api/v1/generate` with your RenderCV JSON payload and save the `application/pdf` response.
+3. Send a `POST` request to `http://localhost:<port>/api/v1/generate` with your RenderCV JSON payload and save the `application/pdf` response.
 
 You must have **rendercv** installed on your local machine for PDF generation to work. See the official RenderCV “Get Started” guide for installation instructions: [Get Started - RenderCV](https://docs.rendercv.com/user_guide/#__tabbed_1_1).
 
@@ -141,7 +130,7 @@ sequenceDiagram
     participant K as DockerRendercvApp (Container)
   end
   box Purple Container
-    participant A as rendercv-app (Node.js + Hono)
+    participant A as rendercv API service
     participant R as rendercv CLI
   end
 
@@ -178,7 +167,7 @@ sequenceDiagram
     participant K as DockerRendercvApp (Container)
   end
   box Purple Container
-    participant A as rendercv-app (Node.js + Hono)
+    participant A as rendercv API service
     participant R as rendercv CLI
   end
 

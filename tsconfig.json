@@ -2,7 +2,6 @@
   "files": [],
   "references": [
     { "path": "./packages/contracts" },
-    { "path": "./apps/http" },
-    { "path": "./apps/rendercv-app" }
+    { "path": "./apps/http" }
   ]
 }

@@ -7,7 +7,6 @@ Guidance for coding agents working in this repository.
 This monorepo provides an HTTP API and MCP server for generating resume PDFs with the `rendercv` CLI.
 
 - `apps/http`: Cloudflare Worker (Hono) + MCP server + container orchestration/proxy
-- `apps/rendercv-app`: Node.js API inside the container that executes `rendercv`
 - `packages/contracts`: shared Zod/OpenAPI schemas and entities
 
 Keep the architectural boundary clear:
@@ -29,13 +28,10 @@ From repo root:
 
 - Install deps: `bun install`
 - Start Worker/MCP stack: `bun run dev:http`
-- Start Node render app: `bun run dev:api`
 - Build all: `bun run build`
 - Lint all: `bun run lint`
 - Unit tests (all): `bun run test`
 - Worker tests only: `bun run test:http`
-- Render app tests only: `bun run test:api`
-- Render app e2e tests: `bun run test:e2e:api`
 - Worker integration tests (workerd / Vitest pool): `bun run test:integration`
 
 ## File structure conventions
@@ -88,8 +84,7 @@ From repo root:
 Run targeted checks for touched areas:
 
 - Worker changes: `bun run test:http` and, when exercising full Worker routing/bindings: `bun run test:integration`
-- Render app changes: `bun run test:api`
-- Shared contracts changes: run affected app tests, typically both `test:http` and `test:api`
+- Shared contracts changes: run affected app tests, typically `test:http` plus integration checks as needed
 
 When changing request/response behavior for `/api/v1/generate`, perform a smoke check:
 

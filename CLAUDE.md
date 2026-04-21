@@ -35,15 +35,6 @@ Key concepts from the root README:
 - The MCP server registers the `rendercv` tool, a prompt, and a schema resource.
 - Tool calls are routed to the container-backed generator.
 
-### `apps/rendercv-app` — Node.js API inside the Docker container
-
-- Node.js HTTP service (Hono + Swagger routes)
-- Executes `rendercv` and returns the generated PDF
-- Main endpoint:
-  - **`POST /api/v1/generate`**
-  - Request body: **RenderCV configuration as JSON** (a JSON equivalent of the RenderCV YAML file)
-  - Response: `Content-Type: application/pdf` with PDF bytes
-
 ### `packages/contracts` — shared schemas/types (zod-openapi)
 
 This package is described as shared **zod-openapi schemas** with:
@@ -103,23 +94,6 @@ pnpm run dev:api
   - Proxies `/api/v1/generate`
   - Registers MCP discovery objects (tool/prompt/resource)
 
-### If you changed the Node API (`apps/rendercv-app`)
-
-- Verify `POST /api/v1/generate` still:
-  - Accepts JSON that is a direct translation of RenderCV YAML
-  - Returns a PDF with `Content-Type: application/pdf`
-
-Quick smoke test (from `apps/rendercv-app/README.md`):
-
-```bash
-curl -X POST http://localhost:8787/api/v1/generate \
-  -H "Content-Type: application/json" \
-  --data-binary @rendercv.json \
-  --output resume.pdf
-```
-
----
-
 ## MCP behavior (what Claude Code should preserve)
 
 The Worker supports MCP discovery + tool calls:
@@ -141,8 +115,7 @@ Tool call outcome:
 
 ## Where to start when editing
 
-- **Change rendering behavior**: start in `apps/rendercv-app` (the Node service that invokes `rendercv`).
-- **Change routing/auth/MCP exposure**: start in `apps/http` (Worker + MCP server + Durable Objects + container proxy).
+- **Change rendering behavior, routing/auth/MCP exposure**: start in `apps/http` (Worker + MCP server + Durable Objects + container proxy).
 - **Change request/response shapes**: start in `packages/contracts` (schemas/types), then update both apps accordingly.
 
 ---

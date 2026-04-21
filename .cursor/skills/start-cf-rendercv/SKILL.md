@@ -13,7 +13,7 @@ description: >-
 - **Docker** running locally (Docker Desktop or compatible daemon). **`bun run dev:http` requires Docker to be up** so Wrangler can use **Cloudflare Containers** for this Worker.
 - **Node.js** >= 20
 - **Bun** >= 1.1.0
-- **`rendercv` CLI** on the host only if you use **`bun run dev:api`** or other host-side RenderCV workflows ([RenderCV get started](https://docs.rendercv.com/user_guide/#__tabbed_1_1)). **Worker only** (`dev:http`) uses the CLI inside the container image instead.
+- **`rendercv` CLI** on the host only if you run host-side RenderCV workflows directly ([RenderCV get started](https://docs.rendercv.com/user_guide/#__tabbed_1_1)). **Worker-only** development (`dev:http`) uses the CLI inside the container image instead.
 
 ## Auth for local MCP / Worker
 
@@ -28,7 +28,7 @@ Run from the **repository root** (`cf-rendercv/`).
 
 ### Worker (api in docker container)
 
-Use this when you only need the **Cloudflare Worker** (Hono routes, MCP, Durable Objects, container orchestration). Do **not** start `pnpm run dev:api`.
+Use this when you need the **Cloudflare Worker** (Hono routes, MCP, Durable Objects, container orchestration).
 
 1. **Install**
 
@@ -42,17 +42,7 @@ Use this when you only need the **Cloudflare Worker** (Hono routes, MCP, Durable
    bun run dev:http
    ```
 
-The Worker proxies PDF work to **Cloudflare Containers**, which runs the `rendercv`-app **inside the container image**, not the separate `@cf-rendercv/rendercv-app` dev process.
-
-`pnpm run dev:api` is an optional convenience: it runs that same Node API **on your machine** as its own server. Skip it for “Worker only”.
-
-### Worker + host-side render API (optional)
-
-If you explicitly want the render app as a **second local process** (in addition to Wrangler), use a **second terminal**:
-
-```bash
-bun run dev:api
-```
+The Worker proxies PDF work to **Cloudflare Containers**, which runs the render API inside the container image.
 
 ## Quick validation
 
@@ -67,7 +57,6 @@ bun run dev:api
 
 - **Unit tests** (scope to what you touched):
   - Worker: `bun run test:http`
-  - Render app: `bun run test:api`
 
 - **MCP debugging (manual launch)**: `npx @modelcontextprotocol/inspector@latest`
 
@@ -156,7 +145,7 @@ This skill is basically two things:
 | Piece                   | Path                 | Role                                              |
 | ----------------------- | -------------------- | ------------------------------------------------- |
 | Worker, MCP, DOs, proxy | `apps/http`          | Orchestration; does not run `rendercv` in workerd |
-| PDF generation API      | `apps/rendercv-app`  | Runs `rendercv`; returns `application/pdf`        |
+| PDF generation API      | Cloudflare Container | Runs `rendercv`; returns `application/pdf`        |
 | Shared schemas          | `packages/contracts` | Zod/OpenAPI types                                 |
 
 Longer context: root **`README.md`**, **`AGENTS.md`**, and **`CLAUDE.md`**.

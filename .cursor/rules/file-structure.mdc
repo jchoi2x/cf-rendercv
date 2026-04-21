@@ -7,7 +7,7 @@ alwaysApply: true
 
 This rule documents and enforces the expected folder/file structure for this repository. It is based on the current organization of:
 
-- `apps/rendercv-app` (Hono API app with OpenAPI)
+- `apps/http` (Cloudflare Worker app)
 - `packages/contracts` (shared schemas/entities)
 
 ---
@@ -25,7 +25,7 @@ This rule documents and enforces the expected folder/file structure for this rep
 ### App entrypoint (wiring)
 
 - Keep app wiring in `src/index.ts`.
-- Example: `apps/rendercv-app/src/index.ts` creates the Hono app and registers routes.
+- Example: `apps/http/src/index.ts` creates the Hono app and registers routes.
 
 ### Endpoint modules (routes)
 
@@ -37,12 +37,12 @@ This rule documents and enforces the expected folder/file structure for this rep
 ### Routes barrel
 
 - Ensure route modules are re-exported via a barrel at `src/routes/index.ts`.
-- Example: `apps/rendercv-app/src/routes/index.ts` exports everything from `./generate`.
+- Example: `apps/http/src/routes/index.ts` exports everything from route modules.
 
 ### App helpers
 
 - Put shared helper logic under `src/helpers/*`.
-- Example: `apps/rendercv-app/src/helpers/generate-swagger-html.ts`.
+- Example: `apps/http/src/helpers/*`.
 
 ### App types
 
@@ -50,7 +50,7 @@ This rule documents and enforces the expected folder/file structure for this rep
 
 ### Import style
 
-- Prefer the internal `@/*` alias for app-internal imports (see `apps/rendercv-app/tsconfig.json`).
+- Prefer configured internal aliases for app-internal imports.
 
 ---
 
