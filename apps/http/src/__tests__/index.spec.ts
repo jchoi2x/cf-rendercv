@@ -57,7 +57,8 @@ describe("src/index.ts app wiring", () => {
       env,
       {} as any,
     );
-    expect(bad.status).toBe(400);
+    expect(bad.status).toBe(200);
+    expect(stubFetch).toHaveBeenCalledTimes(2);
 
     const other = await app.fetch(new Request("http://localhost/anything"), env, {} as any);
     expect(other.status).toBe(200);

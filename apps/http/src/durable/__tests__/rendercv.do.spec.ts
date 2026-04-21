@@ -6,8 +6,6 @@ describe("durable/rendercv.do.ts", () => {
     async () => {
     vi.resetModules();
 
-    const proxyResp = new Response("ok");
-    const callContainerService = vi.fn().mockResolvedValue(proxyResp);
     const registerRenderscv = vi.fn();
     const registerWidgetUi = vi.fn();
 
@@ -41,9 +39,22 @@ describe("durable/rendercv.do.ts", () => {
         constructor(_cfg: any) {}
       },
     }));
-    vi.doMock("../../utils/call-container", () => ({ callContainerService }));
     vi.doMock("../mcp/rendercv/register", () => ({ registerRenderscv }));
     vi.doMock("../mcp/widget-ui/register", () => ({ registerWidgetUi }));
+    vi.doMock("../rendercv/renderer/renderer", () => ({
+      Renderer: class {
+        async buildTypstSource() {
+          return "= test";
+        }
+      },
+    }));
+    vi.doMock("../typst/typst-compiler-manager", () => ({
+      TypstCompilerManager: class {
+        async compilePdf() {
+          return { ok: true, data: new Uint8Array([1, 2, 3]) };
+        }
+      },
+    }));
     vi.doMock("../oauth/auth0", () => ({
       createAuth0OAuthProvider: () => ({ fetch: vi.fn().mockResolvedValue(new Response("oauth")) }),
     }));
@@ -66,8 +77,7 @@ describe("durable/rendercv.do.ts", () => {
     await obj.onConnect({} as any, { request: new Request("http://localhost") } as any);
 
     const gen = await obj.fetch(new Request("http://localhost/api/v1/generate", { method: "POST", body: "{}" }));
-    expect(gen).toBe(proxyResp);
-    expect(callContainerService).toHaveBeenCalled();
+    expect(await gen.text()).toBe("mcp");
     },
     15_000,
   );

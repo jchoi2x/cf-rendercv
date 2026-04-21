@@ -15,7 +15,10 @@ type CvRaw = {
   phone?: unknown;
   website?: unknown;
   social_networks?: Array<{ network: string; username: string }> | null;
-  custom_connections?: Array<{ placeholder: string; url: string | null }> | null;
+  custom_connections?: Array<{
+    placeholder: string;
+    url: string | null;
+  }> | null;
   sections?: Record<string, unknown[]> | null;
   _plain_name?: string | null;
   _footer?: string | null;
@@ -97,10 +100,16 @@ export const NormalEntry = z
     name: z.string().describe("Name"),
     date: z.union([ArbitraryDate, z.null()]).default(null).optional(),
     start_date: z.union([ExactDate, z.null()]).default(null).optional(),
-    end_date: z.union([ExactDate, z.literal("present"), z.null()]).default(null).optional(),
+    end_date: z
+      .union([ExactDate, z.literal("present"), z.null()])
+      .default(null)
+      .optional(),
     location: z.union([z.string(), z.null()]).default(null).optional(),
     summary: z.union([z.string(), z.null()]).default(null).optional(),
-    highlights: z.union([z.array(z.string()), z.null()]).default(null).optional(),
+    highlights: z
+      .union([z.array(z.string()), z.null()])
+      .default(null)
+      .optional(),
   })
   .passthrough()
   .describe("NormalEntry");
@@ -111,10 +120,16 @@ export const ExperienceEntry = z
     position: z.string().describe("Position"),
     date: z.union([ArbitraryDate, z.null()]).default(null).optional(),
     start_date: z.union([ExactDate, z.null()]).default(null).optional(),
-    end_date: z.union([ExactDate, z.literal("present"), z.null()]).default(null).optional(),
+    end_date: z
+      .union([ExactDate, z.literal("present"), z.null()])
+      .default(null)
+      .optional(),
     location: z.union([z.string(), z.null()]).default(null).optional(),
     summary: z.union([z.string(), z.null()]).default(null).optional(),
-    highlights: z.union([z.array(z.string()), z.null()]).default(null).optional(),
+    highlights: z
+      .union([z.array(z.string()), z.null()])
+      .default(null)
+      .optional(),
   })
   .passthrough()
   .describe("ExperienceEntry");
@@ -126,10 +141,16 @@ export const EducationEntry = z
     degree: z.union([z.string(), z.null()]).default(null).optional(),
     date: z.union([ArbitraryDate, z.null()]).default(null).optional(),
     start_date: z.union([ExactDate, z.null()]).default(null).optional(),
-    end_date: z.union([ExactDate, z.literal("present"), z.null()]).default(null).optional(),
+    end_date: z
+      .union([ExactDate, z.literal("present"), z.null()])
+      .default(null)
+      .optional(),
     location: z.union([z.string(), z.null()]).default(null).optional(),
     summary: z.union([z.string(), z.null()]).default(null).optional(),
-    highlights: z.union([z.array(z.string()), z.null()]).default(null).optional(),
+    highlights: z
+      .union([z.array(z.string()), z.null()])
+      .default(null)
+      .optional(),
   })
   .passthrough()
   .describe("EducationEntry");
@@ -137,10 +158,15 @@ export const EducationEntry = z
 export const PublicationEntry = z
   .object({
     title: z.string().describe("Title"),
-    authors: z.array(z.string()).describe("You can bold your name with **double asterisks**."),
+    authors: z
+      .array(z.string())
+      .describe("You can bold your name with **double asterisks**."),
     summary: z.union([z.string(), z.null()]).default(null).optional(),
     doi: z.union([z.string(), z.null()]).default(null).optional(),
-    url: z.union([z.string().url().min(1).max(2083), z.null()]).default(null).optional(),
+    url: z
+      .union([z.string().url().min(1).max(2083), z.null()])
+      .default(null)
+      .optional(),
     journal: z.union([z.string(), z.null()]).default(null).optional(),
     date: z.union([ArbitraryDate, z.null()]).default(null).optional(),
   })
@@ -190,26 +216,47 @@ const BaseCv = z
   .object({
     name: z.union([z.string(), z.null()]).default(null).optional(),
     _plain_name: z.union([z.string(), z.null()]).default(null).optional(),
-    _key_order: z.union([z.array(z.string()), z.null()]).default(null).optional(),
+    _key_order: z
+      .union([z.array(z.string()), z.null()])
+      .default(null)
+      .optional(),
     _footer: z.union([z.string(), z.null()]).default(null).optional(),
     _top_note: z.union([z.string(), z.null()]).default(null).optional(),
     _connections: z.any().default(null).optional(),
     headline: z.union([z.string(), z.null()]).default(null).optional(),
     location: z.union([z.string(), z.null()]).default(null).optional(),
     email: z.any().default(null).optional(),
-    photo: z.union([ExistingPathRelativeToInput, z.null()]).default(null).optional(),
-    phone: z.any().default(null).optional(),
-    website: z
-      .union([z.string().url().min(1).max(2083), z.array(z.string().url().min(1).max(2083)), z.null()])
+    photo: z
+      .union([ExistingPathRelativeToInput, z.null()])
       .default(null)
       .optional(),
-    social_networks: z.union([z.array(SocialNetwork), z.null()]).default(null).optional(),
-    custom_connections: z.union([z.array(CustomConnection), z.null()]).default(null).optional(),
-    sections: z.union([z.object({}).catchall(Section), z.null()]).default(null).optional(),
+    phone: z.any().default(null).optional(),
+    website: z
+      .union([
+        z.string().url().min(1).max(2083),
+        z.array(z.string().url().min(1).max(2083)),
+        z.null(),
+      ])
+      .default(null)
+      .optional(),
+    social_networks: z
+      .union([z.array(SocialNetwork), z.null()])
+      .default(null)
+      .optional(),
+    custom_connections: z
+      .union([z.array(CustomConnection), z.null()])
+      .default(null)
+      .optional(),
+    sections: z
+      .union([z.object({}).catchall(Section), z.null()])
+      .default(null)
+      .optional(),
   })
   .strict();
 
-export const Cv = BaseCv.transform((raw) => formatCv(raw as CvRaw)).describe("Cv");
+export const Cv = BaseCv.transform((raw) => formatCv(raw as CvRaw)).describe(
+  "Cv",
+);
 
 export const cvSchema = Cv;
 export type CvSchemaType = z.infer<typeof cvSchema>;

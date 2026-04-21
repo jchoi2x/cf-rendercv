@@ -1,5 +1,4 @@
 import init, { create_env, type JsExposedEnv } from "@jchoi2x/minijinja";
-import wasm from "@jchoi2x/minijinja/minijinja_bg.wasm";
 
 import { createTemplateModel } from "../templater/create-template-model";
 import {
@@ -107,7 +106,7 @@ export class Renderer {
         // The node bundle auto-initializes its embedded WASM at import time.
         // The workerd/web bundles require explicit initialization.
         if (isWorkerd) {
-          await init(wasm);
+          await init();
         }
 
         // Node (`package.json` "node" export): WASM is loaded inside the package at import time.

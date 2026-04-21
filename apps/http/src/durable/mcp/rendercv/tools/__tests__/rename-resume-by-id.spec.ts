@@ -27,7 +27,7 @@ describe("durable/mcp/rendercv/tools/rename-resume-by-id", () => {
 
     const agent = {
       server: {},
-      renameResumeById: vi.fn().mockResolvedValue(resume),
+      renameResumeById: vi.fn().mockReturnValue(resume),
     } as any;
 
     const { registerRenameResumeByIdTool } = await import("../rename-resume-by-id");
@@ -54,7 +54,7 @@ describe("durable/mcp/rendercv/tools/rename-resume-by-id", () => {
 
     const agent = {
       server: {},
-      renameResumeById: vi.fn().mockResolvedValue(null),
+      renameResumeById: vi.fn().mockReturnValue(null),
     } as any;
 
     const { registerRenameResumeByIdTool } = await import("../rename-resume-by-id");
