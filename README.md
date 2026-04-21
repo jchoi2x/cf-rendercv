@@ -3,6 +3,9 @@
 cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs from [RenderCV](https://github.com/rendercv/rendercv)-style YAML or JSON. PDFs are produced **inside Cloudflare Workers** (`workerd`): templates use **Jinja2-compatible** rendering via WASM, and layout is compiled to PDF with **Typst** WASM modules—no subprocesses and no Docker.
 
 <p>
+  <a href="https://github.com/jchoi2x/cf-rendercv/actions/workflows/test.yml">
+    <img alt="Test workflow status" src="https://github.com/jchoi2x/cf-rendercv/actions/workflows/test.yml/badge.svg" />
+  </a>
   <a href="https://cursor.com/en-US/install-mcp?name=rendercv&config=eyJ1cmwiOiJodHRwczovL3JlbmRlcmN2LWh0dHAueHZ6Zi53b3JrZXJzLmRldi9tY3AifQ%3D%3D">
     <img alt="Install to Cursor" src="https://img.shields.io/badge/Install_to_Cursor-1F6FEB?style=for-the-badge&logo=cursor&logoColor=white" />
   </a>
