@@ -8,7 +8,7 @@
   },
   "compatibility_date": "2025-11-17",
   "vars": {
-    "TYPST_COMPILER_WASM_URL": "https://github.com/jchoi2x/typst.ts/raw/refs/heads/main-bun/packages/compiler/pkg/typst_ts_web_compiler_bg.wasm"
+    "WEBVIEWER_CDN": "https://cdn.jsdelivr.net/npm/@pdftron/webviewer@10.9.0-20240329/public"
   },
   "compatibility_flags": [
     "nodejs_compat",

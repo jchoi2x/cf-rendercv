@@ -1,6 +1,6 @@
 import { registerAppResource } from "@modelcontextprotocol/ext-apps/server";
 
-import type { RenderCvMcpAgent } from "../../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../../types";
 import { widgetUI } from "../widgets/widgetUI";
 
 export const registerWidgetUiResource = (agent: RenderCvMcpAgent) => {

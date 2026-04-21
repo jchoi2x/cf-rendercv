@@ -39,10 +39,14 @@ export const getTemplates = (defaults: Templates) => {
     single_date: z
       .string()
       .default(defaults.single_date ?? "MONTH_ABBREVIATION YEAR"),
-    date_range: z.string().default(defaults.date_range ?? "START_DATE – END_DATE"),
+    date_range: z
+      .string()
+      .default(defaults.date_range ?? "START_DATE – END_DATE"),
     time_span: z
       .string()
-      .default(defaults.time_span ?? "HOW_MANY_YEARS YEARS HOW_MANY_MONTHS MONTHS"),
+      .default(
+        defaults.time_span ?? "HOW_MANY_YEARS YEARS HOW_MANY_MONTHS MONTHS",
+      ),
     one_line_entry: z.object({
       main_column: z
         .string()
@@ -61,15 +65,22 @@ export const getTemplates = (defaults: Templates) => {
         .default(defaults.education_entry?.degree_column ?? "**DEGREE**"),
       date_and_location_column: z
         .string()
-        .default(defaults.education_entry?.date_and_location_column ?? "LOCATION\nDATE"),
+        .default(
+          defaults.education_entry?.date_and_location_column ??
+            "LOCATION\nDATE",
+        ),
     }),
     normal_entry: z.object({
       main_column: z
         .string()
-        .default(defaults.normal_entry?.main_column ?? "**NAME**\nSUMMARY\nHIGHLIGHTS"),
+        .default(
+          defaults.normal_entry?.main_column ?? "**NAME**\nSUMMARY\nHIGHLIGHTS",
+        ),
       date_and_location_column: z
         .string()
-        .default(defaults.normal_entry?.date_and_location_column ?? "LOCATION\nDATE"),
+        .default(
+          defaults.normal_entry?.date_and_location_column ?? "LOCATION\nDATE",
+        ),
     }),
     experience_entry: z.object({
       main_column: z
@@ -80,7 +91,10 @@ export const getTemplates = (defaults: Templates) => {
         ),
       date_and_location_column: z
         .string()
-        .default(defaults.experience_entry?.date_and_location_column ?? "LOCATION\nDATE"),
+        .default(
+          defaults.experience_entry?.date_and_location_column ??
+            "LOCATION\nDATE",
+        ),
     }),
     publication_entry: z.object({
       main_column: z
@@ -91,7 +105,9 @@ export const getTemplates = (defaults: Templates) => {
         ),
       date_and_location_column: z
         .string()
-        .default(defaults.publication_entry?.date_and_location_column ?? "DATE"),
+        .default(
+          defaults.publication_entry?.date_and_location_column ?? "DATE",
+        ),
     }),
   });
 };

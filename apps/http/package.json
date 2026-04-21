@@ -25,6 +25,8 @@
     "@cf-rendercv/contracts": "workspace:*",
     "@cloudflare/containers": "^0.0.30",
     "@cloudflare/workers-oauth-provider": "^0.3.0",
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-openapi": "^1.3.0",
     "@jchoi2x/minijinja": "^0.0.13",
     "@jchoi2x/typst-ts-renderer": "0.7.5",
     "@jchoi2x/typst-ts-web-compiler": "^0.7.11",

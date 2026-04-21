@@ -2,6 +2,8 @@
  * Single-page MCP App (text/html;profile=mcp-app) for the `rendercv` tool.
  * Uses the browser build from esm.sh; CSP allowlists are set on the resource.
  */
+import { env } from "cloudflare:workers";
+
 export const RENDERCV_APP_HTML = `
 <!DOCTYPE html>
 <html lang="en">
@@ -18,15 +20,14 @@ export const RENDERCV_APP_HTML = `
     }
   </script>
 </head>
-<body class='min-w-screen min-h-screen'>
+<body class='min-w-2xl min-h-screen'>
 
-  <h1>RenderCV</h1>
   <div class="panel flex flex-col gap-4">
     <p id="status" class="status">Connecting…</p>
     <div id="actions" class="actions" hidden></div>
     <pre id="error" class="err" hidden></pre>
   </div>
-  <div id="viewer" hidden style="margin-top:12px;height:560px"></div>
+  <div id="viewer" hidden style="margin-top:12px;height:560px;min-width:100%;"></div>
 
   <script type="module">
     import "https://esm.sh/@tailwindcss/browser@4.0.6";
@@ -40,8 +41,8 @@ export const RENDERCV_APP_HTML = `
 
     import WebViewer from "https://esm.sh/@pdftron/webviewer";
 
-    const APRYSE_LICENSE = "demo:1773251044163:637ef9590300000000e0776822862dfcea1362e5ec2c24eef968e7609f";
-    const WEBVIEWER_CDN = "https://cdn.jsdelivr.net/npm/@pdftron/webviewer@11.11.0/public";
+    const APRYSE_LICENSE = "${env.APRYSE_LICENSE}";
+    const WEBVIEWER_CDN = "${env.WEBVIEWER_CDN}";
  
     const statusEl = document.getElementById("status");
     const actionsEl = document.getElementById("actions");
@@ -170,6 +171,8 @@ export const RENDERCV_APP_HTML = `
         viewerEl.hidden = false;
 
         const openBtn = document.createElement("button");
+        const btnClasses = ['bg-blue-500', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded'];
+        openBtn.classList.add(...btnClasses);
         openBtn.type = "button";
         openBtn.textContent = "Open in new tab";
         openBtn.addEventListener("click", function () {

@@ -20,7 +20,7 @@ type IGenerateCv = <O extends GenerateCvOpts = GenerateCvOpts>(
 export const generateCV: IGenerateCv = (async (opts: GenerateCvOpts) => {
   const { content } = opts;
 
-  const stubId = env.MCP_OBJECT.idFromString(opts.prefix ?? "anonymous");
+  const stubId = env.MCP_OBJECT.idFromName(opts.prefix ?? "anonymous");
   const stub = env.MCP_OBJECT.get(stubId);
 
   const result = await stub.renderCvTypstPdf(JSON.stringify(content));

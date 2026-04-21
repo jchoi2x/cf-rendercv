@@ -1,4 +1,4 @@
-import type { RenderCvMcpAgent } from "../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../types";
 import { registerRenderscvPrompt } from "./prompts/rendercv";
 import { registerRendercvAppUiResource } from "./resources/rendercv-app-ui";
 import { registerRenderscvSchemaAndPromptResource } from "./resources/schema-and-prompt";

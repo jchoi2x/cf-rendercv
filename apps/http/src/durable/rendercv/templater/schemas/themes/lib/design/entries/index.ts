@@ -68,9 +68,7 @@ const getHighlights = (defaults: Highlights) => {
     space_between_bullet_and_text: z
       .string()
       .default(defaults.space_between_bullet_and_text ?? "0.5em")
-      .describe(
-        "Space between bullet and text. The default value is `0.5em`.",
-      ),
+      .describe("Space between bullet and text. The default value is `0.5em`."),
   });
 };
 

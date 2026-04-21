@@ -1,7 +1,7 @@
-import { getSchema } from "./schemas/themes/lib";
-import type { TLocaleName } from "./schemas/themes/lib/locale/defaults";
-import type { TThemeName } from "./schemas/themes/lib/design/defaults";
 import { getPreambleContextForTheme } from "./defaults/theme-defaults";
+import { getSchema } from "./schemas/themes/lib";
+import type { TThemeName } from "./schemas/themes/lib/design/defaults";
+import type { TLocaleName } from "./schemas/themes/lib/locale/defaults";
 import type { RenderCvDocumentPayload } from "./types";
 
 /** Preserve CV field order from the input object (Python `Cv.capture_input_order`). */
@@ -50,8 +50,8 @@ export function mergeAndParseRenderCvPayload(
   const preamble = getPreambleContextForTheme(themeName, localeName);
   const pCv = (preamble.cv ?? {}) as Record<string, unknown>;
   const pDesign = (preamble.design ?? {}) as Record<string, unknown>;
-  const pLocale = (preamble.locale ?? {}) as Record<string, unknown>;
-  const pSettings = (preamble.settings ?? {}) as Record<string, unknown>;
+  const pLocale = preamble.locale ?? {};
+  const pSettings = preamble.settings ?? {};
   const uCv = (payload.cv ?? {}) as Record<string, unknown>;
   const uDesign = (payload.design ?? {}) as Record<string, unknown>;
   const uLocale = (payload.locale ?? {}) as Record<string, unknown>;
@@ -71,5 +71,7 @@ export function mergeAndParseRenderCvPayload(
     settings: deepMerge(pSettings, uSettings),
   };
 
-  return getSchema(themeName, localeName).parse(merged) as RenderCvDocumentPayload;
+  return getSchema(themeName, localeName).parse(
+    merged,
+  ) as RenderCvDocumentPayload;
 }

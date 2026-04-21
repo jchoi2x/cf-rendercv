@@ -1,6 +1,6 @@
 import { registerAppResource } from "@modelcontextprotocol/ext-apps/server";
 
-import type { RenderCvMcpAgent } from "../../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../../types";
 import { RENDERCV_SCHEMA_URI } from "../constants";
 
 export const registerRenderscvSchemaAndPromptResource = (

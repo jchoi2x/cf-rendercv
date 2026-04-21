@@ -1,13 +1,16 @@
 import type { Handler } from "hono";
 import { Hono } from "hono";
-import { showRoutes } from "hono/dev";
 
 import { RendercvDo, RendercvOAuthProvider } from "./durable";
 import { rateLimiterMiddleware } from "./middleware/rate-limiter.middleware";
 
 const app = new Hono<{ Bindings: Env; Variables: { key: string } }>();
 
-const pathMathes = ["/swagger-ui", "/openapi.json"];
+const getRoutePathMathes = ["/health", "/swagger-ui", "/openapi.json"];
+const postRoutePathMathes = [
+  "/api/v3/rendercv/typst",
+  "/api/v3/rendercv/render",
+];
 
 app.get("/health", (c) => c.json({ ok: true }));
 
@@ -28,20 +31,11 @@ const proxyToDurable: Handler<
   return subject;
 };
 
-app.post("/api/v2/generate", proxyToDurable);
-app.post("/api/v3/rendercv/typst", proxyToDurable);
-app.post("/api/v3/rendercv/render", proxyToDurable);
-app.post("/api/v3/generate", proxyToDurable);
-app.post("/api/v1/generate", proxyToDurable);
-
-for (const i of pathMathes) {
-  app.get(i, async (c) => {
-    const key = c.get("key");
-    const id = c.env.MCP_OBJECT.idFromName(key);
-    const stub = c.env.MCP_OBJECT.get(id);
-    const subject = await stub.fetch(c.req.raw.clone());
-    return subject;
-  });
+for (const path of getRoutePathMathes) {
+  app.get(path, proxyToDurable);
+}
+for (const path of postRoutePathMathes) {
+  app.post(path, proxyToDurable);
 }
 
 // delegate to the OAuth provider
@@ -53,6 +47,5 @@ app.use(async (c) => {
   );
 });
 
-showRoutes(app);
 export default app;
 export { RendercvDo };

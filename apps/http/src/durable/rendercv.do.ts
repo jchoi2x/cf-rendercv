@@ -1,58 +1,19 @@
 import { DeleteObjectCommand, CopyObjectCommand } from "@aws-sdk/client-s3";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { Connection, ConnectionContext } from "agents";
 import { McpAgent } from "agents/mcp";
-import { Hono } from "hono";
 import YAML from "yaml";
 
 import { s3 } from "../utils/s3";
+import { typstFontStorageKey } from "./helpers/typst-storagekey";
 import { registerRenderscv } from "./mcp/rendercv/register";
 import { registerWidgetUi } from "./mcp/widget-ui/register";
 import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
 import { Renderer } from "./rendercv/renderer/renderer";
 import type { RenderCvDocumentPayload } from "./rendercv/templater/types";
+import { getApp } from "./routes";
+import type { DocumentInput, RenderCvMcpAgent, ResumeRecord } from "./types";
 import { TypstCompilerManager } from "./typst/typst-compiler-manager";
-
-type DocumentInput = {
-  path: string;
-  bucket?: string;
-  createdAt: string;
-  data: string;
-};
-
-export interface ResumeRecord {
-  id: number;
-  path: string;
-  bucket: string;
-  createdAt: string;
-  data: string;
-  pdfUrl: string;
-  dataParsed?: unknown;
-}
-
-export interface RenderCvMcpAgent extends Omit<
-  McpAgent<Env, unknown, AuthContext>,
-  "server"
-> {
-  server: McpServer;
-
-  addDocument(document: DocumentInput): void;
-  getDocuments(): ResumeRecord[];
-  getResumeById(id: number): ResumeRecord | null;
-  renameResumeById(id: number, newName: string): ResumeRecord | null;
-  deleteResumeById(id: number): boolean;
-}
-
-const TYPST_FONT_STORAGE_PREFIX = "typst-font:";
-async function typstFontStorageKey(url: string): Promise<string> {
-  const data = new TextEncoder().encode(url);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  const hex = [...new Uint8Array(digest)]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return `${TYPST_FONT_STORAGE_PREFIX}${hex}`;
-}
 
 export class RendercvDo
   extends McpAgent<Env, unknown, AuthContext>
@@ -83,7 +44,7 @@ export class RendercvDo
     },
   });
 
-  app = new Hono<{ Bindings: Env }>();
+  app = getApp(this);
 
   server = new McpServer({
     name: "RenderCV API",
@@ -110,46 +71,6 @@ export class RendercvDo
         data TEXT
       );
     `);
-
-    this.app.post("/api/v3/rendercv/typst", async (c) => {
-      try {
-        const result = await this.renderCvTypstSource(await c.req.text());
-
-        if (!result.ok) {
-          return c.json({ ok: false, error: result.error }, 500);
-        }
-
-        return new Response(result.source.trimEnd(), {
-          headers: {
-            "content-type": "application/text; charset=utf-8",
-          },
-        });
-      } catch (error) {
-        console.error("[RendercvDO] /api/v3/rendercv/typst failed:", error);
-        const message = error instanceof Error ? error.message : String(error);
-        return c.json({ ok: false, error: message }, 500);
-      }
-    });
-
-    this.app.post("/api/v3/rendercv/render", async (c) => {
-      try {
-        const result = await this.renderCvTypstPdf(await c.req.text());
-
-        if (!result.ok) {
-          return c.json({ ok: false, error: result.error }, 500);
-        }
-
-        return new Response(result.pdf, {
-          headers: {
-            "content-type": "application/pdf",
-          },
-        });
-      } catch (error) {
-        console.error("[RendercvDO] /api/v3/rendercv/render failed:", error);
-        const message = error instanceof Error ? error.message : String(error);
-        return c.json({ ok: false, error: message }, 500);
-      }
-    });
 
     this.app.use("*", (c) => super.fetch(c.req.raw));
   }
@@ -373,31 +294,10 @@ export class RendercvDo
     return true;
   }
 
-  override async onStart() {
-    return super.onStart();
-  }
-
-  override onClose(
-    ctx: Connection<unknown>,
-    code: number,
-    reason: string,
-    wasClean: boolean,
-  ) {
-    return super.onClose(ctx, code, reason, wasClean);
-  }
-
   override async init() {
     // register mcp tools, prompts and resources
     registerRenderscv(this);
     registerWidgetUi(this);
-  }
-
-  override async onConnect(
-    ctx: Connection<unknown>,
-    { request: req }: ConnectionContext,
-  ) {
-    // console.debug(`onConnect::${this.name}`, this.props);
-    return super.onConnect(ctx, { request: req });
   }
 
   async fetch(request: Request) {

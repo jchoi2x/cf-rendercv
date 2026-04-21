@@ -1,6 +1,6 @@
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 
-import type { RenderCvMcpAgent } from "../../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../../types";
 
 export const registerGetDocsTool = (agent: RenderCvMcpAgent) => {
   const { server } = agent;

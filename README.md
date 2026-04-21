@@ -1,6 +1,6 @@
 # cf-rendercv
 
-cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the [`rendercv`](https://github.com/rendercv/rendercv) **CLI** implemented in TypeScript.
+cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs from [RenderCV](https://github.com/rendercv/rendercv)-style YAML or JSON. PDFs are produced **inside Cloudflare Workers** (`workerd`): templates use **Jinja2-compatible** rendering via WASM, and layout is compiled to PDF with **Typst** WASM modules—no subprocesses and no Docker.
 
 <p>
   <a href="https://cursor.com/en-US/install-mcp?name=rendercv&config=eyJ1cmwiOiJodHRwczovL3JlbmRlcmN2LWh0dHAueHZ6Zi53b3JrZXJzLmRldi9tY3AifQ%3D%3D">
@@ -8,11 +8,9 @@ cf-rendercv is an **HTTP API + MCP server** for generating resume PDFs using the
   </a>
 </p>
 
-`rendercv` is a CLI tool and is not readily portable to run inside Cloudflare `workerd`. To work around this, the repo uses **Cloudflare Containers** to run a **Docker container** that has the [`rendercv`](https://github.com/rendercv/rendercv) CLI available. The Cloudflare Worker proxies requests to the containerized API endpoint.
+WebAssembly npm packages used in this repo (optimized for `workerd`):
 
-This repo also depends on WebAssembly npm packages that are optimized for Cloudflare's `workerd` runtime:
-
-- [`@jchoi2x/minijinja` (`^0.0.13`)](https://github.com/jchoi2x/minijinja)
+- [`@jchoi2x/minijinja` (`^0.0.13`)](https://github.com/jchoi2x/minijinja) — Jinja2-style templating
 - [`@jchoi2x/typst.ts` (`0.7.4`)](https://github.com/jchoi2x/typst.ts.git)
 - [`@jchoi2x/typst-ts-renderer` (`0.7.5`)](https://github.com/jchoi2x/typst.ts.git)
 - [`@jchoi2x/typst-ts-web-compiler` (`^0.7.11`)](https://github.com/jchoi2x/typst.ts.git)
@@ -24,22 +22,21 @@ The apps are:
 - `./apps/http`
   - Cloudflare Worker ([Hono](https://hono.dev))
   - MCPAgent (MCP tool/agent wiring)
-  - hosts an MCP server that registers the `rendercv` tool, plus a prompt and a JSON schema resource (see `./apps/http/src/mcp/rendercv.mcp.ts`)
-  - handles MCP tool calls by routing them to the container-backed PDF generator
-  - Cloudflare Container ([`docker run`](https://docs.docker.com/engine/reference/commandline/run/)) (starts/manages the Docker container lifecycle)
+  - hosts an MCP server that registers the `rendercv` tool, prompts, and JSON schema resources (see `./apps/http/src/durable/mcp/rendercv/`)
+  - renders PDFs in the Durable Object using Minijinja + Typst WASM (same pipeline as HTTP)
 
 ## Architecture
 
 - **Cloudflare Worker (`./apps/http`)**
-  - Boots a Docker container when needed.
-  - Proxies incoming HTTP traffic to the API running inside the container.
-  - Exposes `POST /api/v1/generate` where request content is RenderCV configuration as JSON.
+  - Proxies HTTP and MCP traffic to a **Durable Object** (`RendercvDo`) that hosts the Hono app, MCP server, and rendering pipeline.
+  - **Rendering**: validate RenderCV JSON/YAML → build Typst source (Jinja via Minijinja WASM) → compile PDF with Typst WASM.
+  - Exposes `POST /api/v3/rendercv/render` (PDF) and `POST /api/v3/rendercv/typst` (Typst source). Request bodies accept RenderCV as JSON or YAML (see OpenAPI/Swagger).
 
 ## Rendering via HTTP and MCP
 
 This Worker supports using RenderCV in two ways:
 
-- **HTTP API**: `POST /api/v1/generate` (RenderCV configuration as JSON) returns a generated PDF.
+- **HTTP API**: `POST /api/v3/rendercv/render` returns a generated PDF (`application/pdf`). `POST /api/v3/rendercv/typst` returns Typst source (`application/text`). Bodies may be RenderCV JSON or YAML.
 - **MCP tool**: the Worker registers an MCP tool named `rendercv` that accepts `{ content, format }` and returns a generated PDF URL (or base64 when `format: "base64"`).
 
 The Worker also registers:
@@ -47,13 +44,30 @@ The Worker also registers:
 - a prompt named `rendercv`
 - a resource at `rendercv://schema-and-prompt` containing the RenderCV JSON schema
 
+## Deployment
+
+The application is deployed at **[https://rendercv-http.xvzf.workers.dev/](https://rendercv-http.xvzf.workers.dev/)** (HTTP API, OpenAPI/Swagger UI, and MCP).
+
+### OpenAPI (Swagger UI)
+
+![OpenAPI / Swagger UI for the RenderCV HTTP API](docs/assets/swagger.gif)
+
+### MCP Inspector
+
+Run the Model Context Protocol Inspector and connect to the deployed MCP server:
+
+```bash
+npx @modelcontextprotocol/inspector@latest
+```
+
+![Connecting via MCP using npx @modelcontextprotocol/inspector](docs/assets/mcp.gif)
+
 ## Development
 
 At a high level, you will:
 
 ### Prerequisites
 
-- `docker`
 - node >= 20
 - bun >= 1.1.0
 
@@ -78,11 +92,11 @@ After creating the app, configure the resulting `GOOGLE_CLIENT_ID` and `GOOGLE_C
    bun run dev:http
    ```
 
-3. Send a `POST` request to `http://localhost:<port>/api/v1/generate` with your RenderCV JSON payload and save the `application/pdf` response.
+3. Send a `POST` request to `http://localhost:<port>/api/v3/rendercv/render` with your RenderCV JSON or YAML body and save the `application/pdf` response. Use `POST /api/v3/rendercv/typst` for Typst source output.
 
-You must have **rendercv** installed on your local machine for PDF generation to work. See the official RenderCV “Get Started” guide for installation instructions: [Get Started - RenderCV](https://docs.rendercv.com/user_guide/#__tabbed_1_1).
+For document structure and field semantics, see the official RenderCV user guide: [RenderCV — User guide](https://docs.rendercv.com/user_guide/).
 
-To develop or deploy the Cloudflare Worker in `./apps/http`, refer to that app’s own configuration and scripts (e.g., `wrangler.toml`, `package.json`) for the precise commands.
+To develop or deploy the Cloudflare Worker in `./apps/http`, refer to that app’s own configuration and scripts (e.g., `wrangler.jsonc`, `package.json`) for the precise commands.
 
 ## Testing
 
@@ -101,7 +115,7 @@ Watch mode:
 bun run test:integration:watch
 ```
 
-These tests do **not** replace container-backed PDF smoke checks; they validate routing and request handling in the Worker isolate without requiring `wrangler dev` in a separate terminal. The Vitest pool does **not** emulate [Cloudflare Containers](https://developers.cloudflare.com/containers/)—paths that need a live container (for example a successful `POST /api/v1/generate` with a full RenderCV document) still require `bun run dev:http` / Docker or a deployed environment.
+These tests focus on routing and request handling in the Worker isolate without requiring `wrangler dev` in a separate terminal. End-to-end checks that exercise the full Typst compilation path (for example a successful `POST /api/v3/rendercv/render` with a complete RenderCV document) still require `bun run dev:http` or a deployed Worker.
 
 ## Debugging
 
@@ -124,26 +138,21 @@ Rendering a resume via HTTP request
 ```mermaid
 sequenceDiagram
   participant C as HTTP Client
-  participant W as Cloudflare Worker (Hono)
-  box Blue Durable Objects
-    participant D as RendercvDo (MCPAgent durable object)
-    participant K as DockerRendercvApp (Container)
-  end
-  box Purple Container
-    participant A as rendercv API service
-    participant R as rendercv CLI
+  participant W as Worker (edge)
+  box Blue Durable Object
+    participant D as RendercvDo (Hono + MCP)
+    participant J as Minijinja WASM (templates)
+    participant Y as Typst WASM (compile)
   end
 
-
-  C->>W: POST /api/v1/generate (RenderCV JSON)
+  C->>W: POST /api/v3/rendercv/render (JSON or YAML)
   W->>D: stub.fetch(request)
-  D->>K: callContainerService(path, method, body)
-  K->>A: HTTP POST /api/v1/generate
-  A->>R: rendercv (generate PDF)
-  R-->>A: PDF binary
-  A-->>K: application/pdf response
-  K-->>D: proxy response
-  D-->>W: proxy response
+  D->>D: parse + validate RenderCV document
+  D->>J: build Typst source from templates
+  J-->>D: Typst document text
+  D->>Y: compile PDF
+  Y-->>D: PDF bytes
+  D-->>W: application/pdf
   W-->>C: application/pdf
 ```
 
@@ -160,33 +169,24 @@ MCP is the Model Context Protocol, a protocol for building agents that can inter
 ```mermaid
 sequenceDiagram
   participant M as MCP Client (agent)
-  participant R2 as R2 Bucket
-  box Blue Durable Objects
-    participant D as RendercvDo (MCPAgent durable object)
-    participant T as MCP tool: rendercv
-    participant K as DockerRendercvApp (Container)
-  end
-  box Purple Container
-    participant A as rendercv API service
-    participant R as rendercv CLI
-  end
+  participant D as RendercvDo (MCPAgent)
+  participant T as MCP tool: rendercv
+  participant Y as Typst WASM
+  participant S as Object storage (S3-compatible)
 
-
-  M->>D: MCP request to RendercvDo (/mcp)
-  D->>T: invoke tool rendercv (content, format)
-  T->>K: callContainerService('/api/v1/generate', body)
-  K->>A: HTTP POST /api/v1/generate
-  A->>R: rendercv (generate PDF)
-  R-->>A: PDF binary
-  A-->>K: application/pdf
+  M->>D: MCP request (/mcp)
+  D->>T: invoke rendercv (content, format)
+  T->>D: renderCvTypstPdf (same pipeline as HTTP)
+  D->>Y: compile PDF
+  Y-->>D: PDF bytes
 
   rect rgba(33, 66, 99, 0.12)
-    K-->>T: proxy response (PDF)
-    T-->>R2: upload to R2 bucket
+    D->>S: upload PDF for public URL (when format is url)
+    S-->>D: URL + path
   end
 
-  T-->>D: tool result (PDF URL)
-  D-->>M: MCP response (PDF URL)
+  T-->>D: tool result (PDF URL or base64)
+  D-->>M: MCP response
 ```
 
 </details>

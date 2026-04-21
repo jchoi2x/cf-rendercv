@@ -1,8 +1,9 @@
 import { z } from "@hono/zod-openapi";
-import { languages, LOCALE_DEFAULTS, type Locale, type TLocaleName } from "./defaults";
+
+import { languages, LOCALE_DEFAULTS, type TLocaleName } from "./defaults";
 
 export const getLocaleSchema = (language: TLocaleName) => {
-  const defaults = LOCALE_DEFAULTS[language] as Locale;
+  const defaults = LOCALE_DEFAULTS[language];
   return z.object({
     language: z.enum(languages).default(language),
     last_updated: z.string().default(defaults.last_updated),
@@ -11,7 +12,9 @@ export const getLocaleSchema = (language: TLocaleName) => {
     year: z.string().default(defaults.year),
     years: z.string().default(defaults.years),
     present: z.string().default(defaults.present),
-    month_abbreviations: z.array(z.string()).default(defaults.month_abbreviations),
+    month_abbreviations: z
+      .array(z.string())
+      .default(defaults.month_abbreviations),
     month_names: z.array(z.string()).default(defaults.month_names),
   });
 };

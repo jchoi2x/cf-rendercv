@@ -1,4 +1,4 @@
-import type { RenderCvMcpAgent } from "../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../types";
 import { registerWidgetUiResource } from "./resources/widget-ui";
 import { registerShowWidgetTool } from "./tools/show-widget";
 

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { RenderCvDocument } from "@cf-rendercv/contracts";
 
 import { generateCV } from "../../../helpers/rendercv";
-import type { RenderCvMcpAgent } from "../../../rendercv.do";
+import type { RenderCvMcpAgent } from "../../../types";
 import { RENDERCV_APP_UI_URI } from "../constants";
 
 export const registerRenderCvTool = (agent: RenderCvMcpAgent) => {

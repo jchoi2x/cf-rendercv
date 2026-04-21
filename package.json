@@ -10,10 +10,8 @@
   ],
   "scripts": {
     "dev:http": "cd apps/http && bun run dev",
-    "build:http": "cd apps/http && bun run build",
-    "build": "bun run build:http",
     "deploy:http": "cd apps/http && bun run deploy",
-    "deploy": "bun run build:http && bun run deploy:http",
+    "deploy": "bun run deploy:http",
     "format": "biome format --write",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
