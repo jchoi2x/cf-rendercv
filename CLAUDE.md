@@ -88,7 +88,6 @@ pnpm run dev:api
 ### If you changed the Worker (`apps/http`)
 
 - Run unit tests: `pnpm run test:http`
-- Run Worker integration tests (Vitest pool, same `wrangler.jsonc`): `pnpm run test:integration`
 - Ensure the Worker still:
   - Boots the container when needed
   - Proxies `/api/v1/generate`

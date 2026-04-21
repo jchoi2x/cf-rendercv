@@ -16,7 +16,6 @@ This rule documents and enforces the expected folder/file structure for this rep
 
 - Apps live under `apps/<app-name>/src`.
 - Shared contracts and domain models live under `packages/<pkg-name>/src`.
-- **Worker integration tests** (Cloudflare Vitest pool / `workerd`) live under the repo-root `integration/` directory (`*.integration.spec.ts`), configured by `vitest.integration.config.ts`. See `.cursor/rules/integration-testing.mdc`.
 
 ---
 

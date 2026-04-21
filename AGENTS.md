@@ -32,16 +32,8 @@ From repo root:
 - Lint all: `bun run lint`
 - Unit tests (all): `bun run test`
 - Worker tests only: `bun run test:http`
-- Worker integration tests (workerd / Vitest pool): `bun run test:integration`
 
 ## File structure conventions
-
-### Integration tests (repo root)
-
-- **Directory**: `./integration/` — Worker integration specs for this monorepo.
-- **Config**: `vitest.integration.config.ts` at the repo root (Wrangler project: `apps/http/wrangler.jsonc`).
-- **Naming**: `*.integration.spec.ts` (e.g. `integration/worker/http.worker.integration.spec.ts`).
-- **Runtime**: Tests execute in the Workers runtime via `@cloudflare/vitest-pool-workers`; use `exports.default.fetch()` from `cloudflare:workers` for integration-style requests (see Cloudflare Vitest integration docs).
 
 ### Apps (`apps/**/src`)
 
@@ -83,8 +75,8 @@ From repo root:
 
 Run targeted checks for touched areas:
 
-- Worker changes: `bun run test:http` and, when exercising full Worker routing/bindings: `bun run test:integration`
-- Shared contracts changes: run affected app tests, typically `test:http` plus integration checks as needed
+- Worker changes: `bun run test:http`
+- Shared contracts changes: run affected app tests, typically `test:http`
 
 When changing request/response behavior for `/api/v1/generate`, perform a smoke check:
 

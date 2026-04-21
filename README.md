@@ -100,22 +100,9 @@ To develop or deploy the Cloudflare Worker in `./apps/http`, refer to that appâ€
 
 ## Testing
 
-- **Unit tests** live next to source under `apps/**/src/**/__tests__/` (see `.cursor/rules/unit-testing.mdc`).
-- **Worker integration tests** live in the repo-root `./integration/` directory. They use Cloudflareâ€™s [Workers Vitest integration](https://developers.cloudflare.com/workers/testing/vitest-integration/) (`@cloudflare/vitest-pool-workers`): tests run inside `workerd` against the same `apps/http/wrangler.jsonc` as local dev, and call the Worker via `exports.default.fetch()` from `cloudflare:workers` (see Cloudflare [Test APIs](https://developers.cloudflare.com/workers/testing/vitest-integration/test-apis/)).
+- **Unit tests** live next to source under `apps/**/src/**/__tests__/` (see `.cursor/rules/unit-testing.mdc`). From the repo root run `bun run test`, `bun run test:http`, or `bun run test:unit` as documented in `package.json`.
 
-From the repo root:
-
-```bash
-bun run test:integration
-```
-
-Watch mode:
-
-```bash
-bun run test:integration:watch
-```
-
-These tests focus on routing and request handling in the Worker isolate without requiring `wrangler dev` in a separate terminal. End-to-end checks that exercise the full Typst compilation path (for example a successful `POST /api/v3/rendercv/render` with a complete RenderCV document) still require `bun run dev:http` or a deployed Worker.
+End-to-end checks that exercise the full Typst compilation path (for example a successful `POST /api/v3/rendercv/render` with a complete RenderCV document) require `bun run dev:http` or a deployed Worker.
 
 ## Debugging
 

@@ -22,8 +22,6 @@
     "test:unit:watch": "vitest --config vitest.config.ts",
     "test:unit:coverage": "cd apps/http && bun run test:coverage",
     "test:http": "cd apps/http && bun run test",
-    "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:integration:watch": "vitest --config vitest.integration.config.ts",
     "test": "bun run test:http"
   },
   "devDependencies": {

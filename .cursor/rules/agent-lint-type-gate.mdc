@@ -21,12 +21,6 @@ pnpm run lint
 pnpm exec tsc -b
 ```
 
-- **Integration specs** under `integration/`: if you edited those files, also verify they typecheck:
-
-```bash
-pnpm exec tsc -p integration/tsconfig.json
-```
-
 (Use `pnpm run lint:fix` only when autofixes are appropriate and you re-run `pnpm run lint` afterward.)
 
 ## Expectations

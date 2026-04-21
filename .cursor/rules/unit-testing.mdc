@@ -6,8 +6,6 @@ alwaysApply: false
 
 # Unit testing conventions
 
-Worker **integration** tests (repo-root `integration/`, `exports.default.fetch`, Vitest pool) are documented in `.cursor/rules/integration-testing.mdc`.
-
 ## Test files
 
 - **Filename**: `<name>.spec.ts` (e.g. `auth0.handler.spec.ts`).
