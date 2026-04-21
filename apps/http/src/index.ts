@@ -35,8 +35,8 @@ const proxyToDurable: Handler<
 
 app.post("/api/v2/generate", proxyToDurable);
 app.post("/api/v3/rendercv/typst", proxyToDurable);
+app.post("/api/v3/rendercv/render", proxyToDurable);
 app.post("/api/v3/generate", proxyToDurable);
-app.post("/api/v3/rendercv/typst-compile", proxyToDurable);
 app.post("/api/v1/generate", proxyToDurable);
 
 for (const i of pathMathes) {

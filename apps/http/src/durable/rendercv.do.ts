@@ -1,3 +1,4 @@
+import { DeleteObjectCommand, CopyObjectCommand } from "@aws-sdk/client-s3";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Connection, ConnectionContext } from "agents";
 import { McpAgent } from "agents/mcp";
@@ -9,9 +10,10 @@ import { registerRenderscv } from "./mcp/rendercv/register";
 import { registerWidgetUi } from "./mcp/widget-ui/register";
 import type { AuthContext } from "./oauth/auth0";
 import { createAuth0OAuthProvider } from "./oauth/auth0";
-import { compileRenderCvTypstSource } from "./templating";
+import { Renderer } from "./rendercv/renderer/renderer";
+import type { RenderCvDocumentPayload } from "./templating/types";
+import { s3 } from "../utils/s3";
 import { TypstCompilerManager } from "./typst/typst-compiler-manager/typst-compiler-manager";
-
 const TYPST_FONT_STORAGE_PREFIX = "typst-font:";
 
 async function typstFontStorageKey(url: string): Promise<string> {
@@ -25,12 +27,13 @@ async function typstFontStorageKey(url: string): Promise<string> {
 
 async function parseRendercvDocumentBody(
   c: Context<{ Bindings: Env }>,
-): Promise<unknown> {
+): Promise<RenderCvDocumentPayload> {
   const contentType = c.req.header("content-type") ?? "";
   const rawBody =
     contentType.includes("yaml") || contentType.includes("text/")
       ? new TextDecoder().decode(await c.req.arrayBuffer())
       : null;
+
   return rawBody !== null ? YAML.parse(rawBody) : await c.req.json();
 }
 
@@ -68,10 +71,10 @@ export interface RenderCvMcpAgent extends Omit<
   server: McpServer;
 
   addDocument(document: DocumentInput): void;
-  getDocuments(): Promise<ResumeRecord[]>;
+  getDocuments(): ResumeRecord[];
   getResumeById(id: number): ResumeRecord | null;
-  renameResumeById(id: number, newName: string): Promise<ResumeRecord | null>;
-  deleteResumeById(id: number): Promise<boolean>;
+  renameResumeById(id: number, newName: string): ResumeRecord | null;
+  deleteResumeById(id: number): boolean;
 }
 
 export class RendercvDo
@@ -89,6 +92,7 @@ export class RendercvDo
   private workerEnv: Env;
   private _storage: DurableObjectStorage;
   private readonly typstCompilerManager: TypstCompilerManager;
+  private readonly typstSrcRenderer = new Renderer();
 
   constructor(state: DurableObjectState, env: Env) {
     super(state, env);
@@ -131,12 +135,15 @@ export class RendercvDo
       );
     `);
 
-    this.app.post("/api/v1/generate", proxyToContainer);
     this.app.post("/api/v3/rendercv/typst", async (c) => {
       try {
         const candidate = await parseRendercvDocumentBody(c);
-        const result = await compileRenderCvTypstSource(candidate as any);
-        return new Response(result.code.trimEnd(), {
+        // const result = await compileRenderCvTypstSource(candidate as any);
+        const result = await this.typstSrcRenderer.buildTypstSource(
+          candidate as any,
+        );
+
+        return new Response(result.trimEnd(), {
           headers: {
             "content-type": "application/text; charset=utf-8",
           },
@@ -147,13 +154,17 @@ export class RendercvDo
         return c.json({ ok: false, error: message }, 500);
       }
     });
-    this.app.post("/api/v3/rendercv/typst-compile", async (c) => {
+
+    this.app.post("/api/v3/rendercv/render", async (c) => {
       try {
         const candidate = await parseRendercvDocumentBody(c);
-        const result = await compileRenderCvTypstSource(candidate as any);
+        // const result = await compileRenderCvTypstSource(candidate as any);
+        const result = await this.typstSrcRenderer.buildTypstSource(
+          candidate as any,
+        );
         return await this.typstCompilerManager.compilePdfResponse(
           5,
-          result.code.trimEnd(),
+          result.trimEnd(),
         );
       } catch (error) {
         console.error(
@@ -164,6 +175,8 @@ export class RendercvDo
         return c.json({ ok: false, error: message }, 500);
       }
     });
+
+    this.app.post("/api/v1/generate", proxyToContainer);
     this.app.get("/swagger-ui", proxyToContainer);
     this.app.get("/openapi.json", proxyToContainer);
     this.app.use("*", (c) => super.fetch(c.req.raw));
@@ -205,7 +218,7 @@ export class RendercvDo
     this.ctx.waitUntil(this._storage.put(document.path, document.data));
   }
 
-  async getDocuments(): Promise<ResumeRecord[]> {
+  getDocuments(): ResumeRecord[] {
     const documents = this.doSql.exec(`
       SELECT
         id,
@@ -220,19 +233,6 @@ export class RendercvDo
       .toArray()
       .map((row) => this.toResumeRecord(row as any));
 
-    // if (fromDb.length > 0) {
-    //   return fromDb;
-    // }
-
-    // const l = await this._storage.list({});
-
-    // const list = await Promise.all(
-    //   [...l.keys()].map(
-    //     (key) => this._storage.get<ResumeRecord>(key) as Promise<ResumeRecord>,
-    //   ),
-    // );
-
-    // return list;
     return fromDb;
   }
 
@@ -255,10 +255,7 @@ export class RendercvDo
     return this.toResumeRecord(rows[0] as any);
   }
 
-  async renameResumeById(
-    id: number,
-    newName: string,
-  ): Promise<ResumeRecord | null> {
+  renameResumeById(id: number, newName: string): ResumeRecord | null {
     const existing = this.getResumeById(id);
     if (!existing) return null;
 
@@ -274,53 +271,60 @@ export class RendercvDo
     const prefix = lastSlash >= 0 ? existing.path.slice(0, lastSlash) : "";
     const newPath = prefix ? `${prefix}/${finalName}` : finalName;
 
-    const [{ s3 }, { CopyObjectCommand, DeleteObjectCommand }] =
-      await Promise.all([import("../utils/s3"), import("@aws-sdk/client-s3")]);
-
     // Move object in R2 by Copy + Delete.
-    await s3.send(
-      new CopyObjectCommand({
-        Bucket: existing.bucket,
-        CopySource: `${existing.bucket}/${existing.path}`,
-        Key: newPath,
-      }),
-    );
+    try {
+      this.ctx.waitUntil(
+        s3.send(
+          new CopyObjectCommand({
+            Bucket: existing.bucket,
+            CopySource: `${existing.bucket}/${existing.path}`,
+            Key: newPath,
+          }),
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to copy S3 object:", error);
+    } finally {
+      this.doSql.exec(
+        "UPDATE documents SET path = ? WHERE id = ?",
+        newPath,
+        id,
+      );
 
-    this.doSql.exec("UPDATE documents SET path = ? WHERE id = ?", newPath, id);
-
-    // Best-effort cleanup; if this fails, the metadata is still correct.
-    await s3.send(
-      new DeleteObjectCommand({
-        Bucket: existing.bucket,
-        Key: existing.path,
-      }),
-    );
-
+      // Best-effort cleanup; if this fails, the metadata is still correct.
+      this.ctx.waitUntil(
+        s3.send(
+          new DeleteObjectCommand({
+            Bucket: existing.bucket,
+            Key: existing.path,
+          }),
+        ),
+      );
+    }
     return this.getResumeById(id);
   }
 
-  async deleteResumeById(id: number): Promise<boolean> {
+  deleteResumeById(id: number): boolean {
     const existing = this.getResumeById(id);
     if (!existing) return false;
 
-    const [{ s3 }, { DeleteObjectCommand }] = await Promise.all([
-      import("../utils/s3"),
-      import("@aws-sdk/client-s3"),
-    ]);
-
-    // Delete PDF object first (best effort).
     try {
-      await s3.send(
-        new DeleteObjectCommand({
-          Bucket: existing.bucket,
-          Key: existing.path,
-        }),
+      // Delete PDF object
+      this.ctx.waitUntil(
+        s3.send(
+          new DeleteObjectCommand({
+            Bucket: existing.bucket,
+            Key: existing.path,
+          }),
+        ),
       );
-    } catch {
+    } catch (error) {
       // Even if S3 delete fails, remove the SQL record to keep metadata consistent.
+      console.error("Failed to delete S3 object:", error);
+    } finally {
+      this.doSql.exec("DELETE FROM documents WHERE id = ?", id);
     }
 
-    this.doSql.exec("DELETE FROM documents WHERE id = ?", id);
     return true;
   }
 

@@ -1,25 +1,16 @@
-import type { z } from "zod";
+import type { TCvSchema, TRootSchema } from "./schemas/themes/lib";
 
-import type { RenderCvDocument } from "@cf-rendercv/contracts";
-
-/** Keys registered in MiniJinja for Typst Jinja templates. */
-export type JinjaTemplateKey =
-  | "preamble"
-  | "header"
-  | "sectionBegin"
-  | "sectionEnd"
-  | "bulletEntry"
-  | "educationEntry"
-  | "experienceEntry"
-  | "normalEntry"
-  | "numberedEntry"
-  | "oneLineEntry"
-  | "publicationEntry"
-  | "reversedNumberedEntry"
-  | "textEntry";
-
-/** Maps RenderCV section `entry_type` string to internal template key. */
-export type EntryTemplateMap = Record<string, JinjaTemplateKey>;
+export const ThemeNames: string[] = [
+  "classic",
+  "engineeringclassic",
+  "ember",
+  "engineeringresumes",
+  "moderncv",
+  "harvard",
+  "ink",
+  "opal",
+  "sb2nov",
+] as const;
 
 export interface RenderSection {
   title: string;
@@ -66,20 +57,10 @@ export interface NormalizedEntry {
  * `render_single_template(..., cv=, design=, locale=, settings=)`.
  */
 export type RenderCvJinjaRootContext = {
-  cv: Record<string, unknown>;
+  cv: TCvSchema;
   design: { theme?: string } | Record<string, unknown>;
   locale: Record<string, unknown>;
   settings: Record<string, unknown>;
-};
-
-/**
- * Section templates receive the root context plus kwargs matching Python
- * `section_title`, `snake_case_section_title`, `entry_type`.
- */
-export type SectionJinjaContext = RenderCvJinjaRootContext & {
-  section_title: string;
-  snake_case_section_title: string;
-  entry_type: string;
 };
 
 export interface CreateTemplateModelResult {
@@ -87,13 +68,9 @@ export interface CreateTemplateModelResult {
   sections: RenderSection[];
 }
 
-export interface CompileRenderCvTypstSourceResult {
-  preamble: string;
-  header: string;
-  sectionTemplates: string[];
-  model: RenderCvJinjaRootContext;
-  sections: RenderSection[];
-  code: string;
-}
-
-export type RenderCvDocumentPayload = z.infer<typeof RenderCvDocument>;
+/**
+ * Validated top-level document after `mergeAndParseRenderCvPayload` / `getSchema(theme, locale).parse`:
+ * theme defaults are deep-merged with user input, then Zod applies `Cv` transforms (website pick, `_key_order`).
+ * Run `processModel` to produce the template root context (`cv`, `design`, `locale`, `settings`).
+ */
+export type RenderCvDocumentPayload = Required<TRootSchema>;
